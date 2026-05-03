@@ -46,55 +46,52 @@ export default function Header({ onMenuClick }) {
 
 
         <div className="flex items-center ml-auto gap-4">
-        <IoIosNotificationsOutline className="w-9 h-9 text-[#ffffff] cursor-pointer" />
+          {/* Notification Button */}
+          <button className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors">
+            <IoIosNotificationsOutline className="w-6 h-6 text-white" />
+          </button>
 
-        {/* Profile Section */}
-        <div className="relative">
-          <div
-            className="flex items-center gap-3  px-3 py-2  rounded-lg cursor-pointer"
-            onClick={() => setOpenDropdown(!openDropdown)}
-          >
-            <Image
-              src="/logo.png"
-              alt="User Avatar"
-              className="w-10 h-10 rounded-full object-cover"
-            />
+          {/* Language Selector */}
+          <button className="flex items-center gap-2 px-3 h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors text-white">
+            <Icon icon="circle-flags:uk" className="w-6 h-6 rounded-full" />
+            <span className="text-sm font-medium font-montserrat">Eng</span>
+            <FaAngleDown className="w-3.5 h-3.5" />
+          </button>
 
-            <div>
-              <p className="text-base text-[#0F172A] font-medium font-montserrat">John Doe</p>
-              {/* <p className="text-xs text-white">Admin</p> */}
+          {/* Profile Section */}
+          <div className="relative ml-2">
+            <div
+              className="relative cursor-pointer"
+              onClick={() => setOpenDropdown(!openDropdown)}
+            >
+              <Image
+                src="/logo.png"
+                alt="User Avatar"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#4ADE80] border-2 border-[#141416] rounded-full"></span>
             </div>
 
-            <FaAngleDown
-              className={`w-4 h-4 text-[#0F172A] transition-transform duration-200 ${
-                openDropdown ? "rotate-180" : ""
-              }`}
-            />
+            {/* Dropdown */}
+            {openDropdown && (
+              <div className="absolute w-48 right-0 mt-3 p-2 bg-white rounded-lg shadow-xl border border-[#A0A0A0] z-50">
+                <Link to="/settings" onClick={() => setOpenDropdown(false)}>
+                  <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[#0A0A0A] hover:bg-[#2D468A] hover:text-white transition cursor-pointer">
+                    <Icon icon="material-symbols:settings" width="20" />
+                    <span className="font-montserrat text-sm font-medium">Settings</span>
+                  </button>
+                </Link>
+                <button
+                  onClick={() => setOpenDropdown(false)}
+                  className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[#E7000B] hover:bg-[#2D468A] hover:text-white transition cursor-pointer"
+                >
+                  <Icon icon="material-symbols:logout" width="20" />
+                  <span className="font-montserrat text-sm font-medium">Log Out</span>
+                </button>
+              </div>
+            )}
           </div>
-
-          {/* Dropdown */}
-          {openDropdown && (
-            <div className="absolute w-full right-0 mt-2  bg-white rounded-lg shadow-lg border border-[#A0A0A0] z-50">
-              {/* <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
-                Profile
-              </button> */}
-              <Link to="/settings" onClick={() => setOpenDropdown(false)}>
-              <button className="flex w-full items-center gap-3 px-4 py-3 rounded-lg text-[#0A0A0A] hover:bg-[#2D468A] hover:text-white transition cursor-pointer">
-                <Icon
-                  icon="material-symbols:settings"
-                  width="20"
-                />
-                Settings
-              </button>
-              </Link>
-              <button onClick={() => setOpenDropdown(false)} className="flex w-full items-center gap-3 px-4 py-3 rounded-lg text-[#E7000B] hover:bg-[#2D468A] hover:text-white transition cursor-pointer">
-                <Icon icon="material-symbols:logout" width="20" />
-                Log Out
-              </button>
-            </div>
-          )}
         </div>
-      </div>
       </div>
     </header>
   );

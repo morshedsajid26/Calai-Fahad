@@ -18,15 +18,13 @@ export default function Sidebar({ isOpen, onClose }) {
 
   
   const navLinks = [
-    { name: "Overview", path: "/", icon: "material-symbols:dashboard-outline" },
-    { name: "Candidate", path: "/candidate", icon: "lucide:users" },
-    { name: "Document", path: "/document", icon: "mi:document" },
-    { name: "Compliance", path: "/compliance", icon: "charm:circle-tick" },
-    { name: "Compliance Packs", path: "/compliance/packs", icon: "solar:box-outline" },
-    { name: "References", path: "/references", icon: "lets-icons:message" },
-    { name: "Organizations", path: "/organizations", icon: "codicon:organization" },
-    { name: "User Management", path: "/user/management", icon: "tabler:user" },
-    { name: "Settings", path: "/settings", icon: "material-symbols:settings-outline-rounded" },
+    { name: "Dashboard", path: "/", icon: "lucide:layout-dashboard" },
+    { name: "AI Training", path: "/ai-training", icon: "lucide:bot" },
+    { name: "Test Call Window", path: "/test-call-window", icon: "lucide:phone-call" },
+    { name: "Call Summary", path: "/call-summary", icon: "lucide:file-text" },
+    { name: "Order list", path: "/order-list", icon: "lucide:list-checks" },
+    { name: "Item Management", path: "/item-management", icon: "lucide:monitor-cog" },
+    { name: "Settings", path: "/settings", icon: "lucide:settings" },
   ];
 
   return (
@@ -42,7 +40,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#0E0E10] text-[#364153]
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#0E0E10] text-[#ffffff]
         border-r border-[#262626]
         transform transition-transform duration-300 
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
@@ -65,21 +63,21 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 pr-3 py-4 space-y-2 overflow-y-auto">
+          <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
             {navLinks.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
                 onClick={() => window.innerWidth < 1536 && onClose()}
-                className={`flex font-montserrat items-center gap-3 px-4 py-3 rounded-r-2xl transition
+                className={`flex font-montserrat items-center gap-4 px-4 py-3.5 rounded-xl transition-all border border-l-[4px]
                   ${
                     isActivePath(item.path)
-                      ? "bg-[#2563EB] text-[#FFFFFF]"
-                      : "hover:bg-[#2563EB] hover:text-white"
+                      ? "border-[#2563EB]/30 border-l-[#0F42FF] bg-[#18181A] text-white"
+                      : "border-transparent border-l-transparent text-[#D1D5DB] hover:bg-[#18181A] hover:text-white"
                   }`}
               >
-                <Icon icon={item.icon} width="20" />
-                {item.name}
+                <Icon icon={item.icon} width="24" className="text-current" />
+                <span className="text-[16px] font-medium">{item.name}</span>
               </NavLink>
             ))}
           </nav>
