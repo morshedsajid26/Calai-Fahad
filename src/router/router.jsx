@@ -14,10 +14,14 @@ import Dashboard from "../pages/owner/Dashboard";
 // auth
 import LogIn from "../pages/auth/LogIn";
 import SignUp from "../pages/auth/SignUp";
+import ConfirmSignUp from "../pages/auth/ConfirmSignUp";
+import ForgetPass from "../pages/auth/ForgetPass";
+import OTP from "../pages/auth/OTP";
+import NewPass from "../pages/auth/NewPass";
+import Success from "../pages/auth/Success";
 // import ResetPassword from "../pages/auth/ResetPassword";
 // import NewPassword from "../pages/auth/NewPassword";
 // import Success from "../pages/auth/Success";
-// import OTP from "../pages/auth/OTP";
 // import VerifyEmail from "../pages/auth/VerifyEmail";
 // import LandingPageLayout from "../layout/LandingPageLayout";
 // import AboutUs from "../pages/landing/AboutUs";
@@ -34,9 +38,12 @@ const router = createBrowserRouter([
     children: [
       { path: "login", element: <LogIn /> },
       { path: "signup", element: <SignUp /> },
+      { path: "signup/confirm", element: <ConfirmSignUp /> },
+      { path: "forgot/password", element: <ForgetPass /> },
+      { path: "verify/otp", element: <OTP /> },
+      { path: "new/password", element: <NewPass /> },
+      { path: "success", element: <Success /> },
       // { path: "reset/password", element: <ResetPassword /> },
-      // { path: "verify/otp", element: <OTP /> },
-      // { path: "new/password", element: <NewPassword /> },
       // { path: "success", element: <Success /> },
       // { path: "verify/email", element: <VerifyEmail /> },
     ],

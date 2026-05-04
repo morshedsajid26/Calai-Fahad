@@ -47,7 +47,7 @@ const Password = ({
           onClick={() => setShowPass((s) => !s)}
           aria-pressed={showPass}
           aria-label={showPass ? "Hide password" : "Show password"}
-          className={`w-8 h-8 flex items-center justify-center absolute top-1/2 -translate-y-1/2 right-3 text-[#0A0A0A]/50  ${icon}`}
+          className={`w-8 h-8 flex items-center justify-center absolute top-1/2 -translate-y-1/2 right-3 text-[#364153]  ${icon}`}
         >
           {showPass ? <IoEyeOutline className="w-5 h-5" /> : <FaRegEyeSlash className="w-5 h-5" />}
         </button>
