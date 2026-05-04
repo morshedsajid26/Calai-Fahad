@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from "@iconify/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../components/Inputfield";
 import Password from "../../components/Password";
 
 export default function LogIn() {
+  const navigate = useNavigate();
+
+  const [role, setRole] = useState('owner');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    localStorage.setItem('role', role);
+    if (role === 'admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/owner/dashboard');
+    }
+  };
+
   return (
     <div className="flex flex-col items-center ">
       
@@ -14,7 +28,7 @@ export default function LogIn() {
       <h1 className="text-[32px] text-white font-semibold mb-2">Welcome back!</h1>
       <p className="text-gray-400 text-[13px] mb-8">Sign in to access your resumes and tools</p>
 
-      <form className="w-full flex flex-col gap-5">
+      <form onSubmit={handleLogin} className="w-full flex flex-col gap-5">
         {/* Email Input */}
         <InputField
           label="Email"
@@ -48,7 +62,33 @@ export default function LogIn() {
           </Link>
         </div>
 
-        {/* Sign In Button */}
+        {/* Role Toggle Buttons */}
+        <div className="flex gap-4 mt-2">
+          <button
+            type="button"
+            onClick={() => setRole('owner')}
+            className={`flex-1 py-3 text-[13px] font-semibold rounded-lg transition-all ${
+              role === 'owner' 
+                ? 'bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white' 
+                : 'bg-[#111424] text-gray-400 hover:text-white'
+            }`}
+          >
+            OWNER
+          </button>
+          <button
+            type="button"
+            onClick={() => setRole('admin')}
+            className={`flex-1 py-3 text-[13px] font-semibold rounded-lg transition-all ${
+              role === 'admin' 
+                ? 'bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white' 
+                : 'bg-[#111424] text-gray-400 hover:text-white'
+            }`}
+          >
+            ADMIN
+          </button>
+        </div>
+
+        {/* Login Button */}
         <button 
           type="submit"
           className="w-full mt-4 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white text-sm font-medium py-3.5 rounded-full border border-[#1D4ED8] shadow-[0_0_20px_rgba(29,78,216,0.25)] hover:shadow-[0_0_25px_rgba(29,78,216,0.4)] transition-all"

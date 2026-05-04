@@ -4,11 +4,11 @@ import DashboardLayout from "../layout/DashboardLayout";
 import AuthLayout from "../layout/AuthLayout";
 
 // admin
-// import Home from "../pages/admin/Home";
+import AdminDashboard from "../pages/admin/Dashboard";
 
 
 // owner
-import Dashboard from "../pages/owner/Dashboard";
+import OwnerDashboard from "../pages/owner/Dashboard";
 
 
 // auth
@@ -50,19 +50,15 @@ const router = createBrowserRouter([
   },
 
   // ADMIN DASHBOARD ROUTES
-  //  {
-  //   path: "/admin",
-  //   element: <DashboardLayout />,
-  //   children: [
-  //      // owner
-  //     { path: "/admin/dashboard", element: <Dashboard /> },
-  //     { path: "/admin/farm/management", element: <FarmManagement /> },
-  //     { path: "/admin/farm/management/details/:id", element: <FarmDetails /> },
-  //     { path: "/admin/farm/management/create/farm", element: <CreateFarm /> },
-  //     { path: "/admin/subscription/plans", element: <SubscriptionPlans /> },
-  //     { path: "/admin/system/settings", element: <SystemSettings /> },
-  //   ],
-  // },
+   {
+    path: "/admin",
+    element: <DashboardLayout />,
+    children: [
+       
+      { path: "/admin/dashboard", element: <AdminDashboard /> },
+      
+    ],
+  },
   
 
   // SYSTEM OWNER DASHBOARD ROUTES
@@ -71,7 +67,7 @@ const router = createBrowserRouter([
     element: <DashboardLayout />,
     children: [
        // owner
-      { path: "/owner/dashboard", element: <Dashboard /> },
+      { path: "/owner/dashboard", element: <OwnerDashboard /> },
       
     ],
   },

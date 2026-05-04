@@ -17,8 +17,10 @@ export default function Sidebar({ isOpen, onClose }) {
   
 
   
-  const navLinks = [
-    { name: "Dashboard", path: "/", icon: "lucide:layout-dashboard" },
+  const role = localStorage.getItem("role") || "owner"; 
+
+  const ownerNavLinks = [
+    { name: "Dashboard", path: "/owner/dashboard", icon: "lucide:layout-dashboard" },
     { name: "AI Training", path: "/ai-training", icon: "lucide:bot" },
     { name: "Test Call Window", path: "/test-call-window", icon: "lucide:phone-call" },
     { name: "Call Summary", path: "/call-summary", icon: "lucide:file-text" },
@@ -26,6 +28,16 @@ export default function Sidebar({ isOpen, onClose }) {
     { name: "Item Management", path: "/item-management", icon: "lucide:monitor-cog" },
     { name: "Settings", path: "/settings", icon: "lucide:settings" },
   ];
+
+  const adminNavLinks = [
+    { name: "Dashboard", path: "/admin/dashboard", icon: "lucide:layout-grid" },
+    { name: "Tenants", path: "/admin/tenants", icon: "lucide:users" },
+    { name: "Subscriptions & Billing", path: "/admin/subscriptions-billing", icon: "lucide:credit-card" },
+    { name: "API Keys", path: "/admin/api-keys", icon: "lucide:key" },
+    { name: "Settings", path: "/admin/settings", icon: "lucide:settings" },
+  ];
+
+  const navLinks = role === "admin" ? adminNavLinks : ownerNavLinks;
 
   return (
     <>
@@ -69,7 +81,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 key={item.path}
                 to={item.path}
                 onClick={() => window.innerWidth < 1536 && onClose()}
-                className={`flex font-montserrat items-center gap-4 px-4 py-3.5 rounded-xl transition-all border border-l-[4px]
+                className={`flex font-montserrat items-center gap-4 px-2 py-3.5 rounded-xl transition-all border border-l-[4px]
                   ${
                     isActivePath(item.path)
                       ? "border-[#2563EB]/30 border-l-[#0F42FF] bg-[#18181A] text-white"
@@ -77,7 +89,7 @@ export default function Sidebar({ isOpen, onClose }) {
                   }`}
               >
                 <Icon icon={item.icon} width="24" className="text-current" />
-                <span className="text-[16px] font-medium">{item.name}</span>
+                <span className="text-[16px] ">{item.name}</span>
               </NavLink>
             ))}
           </nav>
