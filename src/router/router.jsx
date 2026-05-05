@@ -6,6 +6,7 @@ import AuthLayout from "../layout/AuthLayout";
 // admin
 import AdminDashboard from "../pages/admin/Dashboard";
 import Settings from "../pages/admin/Settings";
+import ApiKeys from "../pages/admin/ApiKeys";
 
 
 // owner
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
     children: [
        
       { path: "/admin/dashboard", element: <AdminDashboard /> },
+      { path: "/admin/api-keys", element: <ApiKeys /> },
       { path: "/admin/settings", element: <Settings /> },
       
     ],
