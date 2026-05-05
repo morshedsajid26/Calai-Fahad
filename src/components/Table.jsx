@@ -67,7 +67,7 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass }) 
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className={`text-left border-b border-gray-800/50 bg-transparent font-semibold text-white py-4 px-4 ${headClass} select-none`}
+                    className={`text-left border-b border-gray-800/50 bg-[#0E0E10] font-semibold text-white py-4 px-4 ${headClass} select-none`}
                     style={{ width: header.column.columnDef.size }}
                   >
                     <div 

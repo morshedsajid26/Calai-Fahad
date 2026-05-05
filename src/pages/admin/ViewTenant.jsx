@@ -98,7 +98,7 @@ const ViewTenant = () => {
           <Table 
             TableHeads={columns} 
             TableRows={billingData} 
-            headClass="[&>div]:justify-start border-none !bg-[#13131A] text-left whitespace-nowrap" 
+            headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
             tableClass="border-none table-fixed min-w-[800px]" 
           />
         </div>
