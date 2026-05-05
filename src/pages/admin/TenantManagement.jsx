@@ -5,18 +5,12 @@ import { Switch } from "@/components/ui/switch";
 import InputField from '../../components/Inputfield';
 import Dropdown from '../../components/Dropdown';
 import Password from '../../components/Password';
+import { Link } from 'react-router-dom';
 
-const initialMockData = [
-  { id: 1, name: "Tech Crop", plan: "Classic", status: "Active", expiry: "30/07/2025" },
-  { id: 2, name: "Startup XYZ", plan: "Pro", status: "Suspended", expiry: "30/07/2025" },
-  { id: 3, name: "Tech Crop", plan: "Classic", status: "Expired", expiry: "30/07/2025" },
-  { id: 4, name: "Startup XYZ", plan: "Pro", status: "Active", expiry: "30/07/2025" },
-  { id: 5, name: "Tech Crop", plan: "Classic", status: "Suspended", expiry: "30/07/2025" },
-  { id: 6, name: "Startup XYZ", plan: "Pro", status: "Expired", expiry: "30/07/2025" },
-];
+import { tenantsMockData } from '../../data/mockData';
 
 const TenantManagement = () => {
-  const [tenants, setTenants] = useState(initialMockData);
+  const [tenants, setTenants] = useState(tenantsMockData);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTenant, setEditingTenant] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -132,9 +126,11 @@ const TenantManagement = () => {
 
         return (
           <div className="flex items-center justify-start gap-8">
+            <Link to={`/admin/tenant-management/view/${row.id}`}>
             <button className="text-gray-400 hover:text-white transition-colors" title="View">
               <Icon icon="lucide:eye" className="text-lg" />
             </button>
+            </Link>
             <button 
               onClick={() => handleEditClick(row)}
               className="text-gray-400 hover:text-white transition-colors" title="Edit">
