@@ -7,7 +7,7 @@ let StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText 
   const isNegative = trend.startsWith('-');
   
   return (
-    <div className="relative overflow-hidden bg-[#18181A] rounded-2xl p-3 border border-gray-800/50 flex flex-col h-full ">
+    <div className="relative overflow-hidden bg-[#191919] rounded-2xl p-3 border border-gray-800/50 flex flex-col h-full ">
       {/* Header */}
       <div className="flex items-center gap-3 relative z-10">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${iconBg}`}>

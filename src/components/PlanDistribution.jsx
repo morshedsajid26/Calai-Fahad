@@ -29,7 +29,7 @@ const renderCustomizedLabel = (props) => {
 
 const PlanDistribution = () => {
   return (
-    <div className="bg-[#18181A] rounded-2xl p-6 border border-gray-800/50 flex flex-col h-full min-h-[400px]">
+    <div className="bg-[#191919] rounded-2xl p-6 border border-gray-800/50 flex flex-col h-full min-h-[400px]">
       <h3 className="text-white text-lg font-medium mb-4">Plan Distribution</h3>
       
       <div className="flex-1 w-full min-h-[250px] relative">
@@ -41,8 +41,8 @@ const PlanDistribution = () => {
               cy="50%"
               outerRadius={100}
               dataKey="value"
-              stroke="#18181A"
-              strokeWidth={3}
+              stroke="#ffffff"
+              strokeWidth={1}
               label={renderCustomizedLabel}
               labelLine={false}
               isAnimationActive={true}
