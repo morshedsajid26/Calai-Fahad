@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 key={item.path}
                 to={item.path}
                 onClick={() => window.innerWidth < 1536 && onClose()}
-                className={`flex font-montserrat items-center gap-4 px-2 py-3.5 rounded-xl transition-all border border-l-[4px]
+                className={`flex  items-center gap-4 px-2 py-3.5 rounded-xl transition-all border border-l-[4px]
                   ${
                     isActivePath(item.path)
                       ? "border-[#2563EB]/30 border-l-[#0F42FF] bg-[#18181A] text-white"
@@ -89,7 +89,7 @@ export default function Sidebar({ isOpen, onClose }) {
                   }`}
               >
                 <Icon icon={item.icon} width="24" className="text-current" />
-                <span className="text-[16px] ">{item.name}</span>
+                <span className="text-sm ">{item.name}</span>
               </NavLink>
             ))}
           </nav>
