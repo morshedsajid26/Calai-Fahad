@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { FileText, X, Bot, User, Download } from 'lucide-react'
+import { jsPDF } from "jspdf"
+
 
 import Table from '../../components/Table'
 import Breadcrumb from '../../components/Breadcrumb'
@@ -140,16 +142,22 @@ const CallSummary = () => {
                   <div className="border-t border-[#1A1A1A] px-8 py-5 flex justify-end">
                     <button 
                       onClick={() => {
+                        const doc = new jsPDF();
+                        
+                        // Title
+                        doc.setFontSize(18);
+                        doc.text("Call Summary", 20, 20);
+                        
+                        // Summary Text
+                        doc.setFontSize(12);
                         const summaryText = "Today's call focused on introducing our AI-powered cold calling solution and understanding the client's current outreach process. We discussed their primary pain points, including low response rates and high time investment in manual dialing. The client expressed interest in automating their lead qualification process and improving conversion rates through personalized conversations. A live demo was scheduled for next week to showcase the platform's real-time voice capabilities, CRM integration, and analytics dashboard. The call concluded with the client requesting a pricing proposal and additional case studies for review before the demo.";
-                        const blob = new Blob([summaryText], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `call_summary_${modalState.data?.callerId || 'download'}.txt`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(url);
+                        
+                        // Split text to fit within page width (170 is approx width available)
+                        const splitText = doc.splitTextToSize(summaryText, 170);
+                        doc.text(splitText, 20, 35);
+                        
+                        // Save the PDF
+                        doc.save(`call_summary_${modalState.data?.callerId || 'download'}.pdf`);
                       }}
                       className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[14px] font-medium"
                     >

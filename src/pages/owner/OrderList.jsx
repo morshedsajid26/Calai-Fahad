@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { Eye, X, Printer, Download } from 'lucide-react'
+import { jsPDF } from "jspdf"
+
 
 import Table from '../../components/Table'
 import Breadcrumb from '../../components/Breadcrumb'
@@ -134,11 +136,31 @@ const OrderList = () => {
                 </button>
                 <button 
                   onClick={() => {
-                    // Mock download functionality
-                    const link = document.createElement('a');
-                    link.href = '#';
-                    link.download = `order_${selectedOrder?.customerName?.replace(' ', '_')}.pdf`;
-                    link.click();
+                    const doc = new jsPDF();
+                    
+                    // Title
+                    doc.setFontSize(18);
+                    doc.text("Order Summary", 20, 20);
+                    
+                    // Order Info
+                    doc.setFontSize(12);
+                    doc.text(`Customer Name: ${selectedOrder?.customerName || ''}`, 20, 35);
+                    doc.text(`Caller ID: ${selectedOrder?.callerId || ''}`, 20, 45);
+                    doc.text(`Date: ${selectedOrder?.date || ''}`, 20, 55);
+                    doc.text(`Time: ${selectedOrder?.time || ''}`, 20, 65);
+                    doc.text(`Email: ${selectedOrder?.email || ''}`, 20, 75);
+                    
+                    // Products List
+                    doc.setFontSize(14);
+                    doc.text("Products:", 20, 95);
+                    
+                    doc.setFontSize(12);
+                    doc.text("- Coca-Cola: 12 x $2.12k", 25, 105);
+                    doc.text("- Sprite: 213 x $10k", 25, 115);
+                    doc.text("- Sprite: 213 x $1.9k", 25, 125);
+                    
+                    // Save the PDF
+                    doc.save(`order_${selectedOrder?.customerName?.replace(/\s+/g, '_') || 'download'}.pdf`);
                   }}
                   className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[13px] font-medium"
                 >
