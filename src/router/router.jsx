@@ -13,6 +13,11 @@ import ViewTenant from "../pages/admin/ViewTenant";
 
 // owner
 import OwnerDashboard from "../pages/owner/Dashboard";
+import AiTraining from "../pages/owner/AiTraining";
+import CallSummary from "../pages/owner/CallSummary";
+import OrderList from "../pages/owner/OrderList";
+import ItemManagement from "../pages/owner/ItemManagement";
+import OwnerSettings from "../pages/owner/Settings";
 
 
 // auth
@@ -78,6 +83,11 @@ const router = createBrowserRouter([
     children: [
        // owner
       { path: "/owner/dashboard", element: <OwnerDashboard /> },
+      { path: "/owner/ai-training", element: <AiTraining /> },
+      { path: "/owner/call-summary", element: <CallSummary /> },
+      { path: "/owner/order-list", element: <OrderList /> },
+      { path: "/owner/item-management", element: <ItemManagement /> },
+      { path: "/owner/settings", element: <OwnerSettings /> },
       
     ],
   },
