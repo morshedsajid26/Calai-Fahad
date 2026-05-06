@@ -161,7 +161,7 @@ const TenantManagement = () => {
   ];
 
   return (
-    <div className="p-4 sm:p-6">
+    <div>
 
         <div className="flex items-center justify-end mb-4">
             <button 

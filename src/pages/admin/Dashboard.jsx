@@ -91,7 +91,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="p-6">
+    <div>
       <div className="grid grid-cols-12 gap-5">
         {statsData.map((stat, index) => (
           <div key={index} className="col-span-12 md:col-span-6 xl:col-span-3">

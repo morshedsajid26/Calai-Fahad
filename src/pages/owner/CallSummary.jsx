@@ -54,7 +54,7 @@ const CallSummary = () => {
   ]
 
   return (
-    <div className="p-6">
+    <div >
       <Breadcrumb text="You can see your AI call summary" />
 
       <div className="bg-[#191919] border border-[#1A1A1A] rounded-2xl shadow-sm overflow-x-auto">

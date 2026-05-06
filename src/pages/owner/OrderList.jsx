@@ -49,7 +49,7 @@ const OrderList = () => {
   ]
 
   return (
-    <div className="p-6">
+    <div>
       <Breadcrumb text="You can see your order" />
 
       <div className="bg-[#191919] border border-[#1A1A1A] rounded-2xl overflow-hidden shadow-sm">

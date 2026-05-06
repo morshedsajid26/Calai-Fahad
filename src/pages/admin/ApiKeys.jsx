@@ -12,7 +12,7 @@ const ApiKeys = () => {
   };
 
   return (
-    <div className="p-6">
+    <div>
       <div className="bg-[#191919] rounded-2xl p-6 border border-gray-800/50">
         
         {/* Header Section */}

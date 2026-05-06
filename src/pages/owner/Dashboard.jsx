@@ -90,7 +90,7 @@ export default function Dashboard() {
     }
   ];
   return (
-    <div className="p-6">
+    <div>
      
      <div className="grid grid-cols-12 gap-5">
       {statsData.map((stat, index) => (
