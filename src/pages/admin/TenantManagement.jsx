@@ -176,7 +176,7 @@ const TenantManagement = () => {
           TableHeads={columns} 
           TableRows={tenants} 
           headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
-          tableClass="border-none table-fixed min-w-[900px]" 
+          tableClass="border-none" 
         />
       </div>
 

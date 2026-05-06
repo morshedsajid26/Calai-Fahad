@@ -53,6 +53,7 @@ export const tenantsMockData = [
     plan: "Pro", 
     expiry: "30/07/2025" 
   },
+  
 ];
 
 export const billingHistoryMock = {

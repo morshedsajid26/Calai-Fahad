@@ -23,6 +23,7 @@ import ForgetPass from "../pages/auth/ForgetPass";
 import OTP from "../pages/auth/OTP";
 import NewPass from "../pages/auth/NewPass";
 import Success from "../pages/auth/Success";
+import Subscription from "@/pages/admin/Subscription";
 // import ResetPassword from "../pages/auth/ResetPassword";
 // import NewPassword from "../pages/auth/NewPassword";
 // import Success from "../pages/auth/Success";
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
       { path: "/admin/dashboard", element: <AdminDashboard /> },
       { path: "/admin/tenant-management", element: <TenantManagement /> },
       { path: "/admin/tenant-management/view/:id", element: <ViewTenant /> },
+      { path: "/admin/subscriptions-billing", element: <Subscription /> },
       { path: "/admin/api-keys", element: <ApiKeys /> },
       { path: "/admin/settings", element: <Settings /> },
       
