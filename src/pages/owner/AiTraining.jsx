@@ -1,8 +1,15 @@
+import Breadcrumb from '@/components/Breadcrumb'
 import React from 'react'
 
 const AiTraining = () => {
   return (
-    <div>AiTraining</div>
+    <div>
+      <Breadcrumb text={`Train your AI assistant with voice and text to enhance its capabilities`}/>
+
+      <div>
+        
+      </div>
+    </div>
   )
 }
 
