@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import DashboardLayout from "../layout/DashboardLayout";
 import AuthLayout from "../layout/AuthLayout";
@@ -18,6 +18,11 @@ import CallSummary from "../pages/owner/CallSummary";
 import OrderList from "../pages/owner/OrderList";
 import ItemManagement from "../pages/owner/ItemManagement";
 import OwnerSettings from "../pages/owner/Settings";
+import ProfileSettings from "../pages/owner/settings/ProfileSettings";
+import ConnectEmail from "../pages/owner/settings/ConnectEmail";
+import BusinessInfo from "../pages/owner/settings/BusinessInfo";
+import OwnerSubscription from "../pages/owner/settings/Subscription";
+import PrivacySetting from "../pages/owner/settings/PrivacySetting";
 
 
 // auth
@@ -29,16 +34,6 @@ import OTP from "../pages/auth/OTP";
 import NewPass from "../pages/auth/NewPass";
 import Success from "../pages/auth/Success";
 import Subscription from "@/pages/admin/Subscription";
-// import ResetPassword from "../pages/auth/ResetPassword";
-// import NewPassword from "../pages/auth/NewPassword";
-// import Success from "../pages/auth/Success";
-// import VerifyEmail from "../pages/auth/VerifyEmail";
-// import LandingPageLayout from "../layout/LandingPageLayout";
-// import AboutUs from "../pages/landing/AboutUs";
-// import PrivacyPolicy from "../pages/landing/PrivacyPolicy";
-// import TermsService from "../pages/landing/TermsService";
-
-
 
 const router = createBrowserRouter([
   //  AUTH ROUTES
@@ -53,9 +48,6 @@ const router = createBrowserRouter([
       { path: "verify/otp", element: <OTP /> },
       { path: "new/password", element: <NewPass /> },
       { path: "success", element: <Success /> },
-      // { path: "reset/password", element: <ResetPassword /> },
-      // { path: "success", element: <Success /> },
-      // { path: "verify/email", element: <VerifyEmail /> },
     ],
   },
 
@@ -64,18 +56,15 @@ const router = createBrowserRouter([
     path: "/admin",
     element: <DashboardLayout />,
     children: [
-       
       { path: "/admin/dashboard", element: <AdminDashboard /> },
       { path: "/admin/tenant-management", element: <TenantManagement /> },
       { path: "/admin/tenant-management/view/:id", element: <ViewTenant /> },
       { path: "/admin/subscriptions-billing", element: <Subscription /> },
       { path: "/admin/api-keys", element: <ApiKeys /> },
       { path: "/admin/settings", element: <Settings /> },
-      
     ],
   },
   
-
   // SYSTEM OWNER DASHBOARD ROUTES
   {
     path: "/owner",
@@ -87,12 +76,20 @@ const router = createBrowserRouter([
       { path: "/owner/call-summary", element: <CallSummary /> },
       { path: "/owner/order-list", element: <OrderList /> },
       { path: "/owner/item-management", element: <ItemManagement /> },
-      { path: "/owner/settings", element: <OwnerSettings /> },
-      
+      { 
+        path: "/owner/settings", 
+        element: <OwnerSettings />,
+        children: [
+          { index: true, element: <Navigate to="profile" replace /> },
+          { path: "profile", element: <ProfileSettings /> },
+          { path: "connect", element: <ConnectEmail /> },
+          { path: "business", element: <BusinessInfo /> },
+          { path: "subscription", element: <OwnerSubscription /> },
+          { path: "privacy", element: <PrivacySetting /> }
+        ]
+      },
     ],
   },
-
- 
 
 ]);
 

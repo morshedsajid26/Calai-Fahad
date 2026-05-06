@@ -14,6 +14,7 @@ const Password = ({
   onChange,
   name, // optional: "password" or "password_confirmation"
   leftIcon,
+  ...props
 }) => {
   const [showPass, setShowPass] = useState(false);
 
@@ -40,6 +41,7 @@ const Password = ({
           className={`w-full outline-none p-4 text-[#364153]  font-inter text-[16px] placeholder-[#0A0A0A]/50 border border-[#D1D5DC]  rounded ${leftIcon ? 'pl-11' : ''} ${inputClass}`}
           aria-label={label || "password"}
           autoComplete={name === "password" ? "new-password" : "off"}
+          {...props}
         />
 
         <button
