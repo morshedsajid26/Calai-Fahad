@@ -48,10 +48,12 @@ const Dropdown = ({
       className={`flex flex-col gap-2   relative ${className}`}
     >
       {/* Label */}
-      <label className={`font-inter text-[#364153]   ${labelClass}`}>
-        {label}
-       
-      </label>
+      {label && (
+        <label className={`font-inter text-[#364153]   ${labelClass}`}>
+          {label}
+        </label>
+      )}
+
 
       {/* Input Box */}
       <div className="relative">

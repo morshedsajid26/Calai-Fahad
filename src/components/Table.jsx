@@ -58,9 +58,9 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass }) 
 
   return (
     <div className="space-y-4 w-full">
-      <div className="overflow-x-auto w-full">
+      <div className="overflow-x-auto  w-full">
         <table className={`w-full border-collapse ${tableClass}`}>
-          {/* ==== TABLE HEADER ==== */}
+          {/* ==== TABLE HEADER ==== */}  
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
