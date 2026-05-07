@@ -8,29 +8,29 @@ import Header from "@/components/Header";
 
 const faqs = [
   {
-    question: "How does the AI work?",
+    question: "How does the AI calling work?",
     answer:
-      "Our AI is powered by advanced GPT-4 technology, trained specifically for business operations. It understands natural language, maintains context across conversations, and learns from your business rules to provide accurate responses and take appropriate actions like creating quotes, scheduling bookings, and updating your CRM.",
+      "When a customer calls your number, our AI agent picks up instantly. It uses advanced voice AI (GPT-4o) to understand natural speech, collect order details, and respond in a human-like voice — all in real time with no delays.",
   },
   {
-    question: "Can I customize the AI responses?",
+    question: "Can I monitor call usage?",
     answer:
-      "Yes! You have full control over how AI responds. You can set custom response templates, define business rules, configure pricing logic, and train the AI on your specific products and services. The AI adapts to your brand voice and business processes.",
+      "Yes! Your dashboard gives you real-time visibility into every call — duration, transcript, order details, AI minute usage, and more. You'll always know exactly what's happening.",
   },
   {
-    question: "How fast is the setup process?",
+    question: "Does it support custom APIs?",
     answer:
-      "Most businesses are fully operational within 5–10 minutes. Simply connect your communication channels (WhatsApp, SMS, etc.), configure your basic business rules, and the AI is ready to handle customer conversations. Our team provides free migration support if you need help.",
+      "Absolutely. Our Business and Enterprise plans include full REST API access. You can integrate VoiceAI with your existing POS, CRM, or any custom backend system.",
   },
   {
-    question: "Which platforms are supported?",
+    question: "Can customers receive confirmation emails?",
     answer:
-      "We support all major communication channels: WhatsApp Business, SMS, Facebook Messenger, Instagram DM, Telegram, web chat widget, and email. All conversations appear in one unified inbox, and AI responds across all channels automatically.",
+      "Yes — automatically. The moment an order is confirmed, VoiceAI sends a branded confirmation email to the customer with the full order summary, total amount, and estimated time.",
   },
   {
-    question: "What happens if the AI doesn't understand something?",
+    question: "Is my business data secure?",
     answer:
-      "The AI is designed to handle complex conversations, but if it encounters something it can't answer, it will automatically escalate to your team. You can also set up custom fallback responses and specify when human intervention is needed.",
+      "We take security seriously. All data is encrypted in transit (TLS 1.3) and at rest (AES-256). We never share your data with third parties. API keys are hashed and stored securely.",
   },
   
 ];
