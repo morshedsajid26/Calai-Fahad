@@ -13,7 +13,7 @@ const FAQdropdown = ({ question, answer, className = "" }) => {
     >
       <div 
         className={`w-full rounded-2xl border transition-all duration-300 overflow-hidden bg-gradient-to-br from-[#1A1A27]  to-[#0F0F18] ${
-          isOpen ? "border-[#AD46FF]/50 " : "border-white/10 "
+          isOpen ? "border-[#0F42FF] " : "border-white/10 "
         } ${className}`}
       >
         <button
@@ -23,9 +23,9 @@ const FAQdropdown = ({ question, answer, className = "" }) => {
           <h4 className="text-white text-base md:text-lg font-inter font-semibold">
             {question}
           </h4>
-          
-          <div className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-300 ${
-            isOpen ? "bg-[#AD46FF] text-white" : "bg-[#AD46FF]/10 text-[#C27AFF]"
+           
+          <div className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-300 text-white ${
+            isOpen ? "bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] " : "bg-[#00135B]/50 "
           }`}>
             {isOpen ? <FiMinus className="w-5 h-5" /> : <FiPlus className="w-5 h-5" />}
           </div>
