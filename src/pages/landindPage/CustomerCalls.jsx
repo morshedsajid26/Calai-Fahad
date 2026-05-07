@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const CustomerCalls = () => {
   return (
     <div className="bg-linear-to-t from-[#59168B]/20 via-[#1C398E]/20 to-[#59168B]/20  text-white py-15">
-      <Container className={`text-center md:!w-[40%]`}>
+      <Container className={`text-center lg:!w-[40%]`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
