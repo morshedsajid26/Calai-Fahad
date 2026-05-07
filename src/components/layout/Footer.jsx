@@ -91,7 +91,7 @@ const Footer = () => {
           className="py-8 border-t border-white/10"
         >
           <p className="text-sm font-inter text-[#99A1AF]">
-            © {new Date().getFullYear()} Tugatai. All rights reserved.
+            © {new Date().getFullYear()} Calai. All rights reserved.
           </p>
         </motion.div>
       </Container>
