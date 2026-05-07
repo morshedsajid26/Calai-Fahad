@@ -89,7 +89,7 @@ const Footer = () => {
           viewport={{ once: false }}
           transition={{ duration: 0.5, delay: 0.4 }}
           className="py-8 border-t border-white/10"
-        >
+        > 
           <p className="text-sm font-inter text-[#99A1AF]">
             © {new Date().getFullYear()} Calai. All rights reserved.
           </p>
