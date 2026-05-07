@@ -76,15 +76,8 @@ const Navbar = () => {
           transition={{ duration: 0.6 }}
           className=" rounded-2xl shadow-sm md:border md:border-black/5 flex items-center justify-between "
         >
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-3xl cursor-pointer p-2 rounded-xl hover:bg-slate-100 transition-colors"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <FiX /> : <FiMenu />}
-          </button>
 
-          <Link to="/"  onClick={() => scrollToSection("home")}>
+            <Link to="/"  onClick={() => scrollToSection("home")}>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Image
                
@@ -94,6 +87,15 @@ const Navbar = () => {
               />
             </motion.div>
           </Link>
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden text-3xl cursor-pointer p-2 rounded-xl hover:bg-slate-100 transition-colors bg-white"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <FiX /> : <FiMenu />}
+          </button>
+
+          
 
           {/* Desktop Menu */}
           <ul className="hidden md:flex items-center justify-end gap-1 ">
@@ -102,7 +104,7 @@ const Navbar = () => {
                 {item.isRoute ? (
                   <Link
                     to={item.href}
-                    className={`py-2 px-4 font-inter text-lg font-medium transition-colors rounded-lg ${
+                    className={`py-2 px-4 font-inter text-lg font-medium transition-colors rounded-lg bg ${
                       location.pathname === item.href
                         ? "text-[#F6A62D] "
                         : "text-slate-600 hover:text-[#F6A62D]"
@@ -149,7 +151,7 @@ const Navbar = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-white mt-4 rounded-2xl shadow-xl border border-slate-100 overflow-hidden"
+              className="md:hidden bg-[#070B14] mt-4 rounded-2xl shadow-xl overflow-hidden"
             >
               <ul className="flex flex-col items-start gap-2 p-6">
                 {navitems.map((item, index) => (
@@ -166,8 +168,8 @@ const Navbar = () => {
                         onClick={() => setOpen(false)}
                         className={`py-3 px-4 font-inter text-lg font-medium block rounded-xl transition-all ${
                           location.pathname === item.href
-                            ? "text-[#F6A62D] bg-orange-50"
-                            : "text-slate-700 hover:bg-orange-50 hover:text-[#F6A62D]"
+                            ? "text-[#0F42FF] bg-[#070B14]"
+                            : "text-white hover:bg-[#070B14] hover:text-[#0F42FF]"
                         }`}
                       >
                         {item.name}
@@ -177,8 +179,8 @@ const Navbar = () => {
                         onClick={() => scrollToSection(item.href, true)}
                         className={`py-3 px-4 font-inter text-lg font-medium block rounded-xl transition-all w-full text-left ${
                           activeSection === item.href
-                            ? "text-[#F6A62D] bg-orange-50"
-                            : "text-slate-700 hover:bg-orange-50 hover:text-[#F6A62D]"
+                            ? "text-[#0F42FF] bg-[#0F42FF]/10"
+                            : "text-white hover:bg-[#0F42FF]/10 hover:text-[#0F42FF]"
                         }`}
                       >
                         {item.name}
@@ -193,8 +195,8 @@ const Navbar = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <Link to="/auth/login" onClick={() => setOpen(false)}>
-                     <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3  border border-[#0F42FF] ">
+                  <Link to="/auth/login" onClick={() => setOpen(false)} >
+                     <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3  border border-[#0F42FF] w-full">
                       Start Free Trial
                     </button>
                   </Link>
