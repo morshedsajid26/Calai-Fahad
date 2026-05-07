@@ -1,3 +1,4 @@
+import Footer from '@/components/layout/Footer'
 import Navbar from '@/components/layout/Navbar'
 import Banner from '@/pages/landindPage/Banner'
 import React from 'react'
@@ -8,6 +9,8 @@ const LandingPageLayout = () => {
     <div className='bg-[#000000]'>
         <Navbar/>
         <Banner/>
+        <Outlet/>
+        <Footer/>
     </div>
   )
 }

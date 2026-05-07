@@ -68,13 +68,13 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100] bg-[#070B14] py-4">
+    <div className="sticky top-0 left-0 right-0 z-[100] bg-[#070B14] py-4">
       <Container>
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className=" py- rounded-2xl shadow-sm md:border md:border-black/5 flex items-center justify-between px-6"
+          className=" rounded-2xl shadow-sm md:border md:border-black/5 flex items-center justify-between "
         >
           {/* Mobile Menu Button */}
           <button
