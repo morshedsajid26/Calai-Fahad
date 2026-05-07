@@ -47,9 +47,9 @@ const FeatureCard = ({ feature, index }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
+    viewport={{ once: false, margin: "-50px" }}
     transition={{ duration: 0.5, delay: index * 0.1 }}
-    className="bg-gradient-to-t from-[#9810FA]/20 to-[#155DFC]/20 border border-[#0F42FF]/20 p-8 rounded-[24px] flex flex-col gap-4  transition-all duration-300 group hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+    className="bg-gradient-to-t from-[#9810FA]/20 to-[#155DFC]/20 border border-[#0F42FF]/20 p-8 rounded-[24px] flex flex-col gap-4 transition-all duration-300 group hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
   >
     <div
       className={`${feature.bg} w-12 h-12 rounded-2xl flex items-center justify-center mb-2 shadow-lg`}
