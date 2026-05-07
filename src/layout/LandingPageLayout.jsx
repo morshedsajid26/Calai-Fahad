@@ -5,6 +5,7 @@ import CustomerCalls from "@/pages/landindPage/CustomerCalls";
 import FAQ from "@/pages/landindPage/FAQ";
 import Features from "@/pages/landindPage/Features";
 import Pricing from "@/pages/landindPage/Pricing";
+import Stats from "@/pages/landindPage/Stats";
 import React from "react";
 
 
@@ -13,6 +14,7 @@ const LandingPageLayout = () => {
     <div className="bg-[#000000]">
       <Navbar />
       <Banner />
+      <Stats />
       <Features />
       <Pricing />
       <FAQ />
