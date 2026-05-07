@@ -14,7 +14,7 @@ const Banner = () => {
       className="relative  bg-linear-to-t from-[#59168B]/40 via-[#02060F] to-[#59168B]/20 overflow-hidden flex items-center py-20 "
     >
       <Container>
-        <div className=" grid md:grid-cols-2   items-center ">
+        <div className=" grid md:grid-cols-2 gap-5   items-center ">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
