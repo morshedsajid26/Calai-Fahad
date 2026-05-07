@@ -34,6 +34,8 @@ import OTP from "../pages/auth/OTP";
 import NewPass from "../pages/auth/NewPass";
 import Success from "../pages/auth/Success";
 import Subscription from "@/pages/admin/Subscription";
+import Banner from "@/pages/landindPage/Banner";
+import LandingPageLayout from "@/layout/LandingPageLayout";
 
 const router = createBrowserRouter([
   //  AUTH ROUTES
@@ -65,7 +67,7 @@ const router = createBrowserRouter([
     ],
   },
   
-  // SYSTEM OWNER DASHBOARD ROUTES
+  // Business OWNER DASHBOARD ROUTES
   {
     path: "/owner",
     element: <DashboardLayout />,
@@ -89,6 +91,13 @@ const router = createBrowserRouter([
         ]
       },
     ],
+  },
+
+
+   //Landing page route
+  {
+    path: "/",
+    element: <LandingPageLayout />,
   },
 
 ]);

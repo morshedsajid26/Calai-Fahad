@@ -9,6 +9,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 
 export default function Header({ onMenuClick }) {
   const [openDropdown, setOpenDropdown] = useState(false);
+  const role = localStorage.getItem("role") || "owner";
 
   return (
     <header className="bg-[#141416] flex items-center px-6 py-3.5 relative">
@@ -52,11 +53,11 @@ export default function Header({ onMenuClick }) {
           </button>
 
           {/* Language Selector */}
-          <button className="flex items-center gap-2 px-3 h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors text-white">
+          {/* <button className="flex items-center gap-2 px-3 h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors text-white">
             <Icon icon="circle-flags:uk" className="w-6 h-6 rounded-full" />
             <span className="text-sm font-medium font-montserrat">Eng</span>
             <FaAngleDown className="w-3.5 h-3.5" />
-          </button>
+          </button> */}
 
           {/* Profile Section */}
           <div className="relative ml-2">
@@ -75,19 +76,26 @@ export default function Header({ onMenuClick }) {
             {/* Dropdown */}
             {openDropdown && (
               <div className="absolute w-48 right-0 mt-3 p-2 bg-white rounded-lg shadow-xl border border-[#A0A0A0] z-50">
-                <Link to="/settings" onClick={() => setOpenDropdown(false)}>
+                <Link to={role === "admin" ? "/admin/settings" : "/owner/settings"} onClick={() => setOpenDropdown(false)}>
                   <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[#0A0A0A] hover:bg-[#2D468A] hover:text-white transition cursor-pointer">
                     <Icon icon="material-symbols:settings" width="20" />
                     <span className="font-montserrat text-sm font-medium">Settings</span>
                   </button>
                 </Link>
+
+                <Link 
+                to={"/auth/login"}
+                onClick={() => setOpenDropdown(false)}  >
+
+
                 <button
-                  onClick={() => setOpenDropdown(false)}
+                 
                   className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[#E7000B] hover:bg-[#2D468A] hover:text-white transition cursor-pointer"
                 >
                   <Icon icon="material-symbols:logout" width="20" />
                   <span className="font-montserrat text-sm font-medium">Log Out</span>
                 </button>
+                </Link>
               </div>
             )}
           </div>
