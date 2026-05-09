@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Sparkles, Check, X } from 'lucide-react'
+import ToggleButton from '../../../components/ToogleButton'
 
-const PlanCard = ({ plan }) => (
+const PlanCard = ({ plan, isAnnual }) => (
   <div className={`bg-[#0E0E10] border ${plan.isPopular ? 'border-blue-600/30 shadow-[0_0_20px_rgba(37,99,235,0.05)]' : 'border-[#272727]'} p-6 rounded-[28px] flex flex-col gap-6 hover:border-[#333333] transition-all group h-full`}>
     <div className="flex flex-col gap-5">
       <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] font-medium w-fit transition-colors ${plan.isPopular ? 'bg-blue-600/10 text-blue-400 border border-blue-600/40' : 'bg-[#1A1A1A] text-gray-300 border border-[#272727]'}`}>
@@ -11,7 +12,7 @@ const PlanCard = ({ plan }) => (
       
       <div className="flex items-baseline gap-1.5">
         <span className="text-white text-[32px] font-bold tracking-tight">{plan.price}</span>
-        <span className="text-gray-500 text-sm font-medium">/month</span>
+        <span className="text-gray-500 text-sm font-medium">/{isAnnual ? 'year' : 'month'}</span>
       </div>
       
       <p className="text-gray-400 text-[13px] leading-relaxed min-h-[40px]">
@@ -43,10 +44,12 @@ const PlanCard = ({ plan }) => (
 )
 
 const Plan = () => {
+  const [isAnnual, setIsAnnual] = useState(false)
+
   const plans = [
     {
       name: "Basic",
-      price: "$1.99",
+      price: isAnnual ? "$19.99" : "$1.99",
       description: "AI Smarter Support Essential",
       features: [
         { text: "500 min call time", included: true },
@@ -58,7 +61,7 @@ const Plan = () => {
     },
     {
       name: "Classic",
-      price: "$3.99",
+      price: isAnnual ? "$39.99" : "$3.99",
       description: "AI Smarter Support Classic",
       features: [
         { text: "1500 min call time", included: true },
@@ -70,7 +73,7 @@ const Plan = () => {
     },
     {
       name: "Pro Plan",
-      price: "$9.99",
+      price: isAnnual ? "$99.99" : "$9.99",
       description: "AI Smarter Support grow Faster.",
       isPopular: true,
       features: [
@@ -83,7 +86,7 @@ const Plan = () => {
     },
     {
       name: "Advanced",
-      price: "$19.99",
+      price: isAnnual ? "$199.99" : "$19.99",
       description: "AI Smarter Support Power User.",
       features: [
         { text: "5000 min call time", included: true },
@@ -95,7 +98,7 @@ const Plan = () => {
     },
     {
       name: "Enterprise",
-      price: "$49.99",
+      price: isAnnual ? "$499.99" : "$49.99",
       description: "AI Smarter Support for Business.",
       features: [
         { text: "Unlimited calls", included: true },
@@ -109,12 +112,19 @@ const Plan = () => {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 mb-12">
-      <h2 className="text-xl font-semibold text-white mb-1">Choose Your Plan</h2>
-      <p className="text-sm text-gray-400 mb-8">Manage your subscription plan</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-6 sm:gap-0">
+        <div>
+          <h2 className="text-xl font-semibold text-white mb-1">Choose Your Plan</h2>
+          <p className="text-sm text-gray-400">Manage your subscription plan</p>
+        </div>
+        <div className=" p-1.5   self-center sm:self-auto">
+          <ToggleButton isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {plans.map((plan, index) => (
-          <PlanCard key={index} plan={plan} />
+          <PlanCard key={index} plan={plan} isAnnual={isAnnual} />
         ))}
       </div>
     </div>

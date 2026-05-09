@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Sparkles, Check, X } from "lucide-react";
 import Header from "@/components/Header";
 import Container from "@/components/Container";
 import { motion } from "framer-motion";
+import ToggleButton from "@/components/ToogleButton";
 
-const PlanCard = ({ plan, index }) => (
+const PlanCard = ({ plan, index, isAnnual }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -33,7 +34,7 @@ const PlanCard = ({ plan, index }) => (
         <span className="text-white text-[32px] font-bold tracking-tight">
           {plan.price}
         </span>
-        <span className="text-gray-500 text-sm font-medium">/month</span>
+        <span className="text-gray-500 text-sm font-medium">/{isAnnual ? 'year' : 'month'}</span>
       </div>
 
       <p className="text-gray-400 text-[13px] leading-relaxed min-h-[40px]">
@@ -67,10 +68,12 @@ const PlanCard = ({ plan, index }) => (
 );
 
 const Pricing = () => {
+  const [isAnnual, setIsAnnual] = useState(false);
+
   const plans = [
     {
       name: "Basic",
-      price: "$1.99",
+      price: isAnnual ? "$19.99" : "$1.99",
       description: "AI Smarter Support Essential",
       features: [
         { text: "500 min call time", included: true },
@@ -82,7 +85,7 @@ const Pricing = () => {
     },
     {
       name: "Classic",
-      price: "$3.99",
+      price: isAnnual ? "$39.99" : "$3.99",
       description: "AI Smarter Support Classic",
       features: [
         { text: "1500 min call time", included: true },
@@ -94,7 +97,7 @@ const Pricing = () => {
     },
     {
       name: "Pro Plan",
-      price: "$9.99",
+      price: isAnnual ? "$99.99" : "$9.99",
       description: "AI Smarter Support grow Faster.",
       isPopular: true,
       features: [
@@ -107,7 +110,7 @@ const Pricing = () => {
     },
     {
       name: "Advanced",
-      price: "$19.99",
+      price: isAnnual ? "$199.99" : "$19.99",
       description: "AI Smarter Support Power User.",
       features: [
         { text: "5000 min call time", included: true },
@@ -119,7 +122,7 @@ const Pricing = () => {
     },
     {
       name: "Enterprise",
-      price: "$49.99",
+      price: isAnnual ? "$499.99" : "$49.99",
       description: "AI Smarter Support for Business.",
       features: [
         { text: "Unlimited calls", included: true },
@@ -146,9 +149,15 @@ const Pricing = () => {
           />
         </motion.div>
 
+        <div className="flex justify-center mt-8">
+          <div className="p-1.5">
+            <ToggleButton isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-10">
           {plans.map((plan, index) => (
-            <PlanCard key={index} plan={plan} index={index} />
+            <PlanCard key={index} plan={plan} index={index} isAnnual={isAnnual} />
           ))}
         </div>
       </Container>
