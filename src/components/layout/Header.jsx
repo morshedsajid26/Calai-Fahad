@@ -75,7 +75,7 @@ export default function Header({ onMenuClick }) {
 
             {/* Dropdown */}
             {openDropdown && (
-              <div className="absolute w-48 right-0 mt-3 p-2 bg-[#0a1024] rounded-lg shadow-xl border border-[#A0A0A0] z-50">
+              <div className="absolute w-48 right-0 mt-3 p-2 bg-[#141416] rounded-lg shadow-xl border border-[#A0A0A0] z-50">
                 <Link to={role === "admin" ? "/admin/settings" : "/owner/settings"} onClick={() => setOpenDropdown(false)}>
                   <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[#0A0A0A] hover:bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white transition cursor-pointer">
                     <Icon icon="material-symbols:settings" width="20" />
