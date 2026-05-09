@@ -68,7 +68,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-[100] bg-[#070B14] py-4">
+    <div className="sticky top-0 left-0 right-0 z-[100] bg-[#070B14] py-4 border-b border-white/10">
       <Container>
         <motion.div
           initial={{ y: -20, opacity: 0 }}

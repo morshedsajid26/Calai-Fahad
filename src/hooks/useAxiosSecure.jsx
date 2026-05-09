@@ -13,7 +13,7 @@ const useAxiosSecure = () => {
     const {logOutUser} = useAuth()
 
     AxiosSecure.interceptors.request.use(function (config) {
-        const token = localStorage.getItem('Acces-Token')
+        const token = localStorage.getItem('Access-Token')
         config.headers.authorization = `Bearer ${token}`
         return config;
 
