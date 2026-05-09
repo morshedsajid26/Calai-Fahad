@@ -3,19 +3,27 @@ import { Icon } from "@iconify/react";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../components/Inputfield";
 import Password from "../../components/Password";
+import toast from "react-hot-toast";
 
 export default function LogIn() {
   const navigate = useNavigate();
 
-  const [role, setRole] = useState('owner');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
-    localStorage.setItem('role', role);
-    if (role === 'admin') {
+
+    if (email === 'admin@test.com' && password === '11') {
+      localStorage.setItem('role', 'admin');
+      toast.success('Welcome Admin!');
       navigate('/admin/dashboard');
-    } else {
+    } else if (email === 'owner@test.com' && password === '11') {
+      localStorage.setItem('role', 'owner');
+      toast.success('Welcome Owner!');
       navigate('/owner/dashboard');
+    } else {
+      toast.error('Invalid email or password');
     }
   };
 
@@ -34,7 +42,9 @@ export default function LogIn() {
           label="Email"
           type="email"
           placeholder="Enter Email"
-           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
           leftIcon={<Icon icon="lucide:lock" width="18" />}
           inputClass="!bg-[#111424] !text-white !placeholder-gray-600 !rounded-full !py-3.5 !border-transparent focus:!border-[#2563EB]/50 !transition-colors !text-sm"
         />
@@ -43,7 +53,9 @@ export default function LogIn() {
         <Password
           label="Password"
           placeholder="Enter Password"
-         labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
           leftIcon={<Icon icon="lucide:lock" width="18" />}
           inputClass="!bg-[#111424] !text-white !placeholder-gray-600 !rounded-full !py-3.5 !border-transparent focus:!border-[#2563EB]/50 !transition-colors !text-sm"
         />
@@ -62,31 +74,6 @@ export default function LogIn() {
           </Link>
         </div>
 
-        {/* Role Toggle Buttons */}
-        <div className="flex gap-4 mt-2">
-          <button
-            type="button"
-            onClick={() => setRole('owner')}
-            className={`flex-1 py-3 text-[13px] font-semibold rounded-lg transition-all ${
-              role === 'owner' 
-                ? 'bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white' 
-                : 'bg-[#111424] text-gray-400 hover:text-white'
-            }`}
-          >
-            OWNER
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole('admin')}
-            className={`flex-1 py-3 text-[13px] font-semibold rounded-lg transition-all ${
-              role === 'admin' 
-                ? 'bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white' 
-                : 'bg-[#111424] text-gray-400 hover:text-white'
-            }`}
-          >
-            ADMIN
-          </button>
-        </div>
 
         {/* Login Button */}
         <button 
