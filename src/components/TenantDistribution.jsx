@@ -30,7 +30,7 @@ const renderCustomizedLabel = (props) => {
 };
 
 const TenantDistribution = () => {
-  const [filter, setFilter] = useState('monthly');
+  const [filter, setFilter] = useState('Weekly');
 
   return (
     <div className="bg-[#191919] rounded-2xl p-6 border border-gray-800/50 flex flex-col h-full min-h-[400px]">
@@ -38,7 +38,7 @@ const TenantDistribution = () => {
         <h3 className="text-white text-lg font-medium">Tenant Status Distribution</h3>
         <div className="relative z-20">
           <Dropdown 
-            options={["monthly", "yearly", "weekly"]}
+            options={["Weekly","Monthly", "Yearly", ]}
             value={filter}
             onSelect={(val) => setFilter(val)}
             inputClass="!bg-transparent !border-[#2563EB] !rounded-full !py-1.5 !px-4 !text-sm !text-gray-300 text-center min-w-[120px] focus:outline-none"
