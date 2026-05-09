@@ -9,10 +9,26 @@ import Breadcrumb from '../../components/Breadcrumb'
 const OrderList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderProducts, setOrderProducts] = useState([]);
 
   const handleViewClick = (order) => {
     setSelectedOrder(order);
+    setOrderProducts(order.products || [
+      { id: 1, name: 'Coca-Cola', quantity: 12, time: '4:45 pm', price: '$2.12k' },
+      { id: 2, name: 'Sprite', quantity: 213, time: '4:46 pm', price: '$10k' },
+      { id: 3, name: 'Sprite', quantity: 213, time: '4:46 pm', price: '$1.9k' },
+    ]);
     setIsModalOpen(true);
+  };
+
+  const handleQuantityChange = (id, change) => {
+    setOrderProducts(prev => prev.map(p => {
+      if (p.id === id) {
+        const newQuantity = Math.max(0, p.quantity + change);
+        return { ...p, quantity: newQuantity };
+      }
+      return p;
+    }));
   };
 
   const columns = [
@@ -91,36 +107,18 @@ const OrderList = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-[#1A1A1A]">
-                      <td className="py-5 text-[14px] text-gray-300">Coca-Cola</td>
-                      <td className="py-5 text-[14px] text-gray-300 text-center">
-                        <span className="text-gray-500 mr-3 cursor-pointer select-none">—</span>
-                        12
-                        <span className="text-gray-500 ml-3 cursor-pointer select-none">+</span>
-                      </td>
-                      <td className="py-5 text-[14px] text-gray-300">4:45 pm</td>
-                      <td className="py-5 text-[14px] text-gray-300 text-right">$2.12k</td>
-                    </tr>
-                    <tr className="border-b border-[#1A1A1A]">
-                      <td className="py-5 text-[14px] text-gray-300">Sprite</td>
-                      <td className="py-5 text-[14px] text-gray-300 text-center">
-                        <span className="text-gray-500 mr-3 cursor-pointer select-none">—</span>
-                        213
-                        <span className="text-gray-500 ml-3 cursor-pointer select-none">+</span>
-                      </td>
-                      <td className="py-5 text-[14px] text-gray-300">4:46 pm</td>
-                      <td className="py-5 text-[14px] text-gray-300 text-right">$10k</td>
-                    </tr>
-                    <tr className="border-b border-[#1A1A1A]">
-                      <td className="py-5 text-[14px] text-gray-300">Sprite</td>
-                      <td className="py-5 text-[14px] text-gray-300 text-center">
-                        <span className="text-gray-500 mr-3 cursor-pointer select-none">—</span>
-                        213
-                        <span className="text-gray-500 ml-3 cursor-pointer select-none">+</span>
-                      </td>
-                      <td className="py-5 text-[14px] text-gray-300">4:46 pm</td>
-                      <td className="py-5 text-[14px] text-gray-300 text-right">$1.9k</td>
-                    </tr>
+                    {orderProducts.map((product) => (
+                      <tr key={product.id} className="border-b border-[#1A1A1A]">
+                        <td className="py-5 text-[14px] text-gray-300">{product.name}</td>
+                        <td className="py-5 text-[14px] text-gray-300 text-center">
+                          <span onClick={() => handleQuantityChange(product.id, -1)} className="text-gray-500 mr-3 cursor-pointer select-none hover:text-white transition-colors">—</span>
+                          <span className="inline-block w-8">{product.quantity}</span>
+                          <span onClick={() => handleQuantityChange(product.id, 1)} className="text-gray-500 ml-3 cursor-pointer select-none hover:text-white transition-colors">+</span>
+                        </td>
+                        <td className="py-5 text-[14px] text-gray-300">{product.time}</td>
+                        <td className="py-5 text-[14px] text-gray-300 text-right">{product.price}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -155,9 +153,11 @@ const OrderList = () => {
                     doc.text("Products:", 20, 95);
                     
                     doc.setFontSize(12);
-                    doc.text("- Coca-Cola: 12 x $2.12k", 25, 105);
-                    doc.text("- Sprite: 213 x $10k", 25, 115);
-                    doc.text("- Sprite: 213 x $1.9k", 25, 125);
+                    let yPos = 105;
+                    orderProducts.forEach(product => {
+                      doc.text(`- ${product.name}: ${product.quantity} x ${product.price}`, 25, yPos);
+                      yPos += 10;
+                    });
                     
                     // Save the PDF
                     doc.save(`order_${selectedOrder?.customerName?.replace(/\s+/g, '_') || 'download'}.pdf`);
