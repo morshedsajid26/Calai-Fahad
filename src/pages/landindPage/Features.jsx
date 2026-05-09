@@ -69,7 +69,7 @@ const FeatureCard = ({ feature, index }) => (
 
 const Features = () => {
   return (
-    <section id="feature" className="py-20 relative">
+    <section className="py-20 relative">
       <Container>
         <div className="mb-14">
           <Header

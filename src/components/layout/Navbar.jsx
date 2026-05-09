@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const navitems = [
   { name: "Home", href: "home" },
-  { name: "Featured", href: "feature" },
+  { name: "Features", href: "feature" },
   { name: "Pricing", href: "pricing" },
   // { name: "About us", href: "aboutUs" },
   { name: "FAQ", href: "faq" },

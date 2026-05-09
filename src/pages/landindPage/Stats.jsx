@@ -55,7 +55,7 @@ const StatCard = ({ stat, index }) => (
 
 const Stats = () => {
   return (
-    <section className="py-20 relative bg-linear-to-b from-[#59168B]/20 via-[#1C398E]/20 to-[#271436]/20">
+    <section  id="feature" className="py-20 relative bg-linear-to-b from-[#59168B]/20 via-[#1C398E]/20 to-[#271436]/20">
       <Container>
         <div className="mb-14">
           <Header
