@@ -36,6 +36,7 @@ import Success from "../pages/auth/Success";
 import Subscription from "@/pages/admin/Subscription";
 import Banner from "@/pages/landindPage/Banner";
 import LandingPageLayout from "@/layout/LandingPageLayout";
+import TestCallWindow from "@/pages/owner/TestCallWindow";
 
 const router = createBrowserRouter([
   //  AUTH ROUTES
@@ -78,6 +79,7 @@ const router = createBrowserRouter([
       { path: "/owner/call-summary", element: <CallSummary /> },
       { path: "/owner/order-list", element: <OrderList /> },
       { path: "/owner/item-management", element: <ItemManagement /> },
+      { path: "/owner/test-voice", element: <TestCallWindow /> },
       { 
         path: "/owner/settings", 
         element: <OwnerSettings />,
@@ -88,6 +90,7 @@ const router = createBrowserRouter([
           { path: "business", element: <BusinessInfo /> },
           { path: "subscription", element: <OwnerSubscription /> },
           { path: "privacy", element: <PrivacySetting /> }
+        
         ]
       },
     ],

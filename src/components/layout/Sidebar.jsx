@@ -22,7 +22,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const ownerNavLinks = [
     { name: "Dashboard", path: "/owner/dashboard", icon: "lucide:layout-dashboard" },
     { name: "AI Training", path: "/owner/ai-training", icon: "lucide:bot" },
-    { name: "Test Call Window", path: "/test-call-window", icon: "lucide:phone-call" },
+    { name: "Test Call Window", path: "/owner/test-voice", icon: "lucide:phone-call" },
     { name: "Call Summary", path: "/owner/call-summary", icon: "lucide:file-text" },
     { name: "Order list", path: "/owner/order-list", icon: "lucide:list-checks" },
     { name: "Item Management", path: "/owner/item-management", icon: "lucide:monitor-cog" },
