@@ -37,6 +37,7 @@ import Subscription from "@/pages/admin/Subscription";
 import Banner from "@/pages/landindPage/Banner";
 import LandingPageLayout from "@/layout/LandingPageLayout";
 import TestCallWindow from "@/pages/owner/TestCallWindow";
+import Telephony from "@/pages/admin/Telephony";
 
 const router = createBrowserRouter([
   //  AUTH ROUTES
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
       { path: "/admin/subscriptions-billing", element: <Subscription /> },
       { path: "/admin/api-keys", element: <ApiKeys /> },
       { path: "/admin/settings", element: <Settings /> },
+      { path: "/admin/telephony-integration", element: <Telephony /> },
     ],
   },
   
