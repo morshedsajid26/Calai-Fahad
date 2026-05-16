@@ -45,7 +45,7 @@ export default function LogIn() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
-          leftIcon={<Icon icon="lucide:lock" width="18" />}
+          leftIcon={<Icon icon="lucide:mail" width="18" />}
           inputClass="!bg-[#111424] !text-white !placeholder-gray-600 !rounded-full !py-3.5 !border-transparent focus:!border-[#2563EB]/50 !transition-colors !text-sm"
         />
 
