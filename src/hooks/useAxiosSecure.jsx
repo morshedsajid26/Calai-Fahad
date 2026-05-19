@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAuth from "./useAuth";
+import Cookies from "js-cookie";
 
 
 const AxiosSecure = axios.create({
-    baseURL: 'http://localhost:5000'
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://test13.fireai.agency/api'
 })
 
 const useAxiosSecure = () => {
@@ -13,7 +14,7 @@ const useAxiosSecure = () => {
     const {logOutUser} = useAuth()
 
     AxiosSecure.interceptors.request.use(function (config) {
-        const token = localStorage.getItem('Access-Token')
+        const token = Cookies.get('Access-Token')
         config.headers.authorization = `Bearer ${token}`
         return config;
 

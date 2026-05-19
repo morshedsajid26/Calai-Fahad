@@ -6,10 +6,13 @@ import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { IoIosNotificationsOutline } from "react-icons/io";
+import useAuth from "../../hooks/useAuth";
+import Cookies from "js-cookie";
 
 export default function Header({ onMenuClick }) {
   const [openDropdown, setOpenDropdown] = useState(false);
-  const role = localStorage.getItem("role") || "owner";
+  const { logOutUser } = useAuth();
+  const role = Cookies.get("role") || "owner";
 
   return (
     <header className="bg-[#141416] flex items-center px-4 md:px-6 py-3.5 relative gap-2 sm:gap-4">
@@ -85,7 +88,10 @@ export default function Header({ onMenuClick }) {
 
                 <Link
                   to={"/auth/login"}
-                  onClick={() => setOpenDropdown(false)}  >
+                  onClick={() => {
+                    logOutUser();
+                    setOpenDropdown(false);
+                  }}  >
 
 
                   <button

@@ -4,6 +4,7 @@ import Image from "../Image";
 import { useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
+import Cookies from "js-cookie";
 
 export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
@@ -17,7 +18,7 @@ export default function Sidebar({ isOpen, onClose }) {
   
 
   
-  const role = localStorage.getItem("role") || "owner"; 
+  const role = Cookies.get("role") || "owner"; 
 
   const ownerNavLinks = [
     { name: "Dashboard", path: "/owner/dashboard", icon: "lucide:layout-dashboard" },

@@ -4,27 +4,63 @@ import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../components/Inputfield";
 import Password from "../../components/Password";
 import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+import useAuth from "../../hooks/useAuth";
+import Cookies from "js-cookie";
 
 export default function LogIn() {
   const navigate = useNavigate();
+  const axiosPublic = useAxiosPublic();
+  const { setUser } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const loginMutation = useMutation({
+    mutationFn: async (credentials) => {
+      const response = await axiosPublic.post('/auth/login', credentials);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data?.success) {
+        const { user, accessToken } = data.data || {};
+        const apiRole = user?.role;
+        
+        // Map API roles to frontend roles (admin / owner)
+        // SYSTEM_OWNER maps to admin, others map to owner
+        const mappedRole = apiRole === 'SYSTEM_OWNER' ? 'admin' : 'owner';
+        
+        Cookies.set('Access-Token', accessToken, { expires: 7 });
+        Cookies.set('role', mappedRole, { expires: 7 });
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        setUser(user);
+        
+        toast.success(data.message || 'Login successful!');
+        
+        if (mappedRole === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/owner/dashboard');
+        }
+      } else {
+        toast.error(data?.message || 'Login failed');
+      }
+    },
+    onError: (error) => {
+      const errorMsg = error?.response?.data?.message || error?.message || 'An error occurred during login';
+      toast.error(errorMsg);
+    }
+  });
+
   const handleLogin = (e) => {
     e.preventDefault();
-
-    if (email === 'admin@test.com' && password === '11') {
-      localStorage.setItem('role', 'admin');
-      toast.success('Welcome Admin!');
-      navigate('/admin/dashboard');
-    } else if (email === 'owner@test.com' && password === '11') {
-      localStorage.setItem('role', 'owner');
-      toast.success('Welcome Owner!');
-      navigate('/owner/dashboard');
-    } else {
-      toast.error('Invalid email or password');
+    if (!email || !password) {
+      toast.error('Please enter email and password');
+      return;
     }
+    loginMutation.mutate({ email, password });
   };
 
   return (
@@ -78,9 +114,17 @@ export default function LogIn() {
         {/* Login Button */}
         <button 
           type="submit"
-          className="w-full mt-4 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white text-sm font-medium py-3.5 rounded-full border border-[#1D4ED8] shadow-[0_0_20px_rgba(29,78,216,0.25)] hover:shadow-[0_0_25px_rgba(29,78,216,0.4)] transition-all"
+          disabled={loginMutation.isPending}
+          className="w-full mt-4 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white text-sm font-medium py-3.5 rounded-full border border-[#1D4ED8] shadow-[0_0_20px_rgba(29,78,216,0.25)] hover:shadow-[0_0_25px_rgba(29,78,216,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign in
+          {loginMutation.isPending ? (
+            <>
+              <Icon icon="lucide:loader-2" className="animate-spin" width="18" />
+              Signing in...
+            </>
+          ) : (
+            'Sign in'
+          )}
         </button>
       </form>
 

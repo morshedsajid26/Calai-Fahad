@@ -6,6 +6,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Image from "../Image";
 import logo from "/logo.png";
 import { motion, AnimatePresence } from "framer-motion";
+import useAuth from "../../hooks/useAuth";
+import Cookies from "js-cookie";
 
 const navitems = [
   { name: "Home", href: "home" },
@@ -20,6 +22,11 @@ const Navbar = () => {
   const [activeSection, setActiveSection] = useState("home");
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { user } = useAuth();
+  const userRole = Cookies.get("role") || (user?.role === "SYSTEM_OWNER" ? "admin" : "owner");
+  const dashboardPath = `/${userRole}/dashboard`;
+  const dashboardLabel = userRole === "admin" ? "Admin" : "Business Owner";
 
   useEffect(() => {
     if (location.pathname !== "/") return;
@@ -133,11 +140,19 @@ const Navbar = () => {
             whileTap={{ scale: 0.98 }}
             className="hidden md:block"
           >
-            <Link to="/auth/login">
-              <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3  border border-[#0F42FF] ">
-                Start Free Trial
-              </button>
-            </Link>
+            {user ? (
+              <Link to={dashboardPath}>
+                <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] cursor-pointer">
+                  {dashboardLabel}
+                </button>
+              </Link>
+            ) : (
+              <Link to="/auth/login">
+                <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] cursor-pointer">
+                  Start Free Trial
+                </button>
+              </Link>
+            )}
           </motion.div>
         </motion.div>
 
@@ -195,11 +210,19 @@ const Navbar = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <Link to="/auth/login" onClick={() => setOpen(false)} >
-                     <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3  border border-[#0F42FF] w-full">
-                      Start Free Trial
-                    </button>
-                  </Link>
+                  {user ? (
+                    <Link to={dashboardPath} onClick={() => setOpen(false)}>
+                      <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] w-full cursor-pointer">
+                        {dashboardLabel}
+                      </button>
+                    </Link>
+                  ) : (
+                    <Link to="/auth/login" onClick={() => setOpen(false)}>
+                      <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] w-full cursor-pointer">
+                        Start Free Trial
+                      </button>
+                    </Link>
+                  )}
                 </motion.div>
               </ul>
             </motion.div>
