@@ -11,29 +11,13 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const data = [
-  { name: '1 Feb', value: 34 },
-  { name: '2 Feb', value: 54 },
-  { name: '3 Feb', value: 35 },
-  { name: '4 Feb', value: 43 },
-  { name: '5 Feb', value: 52 },
-  { name: '6 Feb', value: 87 },
-  { name: '7 Feb', value: 41 },
-  { name: '8 Feb', value: 63 },
-  { name: '9 Feb', value: 41 },
-  { name: '10 Feb', value: 51 },
-  { name: '11 Feb', value: 52 },
-  { name: '12 Feb', value: 52 },
-  { name: '13 Feb', value: 77 },
-];
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[#18181A] border border-gray-800 p-3 rounded-lg shadow-xl">
         <p className="text-gray-400 text-xs mb-1">{label}</p>
         <p className="text-white font-semibold text-sm">
-          {payload[0].value} Duration
+          {payload[0].value} Min
         </p>
       </div>
     );
@@ -41,8 +25,31 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const CallDuration = () => {
+const CallDuration = ({ data: apiData }) => {
   const [timeRange, setTimeRange] = useState('Last 15 days');
+
+  const defaultData = [
+    { name: '1 Feb', value: 34 },
+    { name: '2 Feb', value: 54 },
+    { name: '3 Feb', value: 35 },
+    { name: '4 Feb', value: 43 },
+    { name: '5 Feb', value: 52 },
+    { name: '6 Feb', value: 87 },
+    { name: '7 Feb', value: 41 },
+    { name: '8 Feb', value: 63 },
+    { name: '9 Feb', value: 41 },
+    { name: '10 Feb', value: 51 },
+    { name: '11 Feb', value: 52 },
+    { name: '12 Feb', value: 52 },
+    { name: '13 Feb', value: 77 },
+  ];
+
+  const chartData = apiData && apiData.length > 0
+    ? apiData.map(item => ({
+        name: item.date,
+        value: item.duration
+      }))
+    : defaultData;
 
   return (
     <div className="w-full bg-[#191919] rounded-2xl px-6 py-10 border border-gray-800/50">
@@ -74,7 +81,7 @@ const CallDuration = () => {
       <div className="w-full h-[450px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={data}
+            data={chartData}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
             <defs>
@@ -103,8 +110,7 @@ const CallDuration = () => {
               tickLine={false}
               tick={{ fill: '#9ca3af', fontSize: 12 }}
               dx={-10}
-              domain={[0, 100]}
-              ticks={[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
+              domain={[0, 'auto']}
             />
             
             <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#262626', strokeWidth: 1 }} />

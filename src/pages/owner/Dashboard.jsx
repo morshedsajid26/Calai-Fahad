@@ -2,8 +2,10 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 import CallDuration from '../../components/CallDuration';
 import OverallReports from '../../components/OverallReports';
+import { useQuery } from '@tanstack/react-query';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
-let StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText }) => {
+const StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText }) => {
   return (
     <div className="relative overflow-hidden bg-[#18181A] rounded-2xl p-3 border border-gray-800/50 flex flex-col h-full ">
       {/* Header */}
@@ -28,7 +30,7 @@ let StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText 
       </div>
 
       {/* Background Sparkline */}
-      <div className="absolut bottom-0 left-0 w-full h-17 pointer-events-none opacity-80">
+      <div className="absolute bottom-0 left-0 w-full h-17 pointer-events-none opacity-80">
         <svg viewBox="0 0 200 50" preserveAspectRatio="none" className="w-full h-full">
           <defs>
             <linearGradient id={`gradient-${title.replace(/\s+/g, '-')}`} x1="0" y1="0" x2="0" y2="1">
@@ -50,64 +52,75 @@ let StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText 
       </div>
     </div>
   );
-}
-
+};
 
 export default function Dashboard() {
-  
+  const axiosSecure = useAxiosSecure();
+
+  const { data: dashboardData, isLoading } = useQuery({
+    queryKey: ['ownerDashboardStats'],
+    queryFn: async () => {
+      const response = await axiosSecure.get('/business-owner/dashboard/stats');
+      return response.data;
+    }
+  });
+
+  const stats = dashboardData?.data?.stats;
+  const graphData = dashboardData?.data?.graphData;
+  const overallReport = dashboardData?.data?.overallReport;
+
   const statsData = [
     {
       title: "Total Call Duration",
-      value: "12 hr 45 min",
+      value: stats?.totalCallDuration?.value || "0 hr 0 min",
       icon: "lucide:phone-call",
       iconBg: "bg-[#2563EB]",
-      trend: "+5.09%",
-      trendText: "+1.4 this week"
+      trend: stats?.totalCallDuration?.change || "0%",
+      trendText: stats?.totalCallDuration?.weeklyChange || "+0 this week min"
     },
     {
       title: "Today Total Call",
-      value: "Call 50",
+      value: stats?.todayTotalCall?.value || "Call 0",
       icon: "lucide:phone-incoming",
       iconBg: "bg-[#262626]",
-      trend: "+5.09%",
-      trendText: "+1.4 this week"
+      trend: stats?.todayTotalCall?.change || "0%",
+      trendText: stats?.todayTotalCall?.weeklyChange || "+0 this week"
     },
     {
-      title: "Call Drop Rate",
-      value: "Drop Call 50",
-      icon: "lucide:phone-off",
+      title: "Total Order",
+      value: stats?.totalOrder?.value || "0",
+      icon: "lucide:shopping-bag",
       iconBg: "bg-[#262626]",
-      trend: "+5.09%",
-      trendText: "+1.4 this week"
-    },
-    {
-      title: "Total Message",
-      value: "100 Message",
-      icon: "lucide:message-square",
-      iconBg: "bg-[#262626]",
-      trend: "+5.09%",
-      trendText: "+1.4 this week"
+      trend: stats?.totalOrder?.change || "0%",
+      trendText: stats?.totalOrder?.weeklyChange || "+0 this week"
     }
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Icon icon="lucide:loader-2" className="animate-spin text-[#2563EB]" width="40" />
+      </div>
+    );
+  }
+
   return (
     <div>
-     
-     <div className="grid grid-cols-12 gap-5">
-      {statsData.map((stat, index) => (
-        <div key={index} className="col-span-12 md:col-span-6 xl:col-span-3">
-          <StatCard {...stat} />
+      <div className="grid grid-cols-12 gap-5">
+        {statsData.map((stat, index) => (
+          <div key={index} className="col-span-12 md:col-span-4">
+            <StatCard {...stat} />
+          </div>
+        ))}
+
+        <div className="col-span-12 md:col-span-12 lg:col-span-8">
+          <CallDuration data={graphData} />
         </div>
-      ))}
 
-      <div className="col-span-12 md:col-span-12 lg:col-span-8">
-        < CallDuration />
+        <div className="col-span-12 md:col-span-12 lg:col-span-4">
+          <OverallReports report={overallReport} />
+        </div>
       </div>
-
-      <div className="col-span-12 md:col-span-12 lg:col-span-4">
-        <OverallReports/>
-      </div>
-
-     </div>
     </div>
   );
 }
