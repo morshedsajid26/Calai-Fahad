@@ -27,22 +27,20 @@ export default function LogIn() {
         const { user, accessToken } = data.data || {};
         const apiRole = user?.role;
         
-        // Map API roles to frontend roles (admin / owner)
-        // SYSTEM_OWNER maps to admin, others map to owner
-        const mappedRole = apiRole === 'SYSTEM_OWNER' ? 'admin' : 'owner';
-        
         Cookies.set('Access-Token', accessToken, { expires: 7 });
-        Cookies.set('role', mappedRole, { expires: 7 });
+        Cookies.set('role', apiRole, { expires: 7 });
         localStorage.setItem('user', JSON.stringify(user));
         
         setUser(user);
         
         toast.success(data.message || 'Login successful!');
         
-        if (mappedRole === 'admin') {
+        if (apiRole === 'SYSTEM_OWNER') {
           navigate('/admin/dashboard');
-        } else {
+        } else if (apiRole === 'BUSINESS_OWNER') {
           navigate('/owner/dashboard');
+        } else {
+          navigate('/'); // Fallback if role is unknown
         }
       } else {
         toast.error(data?.message || 'Login failed');

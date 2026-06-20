@@ -1,33 +1,115 @@
 import React, { useState } from 'react';
 import Table from '../../components/Table';
 import { Icon } from '@iconify/react';
-import { Switch } from "@/components/ui/switch";
 import InputField from '../../components/Inputfield';
 import Dropdown from '../../components/Dropdown';
 import Password from '../../components/Password';
 import { Link } from 'react-router-dom';
-
-import { tenantsMockData } from '../../data/mockData';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
+import toast from 'react-hot-toast';
 
 const TenantManagement = () => {
-  const [tenants, setTenants] = useState(tenantsMockData);
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
+
+  const { data: tenantsResponse, isLoading, isError, error } = useQuery({
+    queryKey: ['tenants'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/system-owner/tenants');
+      return res.data;
+    }
+  });
+
+  const tenants = tenantsResponse?.data || [];
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTenant, setEditingTenant] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingTenantId, setDeletingTenantId] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newTenant, setNewTenant] = useState({ name: "", email: "", password: "", plan: "Classic", duration: "Monthly" });
+  
+  const [newTenant, setNewTenant] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    business_name: "",
+    phone: "",
+    business_type: ""
+  });
+
+  const addMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSecure.post('/system-owner/tenants', data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Tenant added successfully');
+      setIsAddModalOpen(false);
+      setNewTenant({
+        first_name: "",
+        last_name: "",
+        email: "",
+        password: "",
+        business_name: "",
+        phone: "",
+        business_type: ""
+      });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to add tenant');
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }) => {
+      const res = await axiosSecure.patch(`/system-owner/tenants/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Tenant updated successfully');
+      setIsEditModalOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to update tenant');
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await axiosSecure.delete(`/system-owner/tenants/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Tenant deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingTenantId(null);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to delete tenant');
+    }
+  });
 
   const handleEditClick = (tenant) => {
-    setEditingTenant({ ...tenant });
+    setEditingTenant({ id: tenant.id, name: tenant.name, plan: tenant.plan, business_type: tenant.business_type || "" });
     setIsEditModalOpen(true);
   };
 
   const handleSaveEdit = () => {
     if (editingTenant) {
-      setTenants(prev => prev.map(t => t.id === editingTenant.id ? { ...t, name: editingTenant.name, plan: editingTenant.plan, email: editingTenant.email } : t));
+      updateMutation.mutate({
+        id: editingTenant.id,
+        data: {
+          name: editingTenant.name,
+          plan: editingTenant.plan,
+          business_type: editingTenant.business_type
+        }
+      });
     }
-    setIsEditModalOpen(false);
   };
 
   const handleDeleteClick = (id) => {
@@ -37,40 +119,24 @@ const TenantManagement = () => {
 
   const handleConfirmDelete = () => {
     if (deletingTenantId) {
-      setTenants(prev => prev.filter(t => t.id !== deletingTenantId));
+      deleteMutation.mutate(deletingTenantId);
     }
-    setIsDeleteModalOpen(false);
-    setDeletingTenantId(null);
   };
 
   const handleAddTenant = () => {
-    if (newTenant.name && newTenant.email) {
-      const tenant = {
-        id: tenants.length > 0 ? Math.max(...tenants.map(t => t.id)) + 1 : 1,
-        name: newTenant.name,
-        plan: newTenant.plan,
-        status: "Active", // Default status
-        expiry: "30/07/2026", // Mock expiry
-      };
-      setTenants([tenant, ...tenants]);
-      setIsAddModalOpen(false);
-      setNewTenant({ name: "", email: "", password: "", plan: "Classic", duration: "Monthly" });
+    if (newTenant.first_name && newTenant.email && newTenant.password) {
+      addMutation.mutate(newTenant);
+    } else {
+      toast.error('Please fill all required fields');
     }
   };
 
   const toggleTenantStatus = (id, currentStatus) => {
-    // Only toggle between Active and Suspended for demonstration
-    if (currentStatus === "Expired") return; 
+    const isExpired = currentStatus?.toLowerCase() === "expired";
+    if (isExpired) return;
 
-    setTenants(prev => prev.map(tenant => {
-      if (tenant.id === id) {
-        return {
-          ...tenant,
-          status: currentStatus === "Active" ? "Suspended" : "Active"
-        };
-      }
-      return tenant;
-    }));
+    const newStatus = currentStatus?.toLowerCase() === "active" ? "suspended" : "active";
+    updateMutation.mutate({ id, data: { status: newStatus } });
   };
 
   const columns = [
@@ -94,15 +160,16 @@ const TenantManagement = () => {
       width: "15%",
       sortable: true,
       render: (row) => {
+        const statusLower = row.status?.toLowerCase();
         let bgClass = "bg-gray-500";
-        if (row.status === "Active") bgClass = "bg-[#4285F4]";
-        else if (row.status === "Suspended") bgClass = "bg-[#EA4335]";
-        else if (row.status === "Expired") bgClass = "bg-[#7A8293]";
+        if (statusLower === "active") bgClass = "bg-[#4285F4]";
+        else if (statusLower === "suspended") bgClass = "bg-[#EA4335]";
+        else if (statusLower === "expired") bgClass = "bg-[#7A8293]";
 
         return (
           <div className="text-left">
-             <span className={`w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] transition-colors duration-300 ${bgClass}`}>
-              {row.status}
+             <span className={`w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] transition-colors duration-300 ${bgClass} capitalize`}>
+              {row.status || 'Unknown'}
             </span>
           </div>
         );
@@ -113,7 +180,10 @@ const TenantManagement = () => {
       Title: "Expiry Date",
       width: "20%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.expiry}</div>
+      render: (row) => {
+        const dateStr = row.expiry_date ? new Date(row.expiry_date).toLocaleDateString('en-GB') : 'N/A';
+        return <div className="text-left text-gray-200">{dateStr}</div>;
+      }
     },
     {
       key: "actions",
@@ -121,8 +191,9 @@ const TenantManagement = () => {
       width: "20%",
       sortable: false,
       render: (row) => {
-        const isActive = row.status === "Active";
-        const isExpired = row.status === "Expired";
+        const statusLower = row.status?.toLowerCase();
+        const isActive = statusLower === "active";
+        const isExpired = statusLower === "expired";
 
         return (
           <div className="flex items-center justify-start gap-8">
@@ -139,7 +210,7 @@ const TenantManagement = () => {
             
             <button 
               onClick={() => toggleTenantStatus(row.id, row.status)}
-              disabled={isExpired}
+              disabled={isExpired || updateMutation.isPending}
               className="w-5 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title={isActive ? "Suspend Tenant" : "Activate Tenant"}
             >
@@ -162,7 +233,6 @@ const TenantManagement = () => {
 
   return (
     <div>
-
         <div className="flex items-center justify-end mb-4">
             <button 
               onClick={() => setIsAddModalOpen(true)}
@@ -171,13 +241,21 @@ const TenantManagement = () => {
                 Add Tenant
             </button>
         </div>
-      <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-hidden w-full">
-        <Table 
-          TableHeads={columns} 
-          TableRows={tenants} 
-          headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
-          tableClass="border-none" 
-        />
+      <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-hidden w-full relative min-h-[200px]">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20 text-white">Loading...</div>
+        ) : isError ? (
+          <div className="flex items-center justify-center py-20 text-red-500">
+            Error: {error?.response?.data?.message || error?.message || 'Failed to fetch tenants'}
+          </div>
+        ) : (
+          <Table 
+            TableHeads={columns} 
+            TableRows={tenants} 
+            headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
+            tableClass="border-none" 
+          />
+        )}
       </div>
 
       {/* Edit Tenant Modal */}
@@ -204,17 +282,17 @@ const TenantManagement = () => {
               />
 
               <InputField
-                label="Email"
-                value={editingTenant?.email || `${(editingTenant?.name || "").toLowerCase().replace(/\s+/g, '')}@test.com`}
-                onChange={(e) => setEditingTenant({...editingTenant, email: e.target.value})}
+                label="Business Type"
+                value={editingTenant?.business_type || ""}
+                onChange={(e) => setEditingTenant({...editingTenant, business_type: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
               <Dropdown
                 label="Plan"
-                options={["Classic", "Pro"]}
-                value={editingTenant?.plan || "Classic"}
+                options={["No Plan", "Classic", "Pro"]}
+                value={editingTenant?.plan || "No Plan"}
                 onSelect={(val) => setEditingTenant({...editingTenant, plan: val})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
@@ -232,9 +310,10 @@ const TenantManagement = () => {
               </button>
               <button 
                 onClick={handleSaveEdit}
-                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm"
+                disabled={updateMutation.isPending}
+                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm disabled:opacity-50"
               >
-                Save Changes
+                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>
@@ -259,9 +338,10 @@ const TenantManagement = () => {
               </button>
               <button 
                 onClick={handleConfirmDelete}
-                className="bg-[#ef4444] text-white px-10 py-2.5 rounded-full font-semibold hover:bg-red-600 transition-colors text-sm"
+                disabled={deleteMutation.isPending}
+                className="bg-[#ef4444] text-white px-10 py-2.5 rounded-full font-semibold hover:bg-red-600 transition-colors text-sm disabled:opacity-50"
               >
-                Delete
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
@@ -283,16 +363,30 @@ const TenantManagement = () => {
             <p className="text-gray-400 text-[13px] mb-8">Add tenant information.</p>
 
             <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <InputField
+                  label="First Name"
+                  placeholder="John"
+                  value={newTenant.first_name}
+                  onChange={(e) => setNewTenant({...newTenant, first_name: e.target.value})}
+                  labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
+                  inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
+                />
+                <InputField
+                  label="Last Name"
+                  placeholder="Doe"
+                  value={newTenant.last_name}
+                  onChange={(e) => setNewTenant({...newTenant, last_name: e.target.value})}
+                  labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
+                  inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
+                />
+              </div>
+
               <InputField
-                label="Company Name"
+                label="Business Name"
                 placeholder="Tech Corp"
-                value={newTenant.name}
-                onChange={(e) => {
-                  const name = e.target.value;
-                  // Only auto-fill email if it hasn't been manually heavily edited, or just dynamically fill it
-                  // For simplicity, just update the email dynamically if it's currently derived from the name
-                  setNewTenant({...newTenant, name, email: `${name.toLowerCase().replace(/\\s+/g, '')}@test.com`})
-                }}
+                value={newTenant.business_name}
+                onChange={(e) => setNewTenant({...newTenant, business_name: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
@@ -315,26 +409,22 @@ const TenantManagement = () => {
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
-              <Dropdown
-                label="Plan"
-                options={["Classic", "Pro"]}
-                value={newTenant.plan}
-                onSelect={(val) => setNewTenant({...newTenant, plan: val})}
+              <InputField
+                label="Phone"
+                placeholder="+1234567890"
+                value={newTenant.phone}
+                onChange={(e) => setNewTenant({...newTenant, phone: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
               />
 
-              <Dropdown
-                label="Subscription Duration"
-                options={["Monthly", "Yearly"]}
-                value={newTenant.duration}
-                onSelect={(val) => setNewTenant({...newTenant, duration: val})}
+              <InputField
+                label="Business Type"
+                placeholder="Restaurant, Retail, etc."
+                value={newTenant.business_type}
+                onChange={(e) => setNewTenant({...newTenant, business_type: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
               />
             </div>
 
@@ -347,9 +437,10 @@ const TenantManagement = () => {
               </button>
               <button 
                 onClick={handleAddTenant}
-                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm"
+                disabled={addMutation.isPending}
+                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm disabled:opacity-50"
               >
-                Add Tenant
+                {addMutation.isPending ? 'Adding...' : 'Add Tenant'}
               </button>
             </div>
           </div>

@@ -18,7 +18,7 @@ export default function Sidebar({ isOpen, onClose }) {
   
 
   
-  const role = Cookies.get("role") || "owner"; 
+  const role = Cookies.get("role") || "BUSINESS_OWNER"; 
 
   const ownerNavLinks = [
     { name: "Dashboard", path: "/owner/dashboard", icon: "lucide:layout-dashboard" },
@@ -39,7 +39,7 @@ export default function Sidebar({ isOpen, onClose }) {
     { name: "Settings", path: "/admin/settings", icon: "lucide:settings" },
   ];
 
-  const navLinks = role === "admin" ? adminNavLinks : ownerNavLinks;
+  const navLinks = role === "SYSTEM_OWNER" ? adminNavLinks : ownerNavLinks;
 
   return (
     <>

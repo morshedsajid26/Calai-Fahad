@@ -14,8 +14,10 @@ const useAxiosSecure = () => {
     const {logOutUser} = useAuth()
 
     AxiosSecure.interceptors.request.use(function (config) {
-        const token = Cookies.get('Access-Token')
-        config.headers.authorization = `Bearer ${token}`
+        const token = Cookies.get('Access-Token');
+        const role = Cookies.get('role');
+        config.headers.authorization = `Bearer ${token}`;
+        config.headers['ngrok-skip-browser-warning'] = '69420';
         return config;
 
     }, function (error) {
@@ -26,7 +28,7 @@ const useAxiosSecure = () => {
         return response;
     }, async function (error) {
 
-        const status = error.response.status;
+        const status = error.response?.status;
         if(status === 401 || status === 403){
             await logOutUser();
             navigate('/login')
