@@ -33,7 +33,7 @@ const PlanDistribution = ({ apiData }) => {
   }));
 
   const hasData = data.some(d => d.value > 0);
-  const renderData = hasData ? data : [{ name: 'No Data', value: 100, color: '#333' }];
+  const renderData = hasData ? data.filter(d => d.value > 0) : [{ name: 'No Data', value: 100, color: '#333' }];
 
   return (
     <div className="bg-[#191919] rounded-2xl p-6 border border-gray-800/50 flex flex-col h-full min-h-[400px]">
