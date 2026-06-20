@@ -36,7 +36,7 @@ const TenantManagement = () => {
     password: "",
     business_name: "",
     phone: "",
-    business_type: ""
+    business_type: "Restaurant"
   });
 
   const addMutation = useMutation({
@@ -55,7 +55,7 @@ const TenantManagement = () => {
         password: "",
         business_name: "",
         phone: "",
-        business_type: ""
+        business_type: "Restaurant"
       });
     },
     onError: (error) => {
@@ -281,12 +281,15 @@ const TenantManagement = () => {
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
-              <InputField
+              <Dropdown
                 label="Business Type"
-                value={editingTenant?.business_type || ""}
-                onChange={(e) => setEditingTenant({...editingTenant, business_type: e.target.value})}
+                options={["Restaurant", "Take_way"]}
+                value={editingTenant?.business_type || "Restaurant"}
+                onSelect={(val) => setEditingTenant({...editingTenant, business_type: val})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
+                optionClass="!bg-white !text-[#111]"
+                icon="!text-gray-500"
               />
 
               <Dropdown
@@ -418,13 +421,15 @@ const TenantManagement = () => {
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
-              <InputField
+              <Dropdown
                 label="Business Type"
-                placeholder="Restaurant, Retail, etc."
-                value={newTenant.business_type}
-                onChange={(e) => setNewTenant({...newTenant, business_type: e.target.value})}
+                options={["Restaurant", "Take_way"]}
+                value={newTenant.business_type || "Restaurant"}
+                onSelect={(val) => setNewTenant({...newTenant, business_type: val})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
+                optionClass="!bg-white !text-[#111]"
+                icon="!text-gray-500"
               />
             </div>
 
