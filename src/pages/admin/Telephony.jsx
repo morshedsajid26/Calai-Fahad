@@ -137,11 +137,11 @@ const Telephony = () => {
       render: (row) => <div className="text-left text-gray-200">{row.managerNumber || "N/A"}</div>
     },
     {
-      key: "vapiAgentId",
-      Title: "Vapi Agent ID",
+      key: "agentName",
+      Title: "Agent Name",
       width: "30%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200 truncate pr-4" title={row.vapiAgentId}>{row.vapiAgentId || "N/A"}</div>
+      render: (row) => <div className="text-left text-gray-200 truncate pr-4" title={row.agentName}>{row.agentName || "N/A"}</div>
     },
     {
       key: "actions",

@@ -8,11 +8,41 @@ import { Link } from "react-router-dom";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import useAuth from "../../hooks/useAuth";
 import Cookies from "js-cookie";
+import { useQuery } from '@tanstack/react-query';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
+import axios from 'axios';
 
 export default function Header({ onMenuClick }) {
   const [openDropdown, setOpenDropdown] = useState(false);
   const { logOutUser } = useAuth();
   const role = Cookies.get("role") || "BUSINESS_OWNER";
+  const axiosSecure = useAxiosSecure();
+
+  const { data: logoData } = useQuery({
+    queryKey: ['platform-logo'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/system-owner/settings/logo');
+      return res.data;
+    }
+  });
+
+  const logoPath = logoData?.data?.logoUrl;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, '') || '';
+  const currentLogoUrl = logoPath ? `${baseUrl}${logoPath}` : null;
+  
+  const { data: logoBlobUrl } = useQuery({
+    queryKey: ['platform-logo-image', currentLogoUrl],
+    enabled: !!currentLogoUrl,
+    queryFn: async () => {
+      const res = await axios.get(currentLogoUrl, {
+        responseType: 'blob',
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
+      return URL.createObjectURL(res.data);
+    }
+  });
+
+  const displayLogo = logoBlobUrl || "/logo.png";
 
   return (
     <header className="bg-[#141416] flex items-center px-4 md:px-6 py-3.5 relative gap-2 sm:gap-4">
@@ -51,9 +81,9 @@ export default function Header({ onMenuClick }) {
 
         <div className="flex items-center ml-auto gap-2 sm:gap-4 shrink-0">
           {/* Notification Button */}
-          <button className="flex items-center justify-center w-10 h-10 sm:w-10 sm:h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors shrink-0">
+          {/* <button className="flex items-center justify-center w-10 h-10 sm:w-10 sm:h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors shrink-0">
             <IoIosNotificationsOutline className="w-6 h-6 sm:w-6 sm:h-6 text-white" />
-          </button>
+          </button> */}
 
           {/* Language Selector */}
           {/* <button className="flex items-center gap-2 px-3 h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors text-white">
@@ -69,7 +99,7 @@ export default function Header({ onMenuClick }) {
               onClick={() => setOpenDropdown(!openDropdown)}
             >
               <Image
-                src="/logo.png"
+                src={displayLogo}
                 alt="User Avatar"
                 className="w-10 h-10 sm:w-10 sm:h-10 rounded-full object-cover"
               />
