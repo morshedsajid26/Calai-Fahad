@@ -3,22 +3,87 @@ import { Icon } from "@iconify/react";
 import InputField from "@/components/Inputfield";
 import Dropdown from "@/components/Dropdown";
 import Table from "@/components/Table";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import useAxiosSecure from '@/hooks/useAxiosSecure';
+import toast from 'react-hot-toast';
 
 import React, { useState } from "react";
 
 const Telephony = () => {
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  
   const [editingNumber, setEditingNumber] = useState(null);
-  const [numbers, setNumbers] = useState([
-    { id: 1, provider: "Twilio", phoneNumber: "+12345678", forwardingNumber: "+123548968", agent: "Agent 1" },
-    { id: 2, provider: "Vonage", phoneNumber: "+98765432", forwardingNumber: "+987654321", agent: "No Agent unlinked" },
-  ]);
-  const [newNumber, setNewNumber] = useState({ provider: "Twilio", phoneNumber: "", forwardingNumber: "", agent: "No Agent unlinked" });
+  const [deletingNumberId, setDeletingNumberId] = useState(null);
+  
+  const [newNumber, setNewNumber] = useState({ twilioNumber: "", managerNumber: "", vapiAgentId: "" });
+
+  const { data: telephonyResponse, isLoading, isError, error } = useQuery({
+    queryKey: ['telephony'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/system-owner/telephony');
+      return res.data;
+    }
+  });
+
+  const numbers = telephonyResponse?.data || [];
+
+  // Add Mutation
+  const addMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSecure.post('/system-owner/telephony', data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['telephony'] });
+      toast.success('Number added successfully');
+      setIsAddModalOpen(false);
+      setNewNumber({ twilioNumber: "", managerNumber: "", vapiAgentId: "" });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to add number');
+    }
+  });
+
+  // Update Mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }) => {
+      const res = await axiosSecure.patch(`/system-owner/telephony/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['telephony'] });
+      toast.success('Number updated successfully');
+      setIsEditModalOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to update number');
+    }
+  });
+
+  // Delete Mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await axiosSecure.delete(`/system-owner/telephony/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['telephony'] });
+      toast.success('Number deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingNumberId(null);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to delete number');
+    }
+  });
 
   const handleAddNumber = () => {
-    // Backend integration will be handled later
-    setIsAddModalOpen(false);
+    addMutation.mutate(newNumber);
   };
 
   const handleEditClick = (number) => {
@@ -27,42 +92,56 @@ const Telephony = () => {
   };
 
   const handleUpdateNumber = () => {
-    // Backend integration will be handled later
-    setIsEditModalOpen(false);
+    if (editingNumber) {
+      updateMutation.mutate({
+        id: editingNumber.id,
+        data: {
+          twilioNumber: editingNumber.twilioNumber,
+          managerNumber: editingNumber.managerNumber
+        }
+      });
+    }
   };
 
   const handleDeleteNumber = (id) => {
-    setNumbers(prev => prev.filter(n => n.id !== id));
+    setDeletingNumberId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingNumberId) {
+      deleteMutation.mutate(deletingNumberId);
+    }
   };
 
   const columns = [
     {
-      key: "provider",
-      Title: "Provider",
+      key: "business",
+      Title: "Business",
       width: "20%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.provider}</div>
+      render: (row) => <div className="text-left text-gray-200">{row.business?.name || "N/A"}</div>
     },
     {
       key: "phoneNumber",
-      Title: "Phone Number",
-      width: "25%",
-      sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.phoneNumber}</div>
-    },
-    {
-      key: "forwardingNumber",
-      Title: "Forwarding Number",
-      width: "25%",
-      sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.forwardingNumber}</div>
-    },
-    {
-      key: "agent",
-      Title: "Linked Agent",
+      Title: "Twilio Number",
       width: "20%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.agent}</div>
+      render: (row) => <div className="text-left text-gray-200">{row.twilioNumber || "N/A"}</div>
+    },
+    {
+      key: "managerNumber",
+      Title: "Manager Number",
+      width: "20%",
+      sortable: true,
+      render: (row) => <div className="text-left text-gray-200">{row.managerNumber || "N/A"}</div>
+    },
+    {
+      key: "vapiAgentId",
+      Title: "Vapi Agent ID",
+      width: "30%",
+      sortable: true,
+      render: (row) => <div className="text-left text-gray-200 truncate pr-4" title={row.vapiAgentId}>{row.vapiAgentId || "N/A"}</div>
     },
     {
       key: "actions",
@@ -94,7 +173,7 @@ const Telephony = () => {
     <div>
       <div className="flex justify-between items-center">
         <Breadcrumb
-          text={`Import and manage Twilio / Vonage phone numbers linked to your AI Agents.`}
+          text={`Import and manage Twilio phone numbers linked to businesses and AI Agents.`}
         />
 
         <div className=" mb-6">
@@ -108,13 +187,21 @@ const Telephony = () => {
         </div>
       </div>
 
-      <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-hidden w-full">
-        <Table 
-          TableHeads={columns} 
-          TableRows={numbers} 
-          headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
-          tableClass="border-none" 
-        />
+      <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-hidden w-full relative min-h-[200px]">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20 text-white">Loading...</div>
+        ) : isError ? (
+          <div className="flex items-center justify-center py-20 text-red-500">
+            Error: {error?.response?.data?.message || error?.message || 'Failed to fetch telephony config'}
+          </div>
+        ) : (
+          <Table 
+            TableHeads={columns} 
+            TableRows={numbers} 
+            headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
+            tableClass="border-none" 
+          />
+        )}
       </div>
 
       {/* Add Number Modal */}
@@ -129,47 +216,34 @@ const Telephony = () => {
             </button>
 
             <h2 className="text-white text-xl font-semibold mb-1">Add Number</h2>
-            <p className="text-gray-400 text-[13px] mb-8">Import Vapi Number</p>
+            <p className="text-gray-400 text-[13px] mb-8">Import Twilio Number</p>
 
             <div className="space-y-6">
-              <Dropdown
-                label="Provider"
-                options={["Twilio", "Vonage", "Vapi"]}
-                value={newNumber.provider}
-                onSelect={(val) => setNewNumber({...newNumber, provider: val})}
-                labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
-                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
-              />
-
               <InputField
-                label="Phone Number"
+                label="Twilio Number"
                 placeholder="+12345678"
-                value={newNumber.phoneNumber}
-                onChange={(e) => setNewNumber({...newNumber, phoneNumber: e.target.value})}
+                value={newNumber.twilioNumber}
+                onChange={(e) => setNewNumber({...newNumber, twilioNumber: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
               <InputField
-                label="Forwarding Number"
+                label="Manager Number"
                 placeholder="+123548968"
-                value={newNumber.forwardingNumber}
-                onChange={(e) => setNewNumber({...newNumber, forwardingNumber: e.target.value})}
+                value={newNumber.managerNumber}
+                onChange={(e) => setNewNumber({...newNumber, managerNumber: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
-              <Dropdown
-                label="Link to Agent"
-                options={["No Agent unlinked", "Agent 1", "Agent 2"]}
-                value={newNumber.agent}
-                onSelect={(val) => setNewNumber({...newNumber, agent: val})}
+              <InputField
+                label="Vapi Agent ID"
+                placeholder="155909ec-dc75-4ed3-8a1d-a49bddd6744f"
+                value={newNumber.vapiAgentId}
+                onChange={(e) => setNewNumber({...newNumber, vapiAgentId: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
               />
             </div>
 
@@ -182,14 +256,16 @@ const Telephony = () => {
               </button>
               <button 
                 onClick={handleAddNumber}
-                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm"
+                disabled={addMutation.isPending}
+                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm disabled:opacity-50"
               >
-                Add Number
+                {addMutation.isPending ? 'Adding...' : 'Add Number'}
               </button>
             </div>
           </div>
         </div>
       )}
+      
       {/* Edit Number Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -205,44 +281,22 @@ const Telephony = () => {
             <p className="text-gray-400 text-[13px] mb-8">Update imported number details</p>
 
             <div className="space-y-6">
-              <Dropdown
-                label="Provider"
-                options={["Twilio", "Vonage", "Vapi"]}
-                value={editingNumber?.provider}
-                onSelect={(val) => setEditingNumber({...editingNumber, provider: val})}
-                labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
-                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
-              />
-
               <InputField
-                label="Phone Number"
+                label="Twilio Number"
                 placeholder="+12345678"
-                value={editingNumber?.phoneNumber}
-                onChange={(e) => setEditingNumber({...editingNumber, phoneNumber: e.target.value})}
+                value={editingNumber?.twilioNumber || ""}
+                onChange={(e) => setEditingNumber({...editingNumber, twilioNumber: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
               <InputField
-                label="Forwarding Number"
+                label="Manager Number"
                 placeholder="+123548968"
-                value={editingNumber?.forwardingNumber}
-                onChange={(e) => setEditingNumber({...editingNumber, forwardingNumber: e.target.value})}
+                value={editingNumber?.managerNumber || ""}
+                onChange={(e) => setEditingNumber({...editingNumber, managerNumber: e.target.value})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-              />
-
-              <Dropdown
-                label="Link to Agent"
-                options={["No Agent unlinked", "Agent 1", "Agent 2"]}
-                value={editingNumber?.agent}
-                onSelect={(val) => setEditingNumber({...editingNumber, agent: val})}
-                labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
-                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
               />
             </div>
 
@@ -255,9 +309,38 @@ const Telephony = () => {
               </button>
               <button 
                 onClick={handleUpdateNumber}
-                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm"
+                disabled={updateMutation.isPending}
+                className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm disabled:opacity-50"
               >
-                Update Number
+                {updateMutation.isPending ? 'Updating...' : 'Update Number'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#0E0E10] border border-gray-800 rounded-[20px] w-full max-w-[500px] p-8 relative shadow-2xl">
+            <h2 className="text-white text-xl font-bold mb-3">Are you absolutely sure?</h2>
+            <p className="text-gray-400 text-[14px] leading-relaxed mb-10 pr-4">
+              This action cannot be undone. This will permanently delete the telephony configuration from the platform.
+            </p>
+
+            <div className="flex items-center justify-center gap-5">
+              <button 
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="bg-white text-black font-semibold px-10 py-2.5 rounded-full hover:bg-gray-200 transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="bg-[#ef4444] text-white px-10 py-2.5 rounded-full font-semibold hover:bg-red-600 transition-colors text-sm disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

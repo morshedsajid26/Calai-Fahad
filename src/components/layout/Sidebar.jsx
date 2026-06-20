@@ -35,7 +35,7 @@ export default function Sidebar({ isOpen, onClose }) {
     { name: "Tenants", path: "/admin/tenant-management", icon: "lucide:users" },
     { name: "Telephony", path: "/admin/telephony-integration", icon: "lucide:phone" },
     { name: "Subscriptions & Billing", path: "/admin/subscriptions-billing", icon: "lucide:credit-card" },
-    { name: "API Keys", path: "/admin/api-keys", icon: "lucide:key" },
+    // { name: "API Keys", path: "/admin/api-keys", icon: "lucide:key" },
     { name: "Settings", path: "/admin/settings", icon: "lucide:settings" },
   ];
 
