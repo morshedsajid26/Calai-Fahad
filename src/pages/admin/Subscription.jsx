@@ -52,36 +52,9 @@ const PlanCard = ({ plan, isAnnual }) => {
 const Subscription = () => {
   const [isAnnual, setIsAnnual] = useState(false)
 
-  const stats = [
-    {
-      title: "Total Revenue",
-      value: "$32,310",
-      label: "All time",
-      icon: <DollarSign className="w-6 h-6" />,
-    },
-    {
-      title: "This Month",
-      value: "$8,540",
-      label: (
-        <div className="flex items-center gap-3">
-          <span className="text-white text-[11px] font-medium">+5.09% ↗</span>
-          <span className="text-gray-500 text-[11px]">+1.4 last month</span>
-        </div>
-      ),
-      icon: <TrendingUp className="w-6 h-6" />,
-    },
-    {
-      title: "Active Plan",
-      value: "2",
-      label: "Available plans",
-      labelColor: "text-green-500",
-      icon: <CreditCard className="w-6 h-6" />,
-    }
-  ]
-
   const axiosSecure = useAxiosSecure()
 
-  const { data: plansResponse, isLoading } = useQuery({
+  const { data: plansResponse, isLoading: isPlansLoading } = useQuery({
     queryKey: ['plans'],
     queryFn: async () => {
       const res = await axiosSecure.get('/system-owner/subscription-billing/plans')
@@ -91,22 +64,71 @@ const Subscription = () => {
 
   const plans = plansResponse?.data || []
 
+  const { data: billingsResponse, isLoading: isBillingsLoading } = useQuery({
+    queryKey: ['billings'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/system-owner/subscription-billing/billings')
+      return res.data
+    }
+  })
+
+  const billingsData = billingsResponse?.data || { stats: {}, recent_invoices: [] };
+  const apiStats = billingsData.stats;
+
+  const stats = [
+    {
+      title: "Total Revenue",
+      value: `$${apiStats?.total_revenue?.toLocaleString() || 0}`,
+      label: "All time",
+      icon: <DollarSign className="w-6 h-6" />,
+    },
+    {
+      title: "This Month",
+      value: `$${apiStats?.monthly_revenue?.toLocaleString() || 0}`,
+      label: (
+        <div className="flex items-center gap-3">
+          <span className="text-gray-500 text-[11px]">revenue this month</span>
+        </div>
+      ),
+      icon: <TrendingUp className="w-6 h-6" />,
+    },
+    {
+      title: "Active Plans",
+      value: apiStats?.active_plans || 0,
+      label: "Subscribed tenants",
+      labelColor: "text-green-500",
+      icon: <CreditCard className="w-6 h-6" />,
+    }
+  ]
+
   const tableHeads = [
-    { key: 'invoiceNo', Title: 'Invoice No.' },
-    { key: 'companyName', Title: 'Company Name' },
+    { key: 'invoice_no', Title: 'Invoice No.' },
+    { key: 'company_name', Title: 'Company Name' },
     { key: 'plan', Title: 'Plan' },
-    { key: 'amount', Title: 'Amount' },
-    { key: 'expiryDate', Title: 'Expiry Date' },
+    { 
+      key: 'amount', 
+      Title: 'Amount',
+      render: (row) => `$${row.amount}` 
+    },
+    { 
+      key: 'expiry_date', 
+      Title: 'Expiry Date',
+      render: (row) => new Date(row.expiry_date).toLocaleDateString('en-GB')
+    },
     { 
       key: 'status', 
       Title: 'Status',
       render: (row) => (
-        <span className="px-4 py-1.5 rounded-lg bg-blue-600 text-white text-[13px] font-medium">
+        <span className={`px-4 py-1.5 rounded-lg text-white text-[13px] font-medium capitalize ${row.status === 'paid' ? 'bg-blue-600' : 'bg-red-500'}`}>
           {row.status}
         </span>
       )
     },
-    { key: 'billingCycle', Title: 'Billing Cycle' },
+    { 
+      key: 'billing_cycle', 
+      Title: 'Billing Cycle',
+      render: (row) => <span className="capitalize">{row.billing_cycle}</span>
+    },
     { 
       key: 'action', 
       Title: 'Action',
@@ -118,35 +140,7 @@ const Subscription = () => {
     }
   ]
 
-  const tableRows = [
-    {
-      invoiceNo: 'INV-001245',
-      companyName: 'Tech Crop',
-      plan: 'Classic',
-      amount: '$599',
-      expiryDate: '2026-03-01',
-      status: 'Paid',
-      billingCycle: 'Monthly'
-    },
-    {
-      invoiceNo: 'INV-001246',
-      companyName: 'Global Tech',
-      plan: 'Premium',
-      amount: '$999',
-      expiryDate: '2026-04-15',
-      status: 'Paid',
-      billingCycle: 'Yearly'
-    },
-    {
-      invoiceNo: 'INV-001247',
-      companyName: 'Soft Solution',
-      plan: 'Basic',
-      amount: '$299',
-      expiryDate: '2026-02-28',
-      status: 'Paid',
-      billingCycle: 'Monthly'
-    }
-  ]
+  const tableRows = billingsData.recent_invoices;
 
   return (
     <div>
@@ -187,7 +181,7 @@ const Subscription = () => {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          {isLoading ? (
+          {isPlansLoading ? (
             <div className="col-span-full flex justify-center py-10">
               <span className="text-gray-400">Loading plans...</span>
             </div>
@@ -205,12 +199,16 @@ const Subscription = () => {
        <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-hidden mt-15">
         
         
+        {isBillingsLoading ? (
+          <div className="flex items-center justify-center py-20 text-white">Loading billing history...</div>
+        ) : (
           <Table 
             TableHeads={tableHeads} 
             TableRows={tableRows} 
             headClass=" border-none text-gray-400 tracking-wider"
             tableClass="border-none"
           />
+        )}
         
       </div>
     </div>
