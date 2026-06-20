@@ -1,10 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Classic', value: 63, color: '#3B82F6' },
-  { name: 'Pro', value: 37, color: '#10B981' },
-];
+const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
 
 const renderCustomizedLabel = (props) => {
   const { cx, cy, midAngle, outerRadius, value, name, fill } = props;
@@ -27,7 +24,17 @@ const renderCustomizedLabel = (props) => {
   );
 };
 
-const PlanDistribution = () => {
+const PlanDistribution = ({ apiData }) => {
+  const data = (apiData || []).map((item, index) => ({
+    name: item.name,
+    value: item.percentage,
+    count: item.count,
+    color: COLORS[index % COLORS.length]
+  }));
+
+  const hasData = data.some(d => d.value > 0);
+  const renderData = hasData ? data : [{ name: 'No Data', value: 100, color: '#333' }];
+
   return (
     <div className="bg-[#191919] rounded-2xl p-6 border border-gray-800/50 flex flex-col h-full min-h-[400px]">
       <h3 className="text-white text-lg font-medium mb-4">Plan Distribution</h3>
@@ -36,18 +43,18 @@ const PlanDistribution = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={renderData}
               cx="50%"
               cy="50%"
               outerRadius={100}
               dataKey="value"
               stroke="#ffffff"
               strokeWidth={1}
-              label={renderCustomizedLabel}
+              label={hasData ? renderCustomizedLabel : false}
               labelLine={false}
               isAnimationActive={true}
             >
-              {data.map((entry, index) => (
+              {renderData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
@@ -55,11 +62,13 @@ const PlanDistribution = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex justify-center items-center gap-6 mt-4 pb-2">
+      <div className="flex justify-center flex-wrap items-center gap-6 mt-4 pb-2">
         {data.map((entry, index) => (
           <div key={index} className="flex items-center gap-2">
             <div className="w-3.5 h-3.5" style={{ backgroundColor: entry.color }}></div>
-            <span className="text-[15px] font-medium" style={{ color: entry.color }}>{entry.name}</span>
+            <span className="text-[15px] font-medium" style={{ color: entry.color }}>
+              {entry.name} ({entry.count})
+            </span>
           </div>
         ))}
       </div>

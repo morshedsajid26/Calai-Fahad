@@ -2,9 +2,11 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 import PlanDistribution from '../../components/PlanDistribution';
 import TenantDistribution from '../../components/TenantDistribution';
+import { useQuery } from '@tanstack/react-query';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 let StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText }) => {
-  const isNegative = trend.startsWith('-');
+  const isNegative = typeof trend === 'string' && trend.startsWith('-');
   
   return (
     <div className="relative overflow-hidden bg-[#191919] rounded-2xl p-3 border border-gray-800/50 flex flex-col h-full ">
@@ -30,7 +32,7 @@ let StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText 
       </div>
 
       {/* Background Sparkline */}
-      <div className="absolut bottom-0 left-0 w-full h-17 pointer-events-none opacity-80">
+      <div className="absolute bottom-0 left-0 w-full h-17 pointer-events-none opacity-80">
         <svg viewBox="0 0 200 50" preserveAspectRatio="none" className="w-full h-full">
           <defs>
             <linearGradient id={`gradient-${title.replace(/\s+/g, '-')}`} x1="0" y1="0" x2="0" y2="1">
@@ -55,40 +57,57 @@ let StatCard = ({ title, value, icon, iconBg = "bg-[#262626]", trend, trendText 
 }
 
 const Dashboard = () => {
+  const axiosSecure = useAxiosSecure();
+
+  const { data: dashboardResponse, isLoading } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/system-owner/dashboard');
+      return res.data;
+    }
+  });
+
+  const dashboardData = dashboardResponse?.data;
+  const stats = dashboardData?.stats;
+
   const statsData = [
     {
       title: "Total Tenants",
-      value: "248",
+      value: stats?.totalTenants?.value ?? 0,
       icon: "lucide:users",
       iconBg: "bg-transparent",
-      trend: "+5.09%",
-      trendText: "+1.4 last month"
+      trend: stats?.totalTenants?.change ?? "0%",
+      trendText: stats?.totalTenants?.subtext ?? ""
     },
     {
       title: "Active Subscription",
-      value: "186",
+      value: stats?.activeSubscriptions?.value ?? 0,
       icon: "lucide:phone-call",
       iconBg: "bg-transparent",
-      trend: "+5.09%",
-      trendText: "+1.4 last month"
+      trend: stats?.activeSubscriptions?.change ?? "0%",
+      trendText: stats?.activeSubscriptions?.subtext ?? ""
     },
     {
       title: "Monthly Revenue",
-      value: "$32500",
+      value: `$${stats?.monthlyRevenue?.value ?? 0}`,
       icon: "lucide:dollar-sign",
       iconBg: "bg-transparent",
-      trend: "+18%",
-      trendText: "+1.4 last month"
+      trend: stats?.monthlyRevenue?.change ?? "0%",
+      trendText: stats?.monthlyRevenue?.subtext ?? ""
     },
     {
       title: "Expiring Tenants",
-      value: "12",
+      value: stats?.expiringTenants?.value ?? 0,
       icon: "lucide:alert-circle",
       iconBg: "bg-transparent",
-      trend: "-75%",
-      trendText: "+1.4 last month"
+      trend: stats?.expiringTenants?.change ?? "0%",
+      trendText: stats?.expiringTenants?.subtext ?? ""
     }
   ];
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-64 text-gray-400">Loading dashboard data...</div>;
+  }
 
   return (
     <div>
@@ -99,15 +118,12 @@ const Dashboard = () => {
           </div>
         ))}
 
-
-
         <div className='col-span-12 md:col-span-12 lg:col-span-6'>
-          <PlanDistribution/>
-          
+          <PlanDistribution apiData={dashboardData?.planDistribution} />
         </div>
 
         <div className='col-span-12 md:col-span-12 lg:col-span-6'>
-          <TenantDistribution/>
+          <TenantDistribution apiData={dashboardData?.tenantStatusDistribution} />
         </div>
       </div>
     </div>

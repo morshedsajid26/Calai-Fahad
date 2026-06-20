@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import Dropdown from './Dropdown';
 
-const data = [
-  { name: 'Active', value: 75, color: '#10B981' },
-  { name: 'Suspended', value: 14, color: '#EF4444' },
-  { name: 'Expired', value: 11, color: '#6B7280' },
-];
+const COLORS = {
+  active: '#10B981',
+  suspended: '#EF4444',
+  trial: '#F59E0B',
+  expired: '#6B7280'
+};
 
 const renderCustomizedLabel = (props) => {
   const { cx, cy, midAngle, outerRadius, value, name, fill } = props;
@@ -29,8 +30,18 @@ const renderCustomizedLabel = (props) => {
   );
 };
 
-const TenantDistribution = () => {
+const TenantDistribution = ({ apiData }) => {
   const [filter, setFilter] = useState('Weekly');
+
+  const data = (apiData || []).map((item) => ({
+    name: item.status.charAt(0).toUpperCase() + item.status.slice(1),
+    value: item.percentage,
+    count: item.count,
+    color: COLORS[item.status.toLowerCase()] || '#8B5CF6'
+  }));
+
+  const hasData = data.some(d => d.value > 0);
+  const renderData = hasData ? data : [{ name: 'No Data', value: 100, color: '#333' }];
 
   return (
     <div className="bg-[#191919] rounded-2xl p-6 border border-gray-800/50 flex flex-col h-full min-h-[400px]">
@@ -52,18 +63,18 @@ const TenantDistribution = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={renderData}
               cx="50%"
               cy="50%"
               outerRadius={100}
               dataKey="value"
               stroke="#ffffff"
               strokeWidth={1}
-              label={renderCustomizedLabel}
+              label={hasData ? renderCustomizedLabel : false}
               labelLine={false}
               isAnimationActive={true}
             >
-              {data.map((entry, index) => (
+              {renderData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
@@ -71,11 +82,13 @@ const TenantDistribution = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex justify-center items-center gap-6 mt-4 pb-2">
+      <div className="flex justify-center flex-wrap items-center gap-6 mt-4 pb-2">
         {data.map((entry, index) => (
           <div key={index} className="flex items-center gap-2">
             <div className="w-3.5 h-3.5" style={{ backgroundColor: entry.color }}></div>
-            <span className="text-[15px] font-medium text-gray-400">{index}</span>
+            <span className="text-[15px] font-medium text-gray-400">
+              {entry.name} ({entry.count})
+            </span>
           </div>
         ))}
       </div>
