@@ -1,10 +1,37 @@
 import React, { useState, useRef } from 'react'
-import { CloudUpload, FileText, X } from 'lucide-react'
+import { CloudUpload, FileText, X, Loader2 } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import useAxiosSecure from '../hooks/useAxiosSecure'
+import toast from 'react-hot-toast'
 
 const UploadPdf = () => {
   const [files, setFiles] = useState([])
+  const [agentName, setAgentName] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef(null)
+  
+  const axiosSecure = useAxiosSecure()
+  const queryClient = useQueryClient()
+
+  const createAgentMutation = useMutation({
+    mutationFn: async (formData) => {
+      const response = await axiosSecure.post('/agent/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      return response.data
+    },
+    onSuccess: () => {
+      toast.success('Agent created and provisioned successfully')
+      setFiles([])
+      setAgentName('')
+      queryClient.invalidateQueries(['recentAgents'])
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Failed to create agent')
+    }
+  })
 
   const processFiles = (newFiles) => {
     const validFiles = Array.from(newFiles).filter(
@@ -12,10 +39,14 @@ const UploadPdf = () => {
     )
     
     if (validFiles.length !== newFiles.length) {
-      alert('Some files were rejected. Please select valid PDF files only.')
+      toast.error('Some files were rejected. Please select valid PDF files only.')
     }
     
     if (validFiles.length > 0) {
+      if (files.length + validFiles.length > 3) {
+        toast.error('Maximum 3 files allowed (Rules, Menu, Special Offers)')
+        return
+      }
       setFiles((prev) => [...prev, ...validFiles])
     }
   }
@@ -24,7 +55,6 @@ const UploadPdf = () => {
     if (e.target.files && e.target.files.length > 0) {
       processFiles(e.target.files)
     }
-    // Reset input value so the same file can be selected again if removed
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -55,13 +85,47 @@ const UploadPdf = () => {
     setFiles((prev) => prev.filter((_, index) => index !== indexToRemove))
   }
 
+  const handleApply = () => {
+    if (!agentName.trim()) {
+      toast.error('Please enter an agent name')
+      return
+    }
+    if (files.length < 2) {
+      toast.error('Please upload at least 2 files (Rules File & Menu File)')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('agent_name', agentName)
+    formData.append('rules_file', files[0])
+    formData.append('menu_file', files[1])
+    
+    if (files[2]) {
+      formData.append('special_offers_file', files[2])
+    }
+
+    createAgentMutation.mutate(formData)
+  }
+
   return (
     <div className="bg-[#191919] p-6 rounded-xl border border-white/5 relative">
-      <div className="text-center mb-6">
-        <h2 className="text-lg font-medium text-white mb-2">Upload doc pdf file</h2>
-        <p className="text-sm text-gray-400">
-          Upload documents with text that will be used to train your AI text model
+      <div className="mb-6">
+        <h2 className="text-lg font-medium text-white mb-2">Create AI Agent</h2>
+        <p className="text-sm text-gray-400 mb-6">
+          Upload documents with text that will be used to train your AI text model. <br/>
+         
         </p>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">Agent Name</label>
+          <input 
+            type="text" 
+            value={agentName}
+            onChange={(e) => setAgentName(e.target.value)}
+            placeholder="e.g. Offer offer burger 2"
+            className="w-full bg-[#111111] border border-[#272727] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+          />
+        </div>
       </div>
 
       <div 
@@ -85,31 +149,39 @@ const UploadPdf = () => {
         {files.length > 0 ? (
           <div className="w-full flex flex-col items-center">
             <div className="flex flex-wrap gap-4 justify-center items-center w-full max-h-[200px] overflow-y-auto p-2">
-              {files.map((file, index) => (
-                <div 
-                  key={index} 
-                  className="relative flex flex-col items-center bg-[#252525] p-3 rounded-xl border border-white/5 hover:border-blue-500/30 transition-colors group"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <FileText className="w-8 h-8 text-blue-400 mb-2" />
-                  <button 
-                    onClick={(e) => removeFile(e, index)}
-                    className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 shadow-lg"
-                    title="Remove file"
+              {files.map((file, index) => {
+                const label = index === 0 ? "Rules" : index === 1 ? "Menu" : "Offers";
+                return (
+                  <div 
+                    key={index} 
+                    className="relative flex flex-col items-center bg-[#252525] p-3 rounded-xl border border-white/5 hover:border-blue-500/30 transition-colors group"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <X className="w-3 h-3 text-white" />
-                  </button>
-                  <h3 className="text-xs text-gray-200 truncate w-20 text-center" title={file.name}>
-                    {file.name}
-                  </h3>
-                  <p className="text-[10px] text-gray-500 mt-1">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
-                </div>
-              ))}
+                    <div className="absolute -top-3 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full z-10">
+                      {label}
+                    </div>
+                    <FileText className="w-8 h-8 text-blue-400 mb-2 mt-1" />
+                    <button 
+                      onClick={(e) => removeFile(e, index)}
+                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 shadow-lg"
+                      title="Remove file"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                    <h3 className="text-xs text-gray-200 truncate w-20 text-center" title={file.name}>
+                      {file.name}
+                    </h3>
+                    <p className="text-[10px] text-gray-500 mt-1">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                )
+              })}
             </div>
-            <div className="mt-6 flex items-center justify-center space-x-2 text-sm text-gray-400 hover:text-white transition-colors">
-              <CloudUpload className="w-4 h-4" />
-              <span>Click or drag to add more files</span>
-            </div>
+            {files.length < 3 && (
+              <div className="mt-6 flex items-center justify-center space-x-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <CloudUpload className="w-4 h-4" />
+                <span>Click or drag to add more files</span>
+              </div>
+            )}
           </div>
         ) : (
           <>
@@ -122,7 +194,7 @@ const UploadPdf = () => {
             <p className="text-sm text-gray-500 mb-6 text-center">or click to browse files from your computer</p>
             
             <button className="px-8 py-2 rounded-full border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_20px_rgba(37,99,235,0.5)] transition-all pointer-events-none">
-              Upload Files
+              Browse Files
             </button>
           </>
         )}
@@ -130,14 +202,16 @@ const UploadPdf = () => {
 
       <div className="absolute bottom-6 right-6">
         <button 
-          className={`px-6 py-2.5 rounded-full text-sm transition-all ${
-            files.length > 0 
-              ? 'border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)]' 
+          onClick={handleApply}
+          className={`px-6 py-2.5 rounded-full text-sm transition-all flex items-center gap-2 ${
+            files.length >= 2 && agentName.trim()
+              ? 'border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] cursor-pointer' 
               : 'border border-blue-600/50 bg-[#0a0a2a] text-gray-400 cursor-not-allowed opacity-50'
           }`}
-          disabled={files.length === 0}
+          disabled={files.length < 2 || !agentName.trim() || createAgentMutation.isPending}
         >
-          Apply Train AI {files.length > 0 && `(${files.length})`}
+          {createAgentMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+          {createAgentMutation.isPending ? 'Creating Agent...' : 'Create Agent'}
         </button>
       </div>
     </div>
