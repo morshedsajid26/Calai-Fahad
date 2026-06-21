@@ -71,9 +71,9 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="px-6 py-6 flex  items-center gap-4">
-            <Image src="/logo.png" alt="Company Logo" />
-
-          
+            <Link to="/">
+              <Image src="/logo.png" alt="Company Logo" />
+            </Link>
           </div>
 
           {/* Navigation */}
