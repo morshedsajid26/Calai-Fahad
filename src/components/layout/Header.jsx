@@ -27,9 +27,22 @@ export default function Header({ onMenuClick }) {
     }
   });
 
+  const { data: profileData } = useQuery({
+    queryKey: ['business-owner-profile'],
+    enabled: role === "BUSINESS_OWNER",
+    queryFn: async () => {
+      const res = await axiosSecure.get('/business-owner/settings/my-profile');
+      return res.data;
+    }
+  });
+
   const logoPath = logoData?.data?.logoUrl;
+  const ownerAvatarPath = profileData?.data?.avatar;
   const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, '') || '';
-  const currentLogoUrl = logoPath ? `${baseUrl}${logoPath}` : null;
+  
+  const currentLogoUrl = role === "SYSTEM_OWNER" 
+    ? (logoPath ? `${baseUrl}${logoPath}` : null)
+    : (ownerAvatarPath ? `${baseUrl}${ownerAvatarPath}` : null);
   
   const { data: logoBlobUrl } = useQuery({
     queryKey: ['platform-logo-image', currentLogoUrl],
