@@ -20,6 +20,7 @@ export default function Header({ onMenuClick }) {
 
   const { data: logoData } = useQuery({
     queryKey: ['platform-logo'],
+    enabled: role === "SYSTEM_OWNER",
     queryFn: async () => {
       const res = await axiosSecure.get('/system-owner/settings/logo');
       return res.data;
