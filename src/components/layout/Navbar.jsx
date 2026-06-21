@@ -24,7 +24,7 @@ const Navbar = () => {
   const location = useLocation();
 
   const { user } = useAuth();
-  const userRole = Cookies.get("role") || (user?.role === "SYSTEM_OWNER" ? "admin" : "owner");
+  const userRole = (user?.role === "SYSTEM_OWNER" ? "admin" : "owner");
   const dashboardPath = `/${userRole}/dashboard`;
   const dashboardLabel = userRole === "admin" ? "Admin" : "Business Owner";
 
