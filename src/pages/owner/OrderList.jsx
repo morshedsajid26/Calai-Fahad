@@ -1,38 +1,89 @@
 import React, { useState } from 'react'
-import { Eye, X, Printer, Download } from 'lucide-react'
-import { jsPDF } from "jspdf"
-
+import { Eye, X, Printer, Download, Loader2 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import useAxiosSecure from '../../hooks/useAxiosSecure'
+import toast from 'react-hot-toast'
 
 import Table from '../../components/Table'
 import Breadcrumb from '../../components/Breadcrumb'
 
 const OrderList = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [orderProducts, setOrderProducts] = useState([]);
+  const axiosSecure = useAxiosSecure();
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+  const { data: ordersResponse, isLoading } = useQuery({
+    queryKey: ['ordersList'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/business-owner/order')
+      return res.data
+    }
+  })
+
+  const { data: orderDetailsResponse, isLoading: isDetailsLoading } = useQuery({
+    queryKey: ['orderDetail', selectedOrderId],
+    enabled: !!selectedOrderId,
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/business-owner/order/${selectedOrderId}`)
+      return res.data
+    }
+  })
+
+  const orders = ordersResponse?.data || [];
+  const selectedOrder = orderDetailsResponse?.data;
+  const orderProducts = selectedOrder?.items || [];
 
   const handleViewClick = (order) => {
-    setSelectedOrder(order);
-    setOrderProducts(order.products || [
-      { id: 1, name: 'Coca-Cola', quantity: 12, time: '4:45 pm', price: '$2.12k' },
-      { id: 2, name: 'Sprite', quantity: 213, time: '4:46 pm', price: '$10k' },
-      { id: 3, name: 'Sprite', quantity: 213, time: '4:46 pm', price: '$1.9k' },
-    ]);
-    setIsModalOpen(true);
+    setSelectedOrderId(order.id);
   };
 
-  const handleQuantityChange = (id, change) => {
-    setOrderProducts(prev => prev.map(p => {
-      if (p.id === id) {
-        const newQuantity = Math.max(0, p.quantity + change);
-        return { ...p, quantity: newQuantity };
-      }
-      return p;
-    }));
+  const closeModal = () => {
+    setSelectedOrderId(null);
   };
+
+  const handleDownload = async () => {
+    if (!selectedOrder) return;
+    try {
+      const toastId = toast.loading('Downloading invoice...');
+      const res = await axiosSecure.get(`/business-owner/order/download/${selectedOrder.id}`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Invoice_${selectedOrder.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      toast.success('Download complete', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to download invoice');
+    }
+  }
+
+  const handlePrint = async () => {
+    if (!selectedOrder) return;
+    try {
+      const toastId = toast.loading('Preparing print...');
+      const res = await axiosSecure.get(`/business-owner/order/download/${selectedOrder.id}`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      toast.dismiss(toastId);
+      const printWindow = window.open(url);
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to prepare print');
+    }
+  }
 
   const columns = [
-    { key: 'callerId', Title: 'Caller ID', width: '15%' },
+    { key: 'callId', Title: 'Caller ID', width: '15%' },
     { key: 'customerName', Title: 'Customer Name', width: '20%' },
     { key: 'time', Title: 'Time', width: '15%' },
     { key: 'date', Title: 'Date', width: '15%' },
@@ -55,120 +106,116 @@ const OrderList = () => {
     }
   ]
 
-  const orders = [
-    { callerId: '20260223', customerName: 'MD Nadim', time: '4:45 pm', date: '30/07/2025', email: 'example@email.com' },
-    { callerId: '20260223', customerName: 'Fatema Akter', time: '4:45 pm', date: '30/07/2025', email: 'example@email.com' },
-    { callerId: '20260223', customerName: 'Nusrat Jahan', time: '4:45 pm', date: '30/07/2025', email: 'example@email.com' },
-    { callerId: '20260223', customerName: 'Tazreen Huda', time: '4:45 pm', date: '30/07/2025', email: 'example@email.com' },
-    { callerId: '20260223', customerName: 'Shakib Ahmed', time: '4:45 pm', date: '30/07/2025', email: 'example@email.com' },
-    { callerId: '20260223', customerName: 'Mitu Jahan', time: '4:45 pm', date: '30/07/2025', email: 'example@email.com' },
-  ]
+  if (isLoading) {
+    return (
+      <div>
+        <Breadcrumb text="You can see your order" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="animate-spin text-[#2563EB] w-10 h-10" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
       <Breadcrumb text="You can see your order" />
 
       <div className="bg-[#191919] border border-[#1A1A1A] rounded-2xl overflow-hidden shadow-sm">
-        <Table 
-          TableHeads={columns} 
-          TableRows={orders} 
-          headClass=" border-b border-[#1A1A1A] text-gray-200 whitespace-nowrap last:[&>div]:justify-center"
-          tableClass="border-none"
-        />
+        {orders.length > 0 ? (
+          <Table 
+            TableHeads={columns} 
+            TableRows={orders} 
+            headClass=" border-b border-[#1A1A1A] text-gray-200 whitespace-nowrap last:[&>div]:justify-center"
+            tableClass="border-none"
+          />
+        ) : (
+          <div className="p-8 text-center text-gray-400 text-sm">
+            No orders found.
+          </div>
+        )}
       </div>
 
       {/* View Modal */}
-      {isModalOpen && (
+      {selectedOrderId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-white">
            <div className="bg-[#111111] border border-[#1A1A1A] rounded-[20px] w-full max-w-[700px] overflow-hidden relative shadow-2xl">
               
               {/* Header */}
               <div className="px-8 py-6 border-b border-[#1A1A1A] flex justify-between items-center">
                 <h2 className="text-[17px] text-gray-200">
-                  Order Summary <span className="text-gray-400">({selectedOrder?.customerName})</span>
+                  Order Summary {selectedOrder && <span className="text-gray-400">({selectedOrder.customerName})</span>}
                 </h2>
                 <button 
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={closeModal}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Table Content */}
-              <div className="px-8 py-2">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-[#1A1A1A]">
-                      <th className="py-4 text-[14px] font-semibold text-white">Product name</th>
-                      <th className="py-4 text-[14px] font-semibold text-white text-center">Order Quantity</th>
-                      <th className="py-4 text-[14px] font-semibold text-white">Time</th>
-                      <th className="py-4 text-[14px] font-semibold text-white text-right">Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orderProducts.map((product) => (
-                      <tr key={product.id} className="border-b border-[#1A1A1A]">
-                        <td className="py-5 text-[14px] text-gray-300">{product.name}</td>
-                        <td className="py-5 text-[14px] text-gray-300 text-center">
-                          <span onClick={() => handleQuantityChange(product.id, -1)} className="text-gray-500 mr-3 cursor-pointer select-none hover:text-white transition-colors">—</span>
-                          <span className="inline-block w-8">{product.quantity}</span>
-                          <span onClick={() => handleQuantityChange(product.id, 1)} className="text-gray-500 ml-3 cursor-pointer select-none hover:text-white transition-colors">+</span>
-                        </td>
-                        <td className="py-5 text-[14px] text-gray-300">{product.time}</td>
-                        <td className="py-5 text-[14px] text-gray-300 text-right">{product.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {isDetailsLoading ? (
+                <div className="flex items-center justify-center min-h-[200px]">
+                  <Loader2 className="animate-spin text-[#2563EB] w-8 h-8" />
+                </div>
+              ) : (
+                <>
+                  {/* Table Content */}
+                  <div className="px-8 py-2 max-h-[400px] overflow-y-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-[#1A1A1A]">
+                          <th className="py-4 text-[14px] font-semibold text-white">Product name</th>
+                          <th className="py-4 text-[14px] font-semibold text-white text-center">Order Quantity</th>
+                          <th className="py-4 text-[14px] font-semibold text-white">Time</th>
+                          <th className="py-4 text-[14px] font-semibold text-white text-right">Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orderProducts.length > 0 ? (
+                          orderProducts.map((product, idx) => (
+                            <tr key={product.id || idx} className="border-b border-[#1A1A1A]">
+                              <td className="py-5 text-[14px] text-gray-300">{product.name || `Item ${idx+1}`}</td>
+                              <td className="py-5 text-[14px] text-gray-300 text-center">
+                                <span className="inline-block px-4">{product.quantity}</span>
+                              </td>
+                              <td className="py-5 text-[14px] text-gray-300">{selectedOrder?.time || '-'}</td>
+                              <td className="py-5 text-[14px] text-gray-300 text-right">${product.price || product.unitPrice || product.totalPrice || 0}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="4" className="py-8 text-center text-gray-500 text-sm">No items found for this order.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
 
-              {/* Footer Actions */}
-              <div className="px-8 py-6 flex justify-end gap-4 mt-2">
-                <button 
-                  onClick={() => window.print()}
-                  className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[13px] font-medium"
-                >
-                  <Printer className="w-4 h-4" />
-                  Print
-                </button>
-                <button 
-                  onClick={() => {
-                    const doc = new jsPDF();
-                    
-                    // Title
-                    doc.setFontSize(18);
-                    doc.text("Order Summary", 20, 20);
-                    
-                    // Order Info
-                    doc.setFontSize(12);
-                    doc.text(`Customer Name: ${selectedOrder?.customerName || ''}`, 20, 35);
-                    doc.text(`Caller ID: ${selectedOrder?.callerId || ''}`, 20, 45);
-                    doc.text(`Date: ${selectedOrder?.date || ''}`, 20, 55);
-                    doc.text(`Time: ${selectedOrder?.time || ''}`, 20, 65);
-                    doc.text(`Email: ${selectedOrder?.email || ''}`, 20, 75);
-                    
-                    // Products List
-                    doc.setFontSize(14);
-                    doc.text("Products:", 20, 95);
-                    
-                    doc.setFontSize(12);
-                    let yPos = 105;
-                    orderProducts.forEach(product => {
-                      doc.text(`- ${product.name}: ${product.quantity} x ${product.price}`, 25, yPos);
-                      yPos += 10;
-                    });
-                    
-                    // Save the PDF
-                    doc.save(`order_${selectedOrder?.customerName?.replace(/\s+/g, '_') || 'download'}.pdf`);
-                  }}
-                  className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[13px] font-medium"
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </button>
-              </div>
-
+                  {/* Footer Actions */}
+                  <div className="px-8 py-6 flex justify-between items-center mt-2 border-t border-[#1A1A1A]">
+                    <div className="text-[15px] font-medium text-white">
+                      Total: <span className="text-[#2563EB]">${selectedOrder?.totalPrice || 0}</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <button 
+                        onClick={handlePrint}
+                        className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[13px] font-medium cursor-pointer"
+                      >
+                        <Printer className="w-4 h-4" />
+                        Print
+                      </button>
+                      <button 
+                        onClick={handleDownload}
+                        className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[13px] font-medium cursor-pointer"
+                      >
+                        <Download className="w-4 h-4" />
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
            </div>
         </div>
       )}
