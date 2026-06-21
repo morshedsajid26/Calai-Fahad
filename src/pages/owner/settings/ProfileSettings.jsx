@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import axios from 'axios'
 import { Mail, Lock, Camera, Loader2 } from 'lucide-react'
 import InputField from '../../../components/Inputfield'
 import Password from '../../../components/Password'
@@ -55,6 +56,21 @@ const ProfileSettings = () => {
     }
   }, [profileResponse, isProfileEditing])
 
+  const currentAvatarUrl = profileResponse?.data?.avatar ? getAvatarUrl(profileResponse.data.avatar) : null;
+  const { data: avatarBlobUrl } = useQuery({
+    queryKey: ['owner-avatar-image', currentAvatarUrl],
+    enabled: !!currentAvatarUrl && !currentAvatarUrl.startsWith('blob:') && !currentAvatarUrl.includes('randomuser.me'),
+    queryFn: async () => {
+      const res = await axios.get(currentAvatarUrl, {
+        responseType: 'blob',
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
+      return URL.createObjectURL(res.data);
+    }
+  });
+
+  const displayImage = selectedFile ? profileImage : (avatarBlobUrl || profileImage);
+
   const handleImageClick = () => {
     if (isProfileEditing && !updateMutation.isPending) {
       fileInputRef.current?.click()
@@ -77,15 +93,13 @@ const ProfileSettings = () => {
       let headers = {}
       if (selectedFile) {
         payload = new FormData()
-        payload.append('firstName', data.firstName)
-        payload.append('lastName', data.lastName)
-        payload.append('email', data.email)
+        payload.append('first_name', data.firstName)
+        payload.append('last_name', data.lastName)
         payload.append('avatar', selectedFile)
       } else {
         payload = {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
+          first_name: data.firstName,
+          last_name: data.lastName,
         }
       }
       const response = await axiosSecure.patch('/business-owner/settings/update-profile', payload, { headers })
@@ -110,11 +124,11 @@ const ProfileSettings = () => {
   })
 
   const handleSaveProfile = () => {
-    if (!firstName || !lastName || !email) {
-      toast.error('First Name, Last Name, and Email are required')
+    if (!firstName || !lastName) {
+      toast.error('First Name and Last Name are required')
       return
     }
-    updateMutation.mutate({ firstName, lastName, email })
+    updateMutation.mutate({ firstName, lastName })
   }
 
   // Mutation for changing password
@@ -179,7 +193,7 @@ const ProfileSettings = () => {
         {/* Profile Image */}
         <div className="relative w-20 h-20 mb-8">
           <img 
-            src={profileImage} 
+            src={displayImage} 
             alt="Profile" 
             className="w-full h-full rounded-full object-cover border-2 border-white/10"
           />
@@ -230,10 +244,10 @@ const ProfileSettings = () => {
             placeholder="Enter Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            readOnly={!isProfileEditing || isProfilePending}
+            readOnly={true}
             leftIcon={<Mail className="w-4 h-4" />}
             labelClass="!text-sm !font-medium !text-gray-300"
-            inputClass={`!bg-[#111111] !border-white/5 !rounded-full !pl-12 !pr-5 !py-3.5 !text-sm ${(!isProfileEditing || isProfilePending) ? '!text-gray-500 cursor-default' : '!text-white'} placeholder:!text-gray-600 focus:!outline-none focus:!border-blue-500/50`}
+            inputClass="!bg-[#111111] !border-white/5 !rounded-full !pl-12 !pr-5 !py-3.5 !text-sm !text-gray-500 cursor-not-allowed placeholder:!text-gray-600 focus:!outline-none focus:!border-transparent"
           />
         </div>
 

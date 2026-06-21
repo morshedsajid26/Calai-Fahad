@@ -1,6 +1,42 @@
 import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+import useAxiosSecure from '../../../hooks/useAxiosSecure'
+import { Loader2 } from 'lucide-react'
 
 const CurrentPlan = () => {
+  const axiosSecure = useAxiosSecure()
+
+  const { data: subResponse, isLoading } = useQuery({
+    queryKey: ['mySubscription'],
+    queryFn: async () => {
+      const response = await axiosSecure.get('/business-owner/subscription/my-subscription')
+      return response.data
+    }
+  })
+
+  const sub = subResponse?.data
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[100px] mt-6 mb-12">
+        <Loader2 className="animate-spin text-[#2563EB] w-8 h-8" />
+      </div>
+    )
+  }
+
+  if (!sub) {
+    return (
+      <div className="relative bg-[#0E0E10] border border-[#272727] rounded-2xl p-6 mt-6 mb-12 flex flex-col items-center justify-center gap-4">
+        <p className="text-gray-400">You do not have an active subscription.</p>
+      </div>
+    )
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+  }
+
   return (
     <div className="relative bg-[#0E0E10] border border-[#272727] rounded-2xl p-6 mt-6 mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
       {/* Badge */}
@@ -10,12 +46,16 @@ const CurrentPlan = () => {
 
       {/* Left Content */}
       <div className="flex flex-col gap-2 pt-2 sm:pt-0">
-        <h2 className="text-[28px] sm:text-[32px] font-bold text-white tracking-tight leading-none mb-1">Pro Plan</h2>
-        <p className="text-[15px] text-gray-400 mb-2">$9.99/month</p>
+        <h2 className="text-[28px] sm:text-[32px] font-bold text-white tracking-tight leading-none mb-1">
+          {sub?.plan?.name || 'Unknown Plan'}
+        </h2>
+        <p className="text-[15px] text-gray-400 mb-2">
+          ${sub?.plan?.priceMonthly}/month
+        </p>
         <div className="flex items-center gap-3 text-[14px] text-gray-400 mt-2">
-          <span>Start Date : 5/22/2025</span>
+          <span>Start Date : {formatDate(sub?.currentPeriodStart || sub?.createdAt || sub?.startDate)}</span>
           <span className="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
-          <span>End Date : 5/22/2025</span>
+          <span>End Date : {formatDate(sub?.currentPeriodEnd || sub?.endDate)}</span>
         </div>
       </div>
 
