@@ -86,12 +86,18 @@ const Navbar = () => {
 
             <Link to="/"  onClick={() => scrollToSection("home")}>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Image
-               
+              {/* <Image
                 src={logo}
                 alt="FarmCheck Logo"
                 className="h-10"
-              />
+              /> */}
+              {/* <div className="bg-white border border-gray-200 rounded-lg py-1 px-2 flex items-center justify-center"> */}
+                <Image
+                  src="/newLogo.png"
+                  alt="Calai Logo"
+                  className="h-8 object-contain invert"
+                />
+              {/* </div> */}
             </motion.div>
           </Link>
           {/* Mobile Menu Button */}
