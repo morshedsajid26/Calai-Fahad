@@ -175,12 +175,12 @@ const OrderList = () => {
                         {orderProducts.length > 0 ? (
                           orderProducts.map((product, idx) => (
                             <tr key={product.id || idx} className="border-b border-[#1A1A1A]">
-                              <td className="py-5 text-[14px] text-gray-300">{product.name || `Item ${idx+1}`}</td>
+                              <td className="py-5 text-[14px] text-gray-300">{product.product_name || `Item ${idx+1}`}</td>
                               <td className="py-5 text-[14px] text-gray-300 text-center">
                                 <span className="inline-block px-4">{product.quantity}</span>
                               </td>
                               <td className="py-5 text-[14px] text-gray-300">{selectedOrder?.time || '-'}</td>
-                              <td className="py-5 text-[14px] text-gray-300 text-right">${product.price || product.unitPrice || product.totalPrice || 0}</td>
+                              <td className="py-5 text-[14px] text-gray-300 text-right">${product.unit_prize || 0}</td>
                             </tr>
                           ))
                         ) : (

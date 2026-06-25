@@ -2,52 +2,56 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Phone, PhoneCall } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
+import Vapi from "@vapi-ai/web";
+import toast from "react-hot-toast";
+import { useQuery } from '@tanstack/react-query';
+import useAxiosSecure from '@/hooks/useAxiosSecure';
+
+const vapi = new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY);
 
 const TestCallWindow = () => {
+  const axiosSecure = useAxiosSecure();
+
+  const { data: agentsResponse, isLoading: isLoadingAgents } = useQuery({
+    queryKey: ['agents'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/agent');
+      return res.data;
+    }
+  });
+
+  const agents = agentsResponse?.data || [];
+  const [selectedAgentId, setSelectedAgentId] = useState("");
+
   const [isCalling, setIsCalling] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0);
   const [callDuration, setCallDuration] = useState(0);
+  const [transcripts, setTranscripts] = useState([]);
+  const [activeTranscript, setActiveTranscript] = useState({ text: "", role: "" });
+  const transcriptRef = useRef(null);
 
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const streamRef = useRef(null);
-  const animationFrameRef = useRef(null);
   const timerRef = useRef(null);
 
   const startCall = async () => {
+    if (!selectedAgentId) {
+      toast.error("Please select an Agent first.");
+      return;
+    }
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const audioContext = new AudioContext();
-      audioContextRef.current = audioContext;
-
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      analyserRef.current = analyser;
-
-      const source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
-
-      setIsCalling(true);
-      setCallDuration(0);
-      
-      // Start Timer
-      if (timerRef.current) clearInterval(timerRef.current);
-      timerRef.current = setInterval(() => {
-        setCallDuration(prev => prev + 1);
-      }, 1000);
-
-      detectVolume();
+      setTranscripts([]);
+      setActiveTranscript({ text: "", role: "" });
+      await vapi.start(selectedAgentId);
     } catch (err) {
-      console.error("Error accessing microphone:", err);
-      alert("Microphone access denied or not available.");
+      console.error("Error starting Vapi call:", err);
+      toast.error(`Error: ${err?.message || "Failed to start call"}. Check console.`);
+      setSubtitles("");
     }
   };
 
   const endCall = () => {
+    vapi.stop();
     setIsCalling(false);
     setIsMuted(false);
     setVolume(0);
@@ -56,16 +60,6 @@ const TestCallWindow = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
-    }
-
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-    }
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
     }
   };
 
@@ -80,36 +74,76 @@ const TestCallWindow = () => {
   const toggleMute = () => {
     const newMuteState = !isMuted;
     setIsMuted(newMuteState);
-    if (streamRef.current) {
-      streamRef.current.getAudioTracks().forEach((track) => {
-        track.enabled = !newMuteState;
-      });
-    }
-  };
-
-  const detectVolume = () => {
-    if (!analyserRef.current) return;
-    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-
-    const update = () => {
-      analyserRef.current.getByteFrequencyData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i];
-      }
-      const average = sum / dataArray.length;
-      setVolume(average);
-      animationFrameRef.current = requestAnimationFrame(update);
-    };
-    update();
+    vapi.setMuted(newMuteState);
   };
 
   useEffect(() => {
+    const onCallStart = () => {
+      setIsCalling(true);
+      setCallDuration(0);
+      toast.success("Call started successfully.");
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setCallDuration((prev) => prev + 1);
+      }, 1000);
+    };
+
+    const onCallEnd = () => {
+      setIsCalling(false);
+      toast.success("Call ended.");
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+
+    const onVolumeLevel = (level) => {
+      setVolume(level * 255); // Scale 0-1 to 0-255 for the waveform visualization
+    };
+
+    const onMessage = (message) => {
+      if (message.type === "transcript") {
+        if (message.transcriptType === "final") {
+          setTranscripts((prev) => [
+            ...prev,
+            { id: Date.now(), role: message.role, text: message.transcript },
+          ]);
+          setActiveTranscript({ text: "", role: "" });
+        } else {
+          setActiveTranscript({ text: message.transcript, role: message.role });
+        }
+      }
+    };
+
+    const onError = (e) => {
+      console.error("Vapi Error Event:", e);
+      toast.error(`Vapi Error: ${e?.message || JSON.stringify(e)}`);
+      setIsCalling(false);
+    };
+
+    vapi.on("call-start", onCallStart);
+    vapi.on("call-end", onCallEnd);
+    vapi.on("volume-level", onVolumeLevel);
+    vapi.on("message", onMessage);
+    vapi.on("error", onError);
+
     return () => {
-      endCall();
+      vapi.off("call-start", onCallStart);
+      vapi.off("call-end", onCallEnd);
+      vapi.off("volume-level", onVolumeLevel);
+      vapi.off("message", onMessage);
+      vapi.off("error", onError);
+      vapi.stop();
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  // Auto-scroll transcript
+  useEffect(() => {
+    if (transcriptRef.current) {
+      transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
+    }
+  }, [transcripts, activeTranscript]);
 
   return (
     <div className="p-6 h-full flex flex-col">
@@ -117,139 +151,214 @@ const TestCallWindow = () => {
         <Breadcrumb text={"Check the voice tester"} />
       </div>
 
-      <div className="flex-1 bg-[#0E0E10] rounded-3xl border border-[#262626] relative flex flex-col items-center justify-center overflow-hidden min-h-[600px] ">
-        {/* Voice Orb Area */}
-        <div className="relative mb-12 md:mb-20 scale-75 md:scale-100">
-          <motion.div
-            animate={{
-              scale: isCalling ? 1 + volume / 800 : 1,
-            }}
-            transition={{
-              duration: isCalling ? 0.1 : 3,
-              repeat: isCalling ? 0 : Infinity,
-              ease: "easeInOut",
-            }}
-            className="w-56 h-56 md:w-64 md:h-64 rounded-full flex items-center justify-center relative z-10 overflow-hidden"
-          >
-            <motion.img
-              src="/moon.png"
-              alt="Voice Orb"
-              className="absolute inset-0 w-full h-full object-cover rounded-full "
-              animate={
-                isCalling
-                  ? {
-                      scale: [1, 1.05, 1],
-                    }
-                  : {}
-              }
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-           
-
-            <span className="text-white text-lg md:text-xl font-bold relative z-20 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              {isCalling ? (isMuted ? "Muted" : "Analyzing...") : "Ready"}
-            </span>
-          </motion.div>
-         
-        </div>
-
-        {/* Improved Spiky Waveforms Area */}
-        <div className="w-full max-w-5xl h-32 md:h-48 flex items-center justify-center relative mb-12 md:mb-16 px-4">
-          <svg
-            width="100%"
-            height="100%"
-            viewBox="0 0 1000 150"
-            preserveAspectRatio="none"
-            className="overflow-visible"
-          >
-            <Waveform
-              color="#2563EB"
-              isCalling={isCalling}
-              volume={volume}
-              multiplier={1.25}
-              freq={0.06}
-              strokeWidth={2}
-            />
-            <Waveform
-              color="#3B82F6"
-              isCalling={isCalling}
-              volume={volume}
-              multiplier={1.0}
-              freq={0.08}
-              strokeWidth={1.5}
-              opacity={0.5}
-            />
-            <Waveform
-              color="#1E40AF"
-              isCalling={isCalling}
-              volume={volume}
-              multiplier={0.6}
-              freq={0.04}
-              strokeWidth={1}
-              opacity={0.3}
-            />
-          </svg>
-        </div>
-
-        {/* Controls Bar */}
-        <div className="absolute bottom-16">
-          <AnimatePresence mode="wait">
-            {!isCalling ? (
-              <motion.button
-                key="start-btn"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                onClick={startCall}
-                className="group flex items-center gap-3 bg-green-500 hover:bg-green-600 text-black px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-base md:text-lg transition-all shadow-[0_0_30px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-95"
-              >
-                <PhoneCall className="w-5 h-5 md:w-6 md:h-6 group-hover:animate-pulse" />
-                Start Test Call
-              </motion.button>
-            ) : (
-              <motion.div
-                key="active-controls"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="relative flex items-center gap-3 md:gap-4 bg-[#111114] border border-blue-500/30 px-5 md:px-6 py-3 md:py-4 rounded-full shadow-[0_0_40px_rgba(37,99,235,0.2)]"
-              >
-                {/* Relocated Timer */}
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full backdrop-blur-md">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                  <span className="text-blue-400 font-mono text-sm tracking-widest">
-                    {formatTime(callDuration)}
-                  </span>
+      <div className={`flex-1 bg-[#0E0E10] rounded-3xl border border-[#262626] overflow-hidden min-h-[600px] ${isCalling ? 'flex flex-col md:flex-row' : 'relative flex flex-col items-center pt-6 md:pt-10 pb-10'}`}>
+        
+        {!isCalling ? (
+          <>
+            {/* --- IDLE STATE (Before Call) --- */}
+            {/* Agent Selector Card */}
+            <div className="w-[90%] max-w-md bg-[#111114]/90 backdrop-blur-xl border border-[#262626] rounded-2xl p-5 md:p-6 z-40 shadow-2xl flex-shrink-0">
+              <div className="flex items-center justify-center gap-3 mb-5">
+                <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-400">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2v20M17 5v14M22 10v4M7 5v14M2 10v4"/>
+                  </svg>
                 </div>
+                <h3 className="text-white font-bold text-lg md:text-xl">Select Your AI Agent</h3>
+              </div>
+              
+              <div className="relative">
+                <select 
+                  value={selectedAgentId} 
+                  onChange={(e) => setSelectedAgentId(e.target.value)}
+                  disabled={isCalling || isLoadingAgents}
+                  className="w-full bg-[#0E0E10] text-gray-200 border border-[#262626] hover:border-gray-600 rounded-xl px-5 py-3.5 text-[15px] outline-none focus:border-green-500 transition-all disabled:opacity-50 appearance-none cursor-pointer pr-10 shadow-inner"
+                >
+                  <option value="" disabled>
+                    {isLoadingAgents ? "Loading agents..." : "Choose an AI Assistant..."}
+                  </option>
+                  {agents.map(agent => {
+                    const vapiId = agent.agentId || agent.vapiAgentId || agent.vapi_agent_id || agent.id;
+                    return (
+                      <option key={agent.id} value={vapiId}>
+                        {agent.name || "Unknown Agent"}
+                      </option>
+                    );
+                  })}
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Voice Orb Area */}
+            <div className="relative my-auto scale-75 md:scale-100 z-10">
+              <motion.div
+                className="w-56 h-56 md:w-64 md:h-64 rounded-full flex items-center justify-center relative z-10 overflow-hidden"
+              >
+                <motion.img
+                  src="/moon.png"
+                  alt="Voice Orb"
+                  className="absolute inset-0 w-full h-full object-cover rounded-full"
+                />
+                <span className="text-white text-lg md:text-xl font-bold relative z-20 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  Ready
+                </span>
+              </motion.div>
+            </div>
+
+            {/* Controls Bar */}
+            <div className="z-40 mt-6 flex-shrink-0">
+              <motion.button
+                onClick={startCall}
+                className={`group flex items-center gap-3 px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-base md:text-lg transition-all ${
+                  !selectedAgentId 
+                    ? "bg-[#262626] text-gray-400 hover:bg-[#333] border border-[#333]" 
+                    : "bg-green-500 hover:bg-green-600 text-black shadow-[0_0_30px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-95"
+                }`}
+              >
+                <PhoneCall className={`w-5 h-5 md:w-6 md:h-6 ${selectedAgentId ? "group-hover:animate-pulse" : ""}`} />
+                {!selectedAgentId ? "Select Agent to Call" : "Start Test Call"}
+              </motion.button>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* --- ACTIVE STATE (Split Screen) --- */}
+            
+            {/* Left Column: Voice Orb & Controls */}
+            <div className="flex-1 relative flex flex-col items-center justify-between p-6 md:p-8 min-h-[500px]">
+              
+              {/* Timer Pill */}
+              <div className="flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full backdrop-blur-md z-20">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                <span className="text-blue-400 font-mono text-sm tracking-wider font-medium">
+                  {formatTime(callDuration)}
+                </span>
+              </div>
+
+              {/* Spiky Waveforms Area */}
+              <div 
+                className="absolute top-1/2 left-0 w-full h-40 md:h-64 -translate-y-1/2 flex items-center justify-center px-4 pointer-events-none z-0 transition-opacity duration-300"
+                style={{ opacity: isCalling && volume > 2 ? 1 : 0 }}
+              >
+                <svg width="100%" height="100%" viewBox="0 0 1000 150" preserveAspectRatio="none" className="overflow-visible">
+                  <Waveform color="#10B981" isCalling={isCalling} volume={volume} multiplier={1.25} freq={0.06} strokeWidth={2} />
+                  <Waveform color="#34D399" isCalling={isCalling} volume={volume} multiplier={1.0} freq={0.08} strokeWidth={1.5} opacity={0.5} />
+                  <Waveform color="#059669" isCalling={isCalling} volume={volume} multiplier={0.6} freq={0.04} strokeWidth={1} opacity={0.3} />
+                </svg>
+              </div>
+
+              {/* Voice Orb */}
+              <div className="relative my-auto z-10">
+                <motion.div
+                  animate={{ scale: 1 + volume / 800 }}
+                  transition={{ duration: 0.1, ease: "easeInOut" }}
+                  className="w-48 h-48 md:w-56 md:h-56 rounded-full flex flex-col items-center justify-center relative overflow-hidden bg-green-900/40 border-[6px] border-green-500/20 shadow-[0_0_60px_rgba(16,185,129,0.15)]"
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-green-500/10"
+                    animate={{ opacity: volume > 10 ? [0.5, 1, 0.5] : 0.5 }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                  
+                  <div className="relative z-20 flex flex-col items-center">
+                    {isMuted ? (
+                      <MicOff className="w-10 h-10 text-gray-400 mb-3" strokeWidth={1.5} />
+                    ) : (
+                      <Mic className="w-10 h-10 text-green-400 mb-3" strokeWidth={1.5} />
+                    )}
+                    <span className="text-white text-sm font-medium opacity-80">
+                      {isMuted ? "Muted" : volume > 5 ? "Speaking..." : "Listening..."}
+                    </span>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Controls Pill */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-1 bg-[#1A1A1D] border border-white/5 p-1.5 rounded-full shadow-xl z-20"
+              >
                 <button
                   onClick={toggleMute}
-                  className={`p-4 rounded-full transition-all ${
+                  className={`p-3.5 rounded-full transition-all flex items-center justify-center ${
                     isMuted
-                      ? "bg-red-500/20 text-red-500"
-                      : "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
+                      ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                      : "bg-transparent text-gray-400 hover:text-white hover:bg-white/5"
                   }`}
                 >
-                  {isMuted ? (
-                    <MicOff className="w-7 h-7" />
-                  ) : (
-                    <Mic className="w-7 h-7" />
-                  )}
+                  {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                 </button>
-                <div className="w-[1px] h-8 bg-blue-500/20 mx-2" />
+                <div className="w-[1px] h-6 bg-white/10 mx-1" />
                 <button
                   onClick={endCall}
-                  className="p-4 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg shadow-red-500/40 hover:scale-110 active:scale-90"
+                  className="p-3.5 px-5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all flex items-center gap-2"
                 >
-                  <Phone className="w-7 h-7 rotate-[135deg]" />
+                  <Phone className="w-5 h-5 rotate-[135deg]" />
                 </button>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </div>
+
+            {/* Right Column: Live Transcript */}
+            <div className="w-full md:w-[380px] lg:w-[450px] border-t md:border-t-0 md:border-l border-white/5 flex flex-col bg-[#111114]/30 h-[400px] md:h-auto">
+              
+              {/* Transcript Header */}
+              <div className="flex items-center gap-2 px-6 py-5 border-b border-white/5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+                  <path d="M2 12h4l2-9 4 18 2-9h4"/>
+                </svg>
+                <h3 className="text-white font-medium text-[15px]">Live Transcript</h3>
+              </div>
+
+              {/* Chat Area */}
+              <div 
+                ref={transcriptRef}
+                className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 scroll-smooth"
+              >
+                {transcripts.map((msg) => (
+                  <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-[15px] ${
+                      msg.role === 'user' 
+                        ? 'bg-[#133F2E] border border-green-500/20 text-green-50 rounded-tr-sm' 
+                        : 'bg-[#252525] border border-white/5 text-gray-200 rounded-tl-sm'
+                    }`}>
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Active/Interim Transcript */}
+                {activeTranscript.text && (
+                  <div className={`flex ${activeTranscript.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-[15px] opacity-70 flex items-end gap-2 ${
+                      activeTranscript.role === 'user' 
+                        ? 'bg-[#133F2E] border border-green-500/20 text-green-50 rounded-tr-sm' 
+                        : 'bg-[#252525] border border-white/5 text-gray-200 rounded-tl-sm'
+                    }`}>
+                      {activeTranscript.text}
+                      <span className="flex gap-0.5 mb-1.5 ml-2">
+                        <span className="w-1 h-1 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1 h-1 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1 h-1 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                {transcripts.length === 0 && !activeTranscript.text && (
+                  <div className="flex-1 flex items-center justify-center text-gray-500 text-sm">
+                    Waiting for speech...
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

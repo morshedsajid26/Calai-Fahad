@@ -35,11 +35,19 @@ const UploadPdf = () => {
 
   const processFiles = (newFiles) => {
     const validFiles = Array.from(newFiles).filter(
-      (file) => file.type === 'application/pdf' || file.name.endsWith('.pdf')
+      (file) => 
+        file.type === 'application/pdf' || 
+        file.name.endsWith('.pdf') ||
+        file.name.endsWith('.xlsx') || 
+        file.name.endsWith('.xls') || 
+        file.name.endsWith('.csv') ||
+        file.type.includes('excel') || 
+        file.type.includes('spreadsheet') || 
+        file.type.includes('csv')
     )
     
     if (validFiles.length !== newFiles.length) {
-      toast.error('Some files were rejected. Please select valid PDF files only.')
+      toast.error('Some files were rejected. Please select valid PDF or Excel files only.')
     }
     
     if (validFiles.length > 0) {
@@ -112,7 +120,7 @@ const UploadPdf = () => {
       <div className="mb-6">
         <h2 className="text-lg font-medium text-white mb-2">Create AI Agent</h2>
         <p className="text-sm text-gray-400 mb-6">
-          Upload documents with text that will be used to train your AI text model. <br/>
+          Upload documents (PDF or Excel) with text that will be used to train your AI text model. <br/>
          
         </p>
 
@@ -141,7 +149,7 @@ const UploadPdf = () => {
           type="file" 
           ref={fileInputRef} 
           onChange={handleFileChange} 
-          accept=".pdf" 
+          accept=".pdf,.xlsx,.xls,.csv" 
           multiple
           className="hidden" 
         />
