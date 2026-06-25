@@ -20,7 +20,33 @@ const Telephony = () => {
   const [editingNumber, setEditingNumber] = useState(null);
   const [deletingNumberId, setDeletingNumberId] = useState(null);
   
-  const [newNumber, setNewNumber] = useState({ twilioNumber: "", managerNumber: "", vapiAgentId: "" });
+  const [newNumber, setNewNumber] = useState({ businessId: "", twilioNumber: "", managerNumber: "", vapiAgentId: "" });
+
+  const { data: tenantsResponse } = useQuery({
+    queryKey: ['tenants'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/system-owner/tenants');
+      return res.data;
+    }
+  });
+  const tenants = tenantsResponse?.data || [];
+  const tenantNames = tenants.map(t => t.name || t.business_name || "Unknown");
+
+  const { data: agentsResponse } = useQuery({
+    queryKey: ['unconnected-agents', newNumber.businessId],
+    queryFn: async () => {
+      if (!newNumber.businessId) return { data: [] };
+      try {
+        const res = await axiosSecure.get(`/system-owner/telephony/unconnected-agents/${newNumber.businessId}`);
+        return res.data;
+      } catch (err) {
+        return { data: [] };
+      }
+    },
+    enabled: !!newNumber.businessId
+  });
+  const unconnectedAgents = agentsResponse?.data || [];
+  const agentNames = unconnectedAgents.map(a => a.name || a.agentName || a.agent_name || "Unnamed Agent");
 
   const { data: telephonyResponse, isLoading, isError, error } = useQuery({
     queryKey: ['telephony'],
@@ -42,7 +68,7 @@ const Telephony = () => {
       queryClient.invalidateQueries({ queryKey: ['telephony'] });
       toast.success('Number added successfully');
       setIsAddModalOpen(false);
-      setNewNumber({ twilioNumber: "", managerNumber: "", vapiAgentId: "" });
+      setNewNumber({ businessId: "", twilioNumber: "", managerNumber: "", vapiAgentId: "" });
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to add number');
@@ -141,7 +167,10 @@ const Telephony = () => {
       Title: "Agent Name",
       width: "30%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200 truncate pr-4" title={row.agentName}>{row.agentName || "N/A"}</div>
+      render: (row) => {
+        const name = row.name|| "N/A";
+        return <div className="text-left text-gray-200 truncate pr-4" title={name}>{name}</div>;
+      }
     },
     {
       key: "actions",
@@ -219,6 +248,21 @@ const Telephony = () => {
             <p className="text-gray-400 text-[13px] mb-8">Import Twilio Number</p>
 
             <div className="space-y-6">
+              <Dropdown
+                label="Business Name"
+                options={tenantNames}
+                placeholder="Select Business"
+                value={tenants.find(t => t.id === newNumber.businessId)?.name || tenants.find(t => t.id === newNumber.businessId)?.business_name || ""}
+                onSelect={(val) => {
+                  const t = tenants.find(t => (t.name || t.business_name) === val);
+                  if (t) setNewNumber({...newNumber, businessId: t.id});
+                }}
+                labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
+                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
+                optionClass="!bg-white !text-[#111]"
+                icon="!text-gray-500"
+              />
+
               <InputField
                 label="Twilio Number"
                 placeholder="+12345678"
@@ -237,13 +281,24 @@ const Telephony = () => {
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
-              <InputField
-                label="Vapi Agent ID"
-                placeholder="155909ec-dc75-4ed3-8a1d-a49bddd6744f"
-                value={newNumber.vapiAgentId}
-                onChange={(e) => setNewNumber({...newNumber, vapiAgentId: e.target.value})}
+              <Dropdown
+                label="Unconnected Agent"
+                options={agentNames}
+                placeholder="Select Agent"
+                value={
+                  (() => {
+                    const a = unconnectedAgents.find(agent => (agent.vapiAgentId || agent.id) === newNumber.vapiAgentId);
+                    return a ? (a.name || a.agentName || a.agent_name || "Unnamed Agent") : "";
+                  })()
+                }
+                onSelect={(val) => {
+                  const a = unconnectedAgents.find(agent => (agent.name || agent.agentName || agent.agent_name || "Unnamed Agent") === val);
+                  if (a) setNewNumber({...newNumber, vapiAgentId: a.vapiAgentId || a.id});
+                }}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
+                optionClass="!bg-white !text-[#111]"
+                icon="!text-gray-500"
               />
             </div>
 
