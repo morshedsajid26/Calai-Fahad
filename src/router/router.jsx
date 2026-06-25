@@ -38,6 +38,8 @@ import Banner from "@/pages/landindPage/Banner";
 import LandingPageLayout from "@/layout/LandingPageLayout";
 import TestCallWindow from "@/pages/owner/TestCallWindow";
 import Telephony from "@/pages/admin/Telephony";
+import TermsCondition from "@/pages/landindPage/TermsCondition";
+import PrivacyPolicy from "@/pages/landindPage/PrivacyPolicy";
 
 const router = createBrowserRouter([
   //  AUTH ROUTES
@@ -104,7 +106,14 @@ const router = createBrowserRouter([
     path: "/",
     element: <LandingPageLayout />,
   },
-
+  {
+    path: "/termscondition",
+    element: <TermsCondition />,
+  },
+  {
+    path: "/privacy",
+    element: <PrivacyPolicy />,
+  },
 ]);
 
 export default router;
