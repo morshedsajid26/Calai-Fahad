@@ -5,9 +5,26 @@ import React from 'react';
 import { FiTwitter, FiLinkedin, FiGithub, FiMail } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import Container from '../Container';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollToSection = (id) => {
+    const doScroll = () => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(doScroll, 500);
+    } else {
+      doScroll();
+    }
+  };
+
   return (
     <footer className="bg-gradient-to-t from-[#000000] via-[#3C0366]/30 to-[#000000] pt-16">
       <Container>
@@ -59,16 +76,16 @@ const Footer = () => {
           </div>
 
           {/* Links */}
-          <div className="flex flex-col gap-4 ">
+          <div className="flex flex-col items-start gap-4 ">
             <h4 className="text-white font-inter font-semibold mb-2">Product</h4>
-            <Link href="#feature" className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors">Features</Link>
-            <Link href="#pricing" className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors">Pricing</Link>
+            <button onClick={() => scrollToSection('feature')} className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors cursor-pointer">Features</button>
+            <button onClick={() => scrollToSection('pricing')} className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors cursor-pointer">Pricing</button>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col items-start gap-4">
             <h4 className="text-white font-inter font-semibold mb-2">Company</h4>
-            <Link href="/about" className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors">About</Link>
-            <Link href="#faq" className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors">FAQ</Link>
+            <button onClick={() => scrollToSection('aboutUs')} className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors cursor-pointer">About</button>
+            <button onClick={() => scrollToSection('faq')} className="text-sm font-inter text-[#CDCDCD] hover:text-[#AD46FF] transition-colors cursor-pointer">FAQ</button>
           </div>
 
           {/* <div className="flex flex-col gap-4">
