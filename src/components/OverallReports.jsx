@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 const defaultChartData = [
   { name: 'Total Call', value: 20, color: '#A94464' },
@@ -25,9 +25,9 @@ const OverallReports = ({ report }) => {
     ? [
         { name: 'Total Call', value: report.totalCall || 0, color: '#A94464' },
         { name: 'Total Call Duration', value: report.totalCallDuration || 0, color: '#9E86FF' },
-        { name: 'Call Drop Rate', value: 0, color: '#00E5FF' },
-        { name: 'Total Message', value: 0, color: '#0F3E75' },
-        { name: 'Total Message Reply', value: 0, color: '#FF998D' },
+        { name: 'Call Drop Rate', value: report.callDropRate || 0, color: '#00E5FF' },
+        { name: 'Total Message', value: report.totalMessage || 0, color: '#0F3E75' },
+        { name: 'Total Message Reply', value: report.totalMessageReply || 0, color: '#FF998D' },
       ]
     : defaultChartData;
 
@@ -58,6 +58,11 @@ const OverallReports = ({ report }) => {
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
+            <Tooltip 
+              formatter={(value, name) => [`${value}%`, name]}
+              contentStyle={{ backgroundColor: '#111111', borderColor: '#333', borderRadius: '8px', color: '#fff' }}
+              itemStyle={{ color: '#fff' }}
+            />
           </PieChart>
         </ResponsiveContainer>
         

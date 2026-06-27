@@ -7,10 +7,9 @@ import toast from "react-hot-toast";
 import { useQuery } from '@tanstack/react-query';
 import useAxiosSecure from '@/hooks/useAxiosSecure';
 
-const vapi = new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY);
-
 const TestCallWindow = () => {
   const axiosSecure = useAxiosSecure();
+  const vapi = React.useMemo(() => new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY || ""), []);
 
   const { data: agentsResponse, isLoading: isLoadingAgents } = useQuery({
     queryKey: ['agents'],
@@ -24,6 +23,7 @@ const TestCallWindow = () => {
   const [selectedAgentId, setSelectedAgentId] = useState("");
 
   const [isCalling, setIsCalling] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0);
   const [callDuration, setCallDuration] = useState(0);
@@ -40,19 +40,21 @@ const TestCallWindow = () => {
     }
 
     try {
+      setIsConnecting(true);
       setTranscripts([]);
       setActiveTranscript({ text: "", role: "" });
       await vapi.start(selectedAgentId);
     } catch (err) {
+      setIsConnecting(false);
       console.error("Error starting Vapi call:", err);
       toast.error(`Error: ${err?.message || "Failed to start call"}. Check console.`);
-      setSubtitles("");
     }
   };
 
   const endCall = () => {
     vapi.stop();
     setIsCalling(false);
+    setIsConnecting(false);
     setIsMuted(false);
     setVolume(0);
     setCallDuration(0);
@@ -79,6 +81,7 @@ const TestCallWindow = () => {
 
   useEffect(() => {
     const onCallStart = () => {
+      setIsConnecting(false);
       setIsCalling(true);
       setCallDuration(0);
       toast.success("Call started successfully.");
@@ -90,6 +93,7 @@ const TestCallWindow = () => {
 
     const onCallEnd = () => {
       setIsCalling(false);
+      setIsConnecting(false);
       toast.success("Call ended.");
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -119,6 +123,7 @@ const TestCallWindow = () => {
       console.error("Vapi Error Event:", e);
       toast.error(`Vapi Error: ${e?.message || JSON.stringify(e)}`);
       setIsCalling(false);
+      setIsConnecting(false);
     };
 
     vapi.on("call-start", onCallStart);
@@ -212,17 +217,27 @@ const TestCallWindow = () => {
 
             {/* Controls Bar */}
             <div className="z-40 mt-6 flex-shrink-0">
-              <motion.button
-                onClick={startCall}
-                className={`group flex items-center gap-3 px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-base md:text-lg transition-all ${
-                  !selectedAgentId 
-                    ? "bg-[#262626] text-gray-400 hover:bg-[#333] border border-[#333]" 
-                    : "bg-green-500 hover:bg-green-600 text-black shadow-[0_0_30px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-95"
-                }`}
-              >
-                <PhoneCall className={`w-5 h-5 md:w-6 md:h-6 ${selectedAgentId ? "group-hover:animate-pulse" : ""}`} />
-                {!selectedAgentId ? "Select Agent to Call" : "Start Test Call"}
-              </motion.button>
+              {!isConnecting ? (
+                <motion.button
+                  onClick={startCall}
+                  className={`group flex items-center gap-3 px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-base md:text-lg transition-all ${
+                    !selectedAgentId 
+                      ? "bg-[#262626] text-gray-400 hover:bg-[#333] border border-[#333]" 
+                      : "bg-green-500 hover:bg-green-600 text-black shadow-[0_0_30px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-95"
+                  }`}
+                >
+                  <PhoneCall className={`w-5 h-5 md:w-6 md:h-6 ${selectedAgentId ? "group-hover:animate-pulse" : ""}`} />
+                  {!selectedAgentId ? "Select Agent to Call" : "Start Test Call"}
+                </motion.button>
+              ) : (
+                <motion.button
+                  disabled
+                  className="flex items-center gap-3 px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-base md:text-lg transition-all bg-green-500/70 text-black opacity-80 cursor-not-allowed shadow-[0_0_30px_rgba(34,197,94,0.2)]"
+                >
+                  <PhoneCall className="w-5 h-5 md:w-6 md:h-6 animate-pulse" />
+                  Connecting...
+                </motion.button>
+              )}
             </div>
           </>
         ) : (

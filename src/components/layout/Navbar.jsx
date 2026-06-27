@@ -147,11 +147,11 @@ const Navbar = () => {
                 </button>
               </Link>
             ) : (
-              // <Link to="/auth/login">
+               <Link to="/auth/login">
                 <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] cursor-pointer">
                   Start Free Trial
                 </button>
-              /* </Link> */
+              </Link> 
             )}
           </motion.div>
         </motion.div>
@@ -217,11 +217,11 @@ const Navbar = () => {
                       </button>
                     </Link>
                   ) : (
-                    // <Link to="/auth/login" onClick={() => setOpen(false)}>
+                   <Link to="/auth/login" onClick={() => setOpen(false)}>
                       <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] w-full cursor-pointer">
                         Start Free Trial
                       </button>
-                    /* </Link> */
+                 </Link> 
                   )}
                 </motion.div>
               </ul>
