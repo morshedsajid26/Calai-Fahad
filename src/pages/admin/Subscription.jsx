@@ -62,7 +62,7 @@ const Subscription = () => {
     }
   })
 
-  const plans = plansResponse?.data || []
+  const plans = Array.isArray(plansResponse?.data) ? plansResponse.data : [];
 
   const { data: billingsResponse, isLoading: isBillingsLoading } = useQuery({
     queryKey: ['billings'],
@@ -140,7 +140,7 @@ const Subscription = () => {
     }
   ]
 
-  const tableRows = billingsData.recent_invoices;
+  const tableRows = billingsData.recent_invoices || [];
 
   return (
     <div>
