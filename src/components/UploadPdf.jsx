@@ -1,27 +1,17 @@
 import React, { useState, useRef } from 'react'
 import { CloudUpload, FileText, X, Loader2 } from 'lucide-react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import useAxiosSecure from '../hooks/useAxiosSecure'
 import toast from 'react-hot-toast'
-import Dropdown from './Dropdown'
 
 const UploadPdf = () => {
   const [files, setFiles] = useState([])
   const [agentName, setAgentName] = useState('')
-  const [voiceId, setVoiceId] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef(null)
   
   const axiosSecure = useAxiosSecure()
   const queryClient = useQueryClient()
-
-  const { data: voicesData, isLoading: isLoadingVoices } = useQuery({
-    queryKey: ['voices'],
-    queryFn: async () => {
-      const res = await axiosSecure.get('/voices')
-      return res.data
-    }
-  })
 
   const createAgentMutation = useMutation({
     mutationFn: async (formData) => {
@@ -36,7 +26,6 @@ const UploadPdf = () => {
       toast.success('Agent created and provisioned successfully')
       setFiles([])
       setAgentName('')
-      setVoiceId('')
       queryClient.invalidateQueries(['recentAgents'])
     },
     onError: (err) => {
@@ -109,10 +98,6 @@ const UploadPdf = () => {
       toast.error('Please enter an agent name')
       return
     }
-    if (!voiceId) {
-      toast.error('Please select a voice')
-      return
-    }
     if (files.length < 2) {
       toast.error('Please upload at least 2 files (Rules File & Menu File)')
       return
@@ -120,7 +105,6 @@ const UploadPdf = () => {
 
     const formData = new FormData()
     formData.append('agent_name', agentName)
-    formData.append('voice_id', voiceId)
     formData.append('rules_file', files[0])
     formData.append('menu_file', files[1])
     
@@ -140,33 +124,15 @@ const UploadPdf = () => {
          
         </p>
 
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Agent Name</label>
-            <input 
-              type="text" 
-              value={agentName}
-              onChange={(e) => setAgentName(e.target.value)}
-              placeholder="e.g. Offer offer burger 2"
-              className="w-full bg-[#111111] border border-[#272727] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-            />
-          </div>
-          <div>
-            <Dropdown
-              label="Voice"
-              placeholder={isLoadingVoices ? 'Loading voices...' : 'Select a voice'}
-              options={voicesData?.voices?.map((voice) => voice.name) || []}
-              value={voicesData?.voices?.find(v => v.id === voiceId)?.name || ''}
-              onSelect={(val) => {
-                const selectedVoice = voicesData?.voices?.find(v => v.name === val)
-                if (selectedVoice) setVoiceId(selectedVoice.id)
-              }}
-              labelClass="!text-sm !font-medium !text-gray-300"
-              inputClass={`!bg-[#111111] !border-[#272727] !text-white !text-sm !rounded-xl !px-4 !py-3 focus:!border-blue-500 !transition-colors ${isLoadingVoices ? 'opacity-50 pointer-events-none' : ''}`}
-              optionClass="!bg-[#111111] !border-[#272727] !text-gray-300"
-              icon="!text-gray-400"
-            />
-          </div>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">Agent Name</label>
+          <input 
+            type="text" 
+            value={agentName}
+            onChange={(e) => setAgentName(e.target.value)}
+            placeholder="e.g. Offer offer burger 2"
+            className="w-full bg-[#111111] border border-[#272727] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+          />
         </div>
       </div>
 
@@ -246,11 +212,11 @@ const UploadPdf = () => {
         <button 
           onClick={handleApply}
           className={`px-6 py-2.5 rounded-full text-sm transition-all flex items-center gap-2 ${
-            files.length >= 2 && agentName.trim() && voiceId
+            files.length >= 2 && agentName.trim()
               ? 'border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] cursor-pointer' 
               : 'border border-blue-600/50 bg-[#0a0a2a] text-gray-400 cursor-not-allowed opacity-50'
           }`}
-          disabled={files.length < 2 || !agentName.trim() || !voiceId || createAgentMutation.isPending}
+          disabled={files.length < 2 || !agentName.trim() || createAgentMutation.isPending}
         >
           {createAgentMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
           {createAgentMutation.isPending ? 'Creating Agent...' : 'Create Agent'}
