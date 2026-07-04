@@ -1,53 +1,47 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { PhoneCall, Receipt, Activity, Clock } from "lucide-react";
+import { PhoneOff, Users, TrendingUp } from "lucide-react";
 import Header from "@/components/Header";
 import Container from "@/components/Container";
 
-const statsData = [
+const problemsData = [
   {
-    icon: <PhoneCall className="w-6 h-6 text-white" />,
-    value: "50K+",
-    label: "Calls Managed",
+    icon: <PhoneOff className="w-6 h-6 text-white" />,
+    title: "Missed Opportunities",
+    description: "Busy phone lines mean customers may give up and order somewhere else.",
     bg: "bg-[#9810FA]", // Purple
   },
   {
-    icon: <Receipt className="w-6 h-6 text-white" />,
-    value: "10K+",
-    label: "Orders Processed",
+    icon: <Users className="w-6 h-6 text-white" />,
+    title: "Staff Under Pressure",
+    description: "Your team spends valuable time answering repetitive questions instead of focusing on service.",
     bg: "bg-[#3B82F6]", // Blue
   },
   {
-    icon: <Activity className="w-6 h-6 text-white" />,
-    value: "99.9%",
-    label: "Uptime",
+    icon: <TrendingUp className="w-6 h-6 text-white" />,
+    title: "Rising Costs",
+    description: "Hiring extra staff just to manage calls is expensive.",
     bg: "bg-[#06B6D4]", // Teal
-  },
-  {
-    icon: <Clock className="w-6 h-6 text-white" />,
-    value: "24/7",
-    label: "AI Support",
-    bg: "bg-[#6366F1]", // Indigo
   },
 ];
 
-const StatCard = ({ stat, index }) => (
+const ProblemCard = ({ problem, index }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: false, margin: "-50px" }}
     transition={{ duration: 0.5, delay: index * 0.1 }}
-    className="bg-gradient-to-b from-[#B5B9FF]/30 to-[#2B2C49]/50 border border-[#0F42FF]/40 p-6 rounded-[20px] flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300 shadow-lg"
+    className="bg-gradient-to-b from-[#B5B9FF]/30 to-[#2B2C49]/50 border border-[#0F42FF]/40 p-6 md:p-8 rounded-[24px] flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300 shadow-lg"
   >
-    <div className={`${stat.bg} w-12 h-12 rounded-xl flex items-center justify-center mb-2 shadow-md`}>
-      {stat.icon}
+    <div className={`${problem.bg} w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-md`}>
+      {problem.icon}
     </div>
-    <div className="flex flex-col gap-1">
-      <h3 className="text-white font-inter text-3xl font-bold tracking-tight">
-        {stat.value}
+    <div className="flex flex-col gap-3">
+      <h3 className="text-white font-inter text-2xl font-bold tracking-tight">
+        {problem.title}
       </h3>
-      <p className="text-[#B4B6C9] font-inter text-[15px]">
-        {stat.label}
+      <p className="text-[#B4B6C9] font-inter text-[16px] leading-relaxed">
+        {problem.description}
       </p>
     </div>
   </motion.div>
@@ -55,18 +49,18 @@ const StatCard = ({ stat, index }) => (
 
 const Stats = () => {
   return (
-    <section  id="feature" className="py-20 relative bg-linear-to-b from-[#59168B]/20 via-[#1C398E]/20 to-[#271436]/20">
+    <section id="feature" className="py-20 relative bg-linear-to-b from-[#59168B]/20 via-[#1C398E]/20 to-[#271436]/20">
       <Container>
         <div className="mb-14">
           <Header
-            titleText="Trusted by Modern Businesses"
-            subtitleText="Join thousands of businesses automating their customer calls"
+            titleText="Running a Busy Restaurant or Takeaway Isn't Easy"
+            subtitleText="During peak hours, every second matters. Staff are preparing food, serving customers and managing delivery orders — while the phone keeps ringing."
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statsData.map((stat, index) => (
-            <StatCard key={index} stat={stat} index={index} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mx-auto">
+          {problemsData.map((problem, index) => (
+            <ProblemCard key={index} problem={problem} index={index} />
           ))}
         </div>
       </Container>

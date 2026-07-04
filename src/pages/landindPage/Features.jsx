@@ -31,8 +31,8 @@ const featuresData = [
   },
   {
     icon: <Lock className="w-6 h-6 text-white" />,
-    title: "Secure API Integration",
-    description: "Connect securely with external systems and services.",
+    title: "Kitchen Printing",
+    description: "Orders confirmed arrive to your printer instantly",
     bg: "bg-[#8B5CF6]",
   },
   {

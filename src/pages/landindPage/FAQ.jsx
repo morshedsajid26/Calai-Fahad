@@ -8,31 +8,57 @@ import Header from "@/components/Header";
 
 const faqs = [
   {
-    question: "How does the AI calling work?",
-    answer:
-      "When a customer calls your number, our AI agent picks up instantly. It uses advanced voice AI (GPT-4o) to understand natural speech, collect order details, and respond in a human-like voice — all in real time with no delays.",
+    question: "What is Calai?",
+    answer: "Calai is an AI phone assistant built for restaurants and takeaways. It answers customer calls, takes orders, answers questions and helps your team deliver a faster service.",
   },
   {
-    question: "Can I monitor call usage?",
-    answer:
-      "Yes! Your dashboard gives you real-time visibility into every call — duration, transcript, order details, AI minute usage, and more. You'll always know exactly what's happening.",
+    question: "Will customers know they are speaking to AI?",
+    answer: "Calai is designed to provide natural, friendly conversations so customers can order easily without complicated menus, buttons or waiting on hold.",
   },
   {
-    question: "Does it support custom APIs?",
-    answer:
-      "Absolutely. Our Business and Enterprise plans include full REST API access. You can integrate VoiceAI with your existing POS, CRM, or any custom backend system.",
+    question: "Does Calai replace my staff?",
+    answer: "No. Calai works alongside your team by handling phone calls and repetitive questions, giving your staff more time to focus on preparing food and serving customers.",
   },
   {
-    question: "Can customers receive confirmation emails?",
-    answer:
-      "Yes — automatically. The moment an order is confirmed, VoiceAI sends a branded confirmation email to the customer with the full order summary, total amount, and estimated time.",
+    question: "How does Calai learn about my restaurant?",
+    answer: "Calai is trained using your restaurant information including your menu, prices, opening hours, special offers and frequently asked questions.",
   },
   {
-    question: "Is my business data secure?",
-    answer:
-      "We take security seriously. All data is encrypted in transit (TLS 1.3) and at rest (AES-256). We never share your data with third parties. API keys are hashed and stored securely.",
+    question: "Can Calai take food orders?",
+    answer: "Yes. Calai can understand customer orders, handle changes or special requests, confirm details and send the completed order to your restaurant.",
   },
-  
+  {
+    question: "What happens if a customer changes their order?",
+    answer: "Customers can speak naturally. Calai understands changes during the conversation and updates the order before confirming it.",
+  },
+  {
+    question: "How do I receive orders from Calai?",
+    answer: "Orders are sent clearly to your restaurant dashboard and can be printed directly to your kitchen printer for your team to prepare.",
+  },
+  {
+    question: "Do my customers need to download an app?",
+    answer: "No. Customers simply call your restaurant like they normally do — Calai handles the conversation in the background.",
+  },
+  {
+    question: "Do I need to change my phone number?",
+    answer: "No. Calai can connect with your existing phone setup, allowing customers to continue calling the number they already know.",
+  },
+  {
+    question: "Can I update my menu and prices?",
+    answer: "Yes. You can update your menu, pricing, offers and business information whenever changes are needed.",
+  },
+  {
+    question: "What happens during busy periods?",
+    answer: "Unlike a traditional phone line, Calai can help handle multiple customer conversations, reducing waiting times during your busiest hours.",
+  },
+  {
+    question: "Can Calai recommend extras to customers?",
+    answer: "Yes. Calai can suggest relevant items such as drinks, sides and special offers to help improve the customer experience and increase order value.",
+  },
+  {
+    question: "How long does setup take?",
+    answer: "Getting started is simple. Provide your restaurant details and menu, and Calai can be prepared for your business without complicated technical setup.",
+  },
 ];
 
 const FAQ = () => {

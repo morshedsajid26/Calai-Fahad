@@ -4,6 +4,8 @@ import Banner from "@/pages/landindPage/Banner";
 import CustomerCalls from "@/pages/landindPage/CustomerCalls";
 import FAQ from "@/pages/landindPage/FAQ";
 import Features from "@/pages/landindPage/Features";
+import HowItWorks from "@/pages/landindPage/HowItWorks";
+import Demo from "@/pages/landindPage/Demo";
 import Pricing from "@/pages/landindPage/Pricing";
 import Stats from "@/pages/landindPage/Stats";
 import React from "react";
@@ -15,6 +17,8 @@ const LandingPageLayout = () => {
       <Navbar />
       <Banner />
       <Stats />
+      <HowItWorks />
+      <Demo />
       <Features />
       <Pricing />
       <FAQ />

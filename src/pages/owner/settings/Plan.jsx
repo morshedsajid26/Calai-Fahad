@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
 import { Sparkles, Check, X, Loader2 } from 'lucide-react'
-import ToggleButton from '../../../components/ToogleButton'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import useAxiosSecure from '../../../hooks/useAxiosSecure'
 import toast from 'react-hot-toast'
 
-const PlanCard = ({ plan, isAnnual, onUpgrade, isPendingUpgrade }) => {
+const PlanCard = ({ plan, onUpgrade, isPendingUpgrade }) => {
   const isPopular = plan.name === "Growth" || plan.name === "Starter"; // Example popular logic
   
   return (
@@ -18,9 +17,9 @@ const PlanCard = ({ plan, isAnnual, onUpgrade, isPendingUpgrade }) => {
         
         <div className="flex items-baseline gap-1.5">
           <span className="text-white text-[32px] font-bold tracking-tight">
-            £{isAnnual ? plan.priceYearly : plan.priceMonthly}
+            £{plan.priceMonthly}
           </span>
-          <span className="text-gray-500 text-sm font-medium">/{isAnnual ? 'year' : 'month'}</span>
+          <span className="text-gray-500 text-sm font-medium">/month</span>
         </div>
         
         <p className="text-gray-400 text-[13px] leading-relaxed min-h-[40px]">
@@ -54,7 +53,6 @@ const PlanCard = ({ plan, isAnnual, onUpgrade, isPendingUpgrade }) => {
 }
 
 const Plan = () => {
-  const [isAnnual, setIsAnnual] = useState(false)
   const axiosSecure = useAxiosSecure()
 
   const { data: plansResponse, isLoading } = useQuery({
@@ -69,7 +67,7 @@ const Plan = () => {
     mutationFn: async (planId) => {
       const payload = {
         planId,
-        billingCycle: isAnnual ? "yearly" : "monthly"
+        billingCycle: "monthly"
       }
       const response = await axiosSecure.post('/business-owner/payment/create-checkout-session', payload)
       return response.data
@@ -107,9 +105,6 @@ const Plan = () => {
           <h2 className="text-xl font-semibold text-white mb-1">Choose Your Plan</h2>
           <p className="text-sm text-gray-400">Manage your subscription plan</p>
         </div>
-        <div className=" p-1.5   self-center sm:self-auto">
-          <ToggleButton isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
-        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -117,7 +112,6 @@ const Plan = () => {
           <PlanCard 
             key={plan.id || index} 
             plan={plan} 
-            isAnnual={isAnnual} 
             onUpgrade={handleUpgrade}
             isPendingUpgrade={checkoutMutation.isPending && checkoutMutation.variables === plan.id}
           />

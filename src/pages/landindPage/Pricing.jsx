@@ -1,15 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { Sparkles, Check, X, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Container from "@/components/Container";
 import { motion } from "framer-motion";
-import ToggleButton from "@/components/ToogleButton";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosPublic from "@/hooks/useAxiosPublic";
 
-const PlanCard = ({ plan, index, isAnnual }) => {
+const PlanCard = ({ plan, index }) => {
   const isPopular = plan.name?.toLowerCase() === 'pro' || plan.isPopular;
-  const priceValue = isAnnual ? plan.priceYearly : plan.priceMonthly;
+  const priceValue = plan.priceMonthly;
   const priceDisplay = priceValue !== undefined ? `$${priceValue}` : (plan.price || "$0");
 
   return (
@@ -41,7 +40,7 @@ const PlanCard = ({ plan, index, isAnnual }) => {
         <span className="text-white text-[32px] font-bold tracking-tight">
           {priceDisplay}
         </span>
-        <span className="text-gray-500 text-sm font-medium">/{isAnnual ? 'year' : 'month'}</span>
+        <span className="text-gray-500 text-sm font-medium">/month</span>
       </div>
 
       <p className="text-gray-400 text-[13px] leading-relaxed min-h-[40px]">
@@ -80,7 +79,6 @@ const PlanCard = ({ plan, index, isAnnual }) => {
 };
 
 const Pricing = () => {
-  const [isAnnual, setIsAnnual] = useState(false);
   const axiosPublic = useAxiosPublic();
   const { data: plansResponse, isLoading } = useQuery({
     queryKey: ['publicPlans'],
@@ -107,12 +105,6 @@ const Pricing = () => {
           />
         </motion.div>
 
-        <div className="flex justify-center mt-8">
-          <div className="p-1.5">
-            <ToggleButton isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-10">
           {isLoading ? (
             <div className="col-span-full flex justify-center py-12">
@@ -120,7 +112,7 @@ const Pricing = () => {
             </div>
           ) : plans.length > 0 ? (
             plans.map((plan, index) => (
-              <PlanCard key={plan.id || index} plan={plan} index={index} isAnnual={isAnnual} />
+              <PlanCard key={plan.id || index} plan={plan} index={index} />
             ))
           ) : (
             <div className="col-span-full flex justify-center py-12">

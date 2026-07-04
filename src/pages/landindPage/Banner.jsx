@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 import { FiPlay, FiArrowRight } from "react-icons/fi";
 import { RiSparklingFill } from "react-icons/ri";
 import Container from "@/components/Container";
-// import { Container } from "lucide-react";
+import BannerVideo from "./BannerVideo";
 
 const Banner = () => {
   return (
     <section
       id="home"
-      className="relative  bg-linear-to-t from-[#59168B]/40 via-[#02060F] to-[#59168B]/20 overflow-hidden flex items-center py-20 min-h-screen"
+      className="relative  bg-linear-to-t from-[#59168B]/40 via-[#02060F] to-[#59168B]/20 overflow-hidden flex items-center  min-h-screen"
     >
       <Container>
         <div className=" grid md:grid-cols-2 gap-5   items-center ">
@@ -44,9 +44,7 @@ const Banner = () => {
 
             {/* Subheading */}
             <p className="text-lg md:text-xl text-[#99A1AF]  font-inter text-center md:text-start">
-              Never miss a customer call again. Our AI agent answers calls,
-              talks with customers, collects orders, and sends confirmation
-              emails automatically.
+              Better service for your customers, Less pressure on your team, Calai answers calls, takes orders, upsell on items and helps your business save time and money
             </p>
 
             {/* Buttons */}
@@ -75,25 +73,8 @@ const Banner = () => {
             </div>
           </motion.div>
 
-          {/* Right Content - Video Animation */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: false }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className=""
-          >
-            <div className="relative w-full backdrop-blur-2xl shadow-2xl overflow-hidden flex items-center justify-end">
-              <video
-                src="/Banner.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className=" object-cover rounded-2xl "
-              />
-            </div>
-          </motion.div>
+          {/* Right Content - Custom UI Graphic */}
+          <BannerVideo />
         </div>
       </Container>
     </section>

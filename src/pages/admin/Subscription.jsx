@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import { DollarSign, TrendingUp, CreditCard, Download, Sparkles, Check, X } from 'lucide-react'
 import Table from '../../components/Table'
-import ToggleButton from '../../components/ToogleButton'
 import { useQuery } from '@tanstack/react-query'
 import useAxiosSecure from '../../hooks/useAxiosSecure'
 
-const PlanCard = ({ plan, isAnnual }) => {
+const PlanCard = ({ plan }) => {
   const isPopular = plan.name?.toLowerCase() === 'pro' || plan.isPopular;
-  const price = isAnnual ? plan.priceYearly : plan.priceMonthly;
+  const price = plan.priceMonthly;
 
   return (
     <div className={`bg-[#131313] border ${isPopular ? 'border-blue-600/30 shadow-[0_0_20px_rgba(37,99,235,0.05)]' : 'border-[#272727]'} p-6 rounded-[28px] flex flex-col gap-6 hover:border-[#333333] transition-all group`}>
@@ -19,7 +18,7 @@ const PlanCard = ({ plan, isAnnual }) => {
         
         <div className="flex items-baseline gap-1.5">
           <span className="text-white text-[32px] font-bold tracking-tight">${price}</span>
-          <span className="text-gray-500 text-sm font-medium">/{isAnnual ? 'year' : 'month'}</span>
+          <span className="text-gray-500 text-sm font-medium">/month</span>
         </div>
         
         <p className="text-gray-400 text-[13px] leading-relaxed min-h-[40px]">
@@ -50,8 +49,6 @@ const PlanCard = ({ plan, isAnnual }) => {
 }
 
 const Subscription = () => {
-  const [isAnnual, setIsAnnual] = useState(false)
-
   const axiosSecure = useAxiosSecure()
 
   const { data: plansResponse, isLoading: isPlansLoading } = useQuery({
@@ -175,9 +172,6 @@ const Subscription = () => {
       <div className="my-15">
         <div className="flex flex-col sm:flex-row justify-end items-start sm:items-end mb-8 gap-6 sm:gap-0">
           
-          <div className=" p-1.5 self-center sm:self-auto">
-            <ToggleButton isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
-          </div>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -187,7 +181,7 @@ const Subscription = () => {
             </div>
           ) : (
             plans.map((plan, index) => (
-              <PlanCard key={plan.id || index} plan={plan} isAnnual={isAnnual} />
+              <PlanCard key={plan.id || index} plan={plan} />
             ))
           )}
         </div>

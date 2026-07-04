@@ -11,9 +11,9 @@ import Cookies from "js-cookie";
 
 const navitems = [
   { name: "Home", href: "home" },
-  { name: "Features", href: "feature" },
+  { name: "How it works", href: "how-it-works" },
+  { name: "Demo", href: "demo" },
   { name: "Pricing", href: "pricing" },
-  // { name: "About us", href: "aboutUs" },
   { name: "FAQ", href: "faq" },
 ];
 
@@ -149,7 +149,7 @@ const Navbar = () => {
             ) : (
                <Link to="/auth/login">
                 <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] cursor-pointer">
-                  Start Free Trial
+                  Log In
                 </button>
               </Link> 
             )}
@@ -219,7 +219,7 @@ const Navbar = () => {
                   ) : (
                    <Link to="/auth/login" onClick={() => setOpen(false)}>
                       <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-6 py-3 border border-[#0F42FF] w-full cursor-pointer">
-                        Start Free Trial
+                        Log In
                       </button>
                  </Link> 
                   )}
