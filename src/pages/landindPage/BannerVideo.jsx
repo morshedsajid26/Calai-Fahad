@@ -78,8 +78,8 @@ const BannerGraphic = () => {
                   <motion.div 
                     key={i}
                     animate={{ height: [h*0.4, h, h*0.4] }}
-                    transition={{ duration: 0.8, repeat: Infinity, delay: i*0.1 }}
-                    className="w-1.5 bg-[#00D3F3] rounded-full"
+                    transition={{ duration: 2, repeat: Infinity, delay: i*0.20, ease: "easeInOut" }}
+                    className="w-2 bg-[#00D3F3] rounded-full"
                     style={{ height: h }}
                   />
                 ))}
@@ -128,8 +128,13 @@ const BannerGraphic = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="absolute -bottom-10 -right-2 md:-right-8 z-30 w-[240px] md:w-[280px] bg-[#0A0D14] border border-[#271E4B] rounded-2xl p-5 md:p-6 shadow-[0_30px_60px_rgba(0,0,0,0.8)]"
+          className="absolute -bottom-10 -right-2 md:-right-8 z-30 w-[240px] md:w-[280px]"
         >
+          <motion.div
+            animate={{ y: [0, -12, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="w-full h-full bg-[#0A0D14] border border-[#271E4B] rounded-2xl p-5 md:p-6 shadow-[0_30px_60px_rgba(0,0,0,0.8)]"
+          >
           <div className="flex gap-3 items-center mb-5">
             <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
               <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 4h16v12H4V8zm2 2v8h12v-8H6zm2 2h8v2H8v-2z"></path></svg>
@@ -163,6 +168,7 @@ const BannerGraphic = () => {
             <span className="text-[#00D3F3] font-bold text-sm md:text-base">Total</span>
             <span className="text-[#00D3F3] font-bold text-sm md:text-base">£110</span>
           </div>
+          </motion.div>
         </motion.div>
         
       </div>
