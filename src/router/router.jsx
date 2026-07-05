@@ -40,6 +40,7 @@ import TestCallWindow from "@/pages/owner/TestCallWindow";
 import Telephony from "@/pages/admin/Telephony";
 import TermsCondition from "@/pages/landindPage/TermsCondition";
 import PrivacyPolicy from "@/pages/landindPage/PrivacyPolicy";
+import ThankYouContact from "@/pages/landindPage/ThankYouContact";
 
 const router = createBrowserRouter([
   //  AUTH ROUTES
@@ -113,6 +114,10 @@ const router = createBrowserRouter([
   {
     path: "/privacy",
     element: <PrivacyPolicy />,
+  },
+  {
+    path: "/thank-you-contact",
+    element: <ThankYouContact />,
   },
 ]);
 

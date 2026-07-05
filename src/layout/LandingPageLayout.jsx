@@ -8,6 +8,7 @@ import HowItWorks from "@/pages/landindPage/HowItWorks";
 import Demo from "@/pages/landindPage/Demo";
 import Pricing from "@/pages/landindPage/Pricing";
 import Stats from "@/pages/landindPage/Stats";
+import Contact from "@/pages/landindPage/Contact";
 import React from "react";
 
 
@@ -22,6 +23,7 @@ const LandingPageLayout = () => {
       <Features />
       <Pricing />
       <FAQ />
+      <Contact />
       <CustomerCalls />
       <Footer />
     </div>
