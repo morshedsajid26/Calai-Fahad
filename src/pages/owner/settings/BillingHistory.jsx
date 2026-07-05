@@ -57,7 +57,7 @@ const BillingHistory = () => {
           <Table 
             TableHeads={tableHeads} 
             TableRows={tableRows}
-            headClass=" border-b border-[#1A1A1A] text-gray-200 whitespace-nowrap last:[&>div]:justify-center"
+            headClass=" border-b border-[#1A1A1A] text-gray-200 whitespace-nowrap"
             tableClass="border-none"
           />
         ) : (

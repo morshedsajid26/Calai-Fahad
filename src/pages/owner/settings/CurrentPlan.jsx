@@ -46,9 +46,14 @@ const CurrentPlan = () => {
 
       {/* Left Content */}
       <div className="flex flex-col gap-2 pt-2 sm:pt-0">
-        <h2 className="text-[28px] sm:text-[32px] font-bold text-white tracking-tight leading-none mb-1">
-          {sub?.plan?.name || 'Unknown Plan'}
-        </h2>
+        <div className="flex items-center gap-4 mb-1">
+          <h2 className="text-[28px] sm:text-[32px] font-bold text-white tracking-tight leading-none">
+            {sub?.plan?.name || 'Unknown Plan'}
+          </h2>
+          <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider mt-1 ${sub?.status === 'active' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
+            {sub?.status === 'active' ? 'Active' : 'Inactive'}
+          </span>
+        </div>
         <p className="text-[15px] text-gray-400 mb-2">
           ${sub?.plan?.priceMonthly}/month
         </p>
@@ -61,7 +66,14 @@ const CurrentPlan = () => {
 
       {/* Right Button */}
       <div>
-        <button className="px-8 py-2.5 rounded-xl border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm font-medium text-white shadow-[0_0_15px_rgba(37,99,235,0.2)] hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all whitespace-nowrap">
+        <button 
+          disabled={sub?.status === 'active'}
+          className={`px-8 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
+            sub?.status === 'active'
+              ? 'border border-[#272727] bg-[#1A1A1A] text-gray-500 cursor-not-allowed'
+              : 'border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white shadow-[0_0_15px_rgba(37,99,235,0.2)] hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] cursor-pointer'
+          }`}
+        >
           Upgrade Plan
         </button>
       </div>

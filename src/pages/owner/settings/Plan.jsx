@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import useAxiosSecure from '../../../hooks/useAxiosSecure'
 import toast from 'react-hot-toast'
 
-const PlanCard = ({ plan, onUpgrade, isPendingUpgrade }) => {
+const PlanCard = ({ plan, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
   const isPopular = plan.name === "Growth" || plan.name === "Starter"; // Example popular logic
   
   return (
@@ -39,14 +39,23 @@ const PlanCard = ({ plan, onUpgrade, isPendingUpgrade }) => {
       </div>
 
       <div className="mt-auto">
-        <button 
-          onClick={() => onUpgrade(plan.id)}
-          disabled={isPendingUpgrade}
-          className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {isPendingUpgrade && <Loader2 className="w-4 h-4 animate-spin" />}
-          Upgrade plan
-        </button>
+        {isCurrentPlan ? (
+          <button 
+            disabled
+            className="w-full py-2.5 rounded-lg border border-[#272727] bg-[#1A1A1A] text-sm text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            Current Plan
+          </button>
+        ) : (
+          <button 
+            onClick={() => onUpgrade(plan.id)}
+            disabled={isPendingUpgrade}
+            className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isPendingUpgrade && <Loader2 className="w-4 h-4 animate-spin" />}
+            Upgrade plan
+          </button>
+        )}
       </div>
     </div>
   )
@@ -55,10 +64,18 @@ const PlanCard = ({ plan, onUpgrade, isPendingUpgrade }) => {
 const Plan = () => {
   const axiosSecure = useAxiosSecure()
 
-  const { data: plansResponse, isLoading } = useQuery({
+  const { data: plansResponse, isLoading: isLoadingPlans } = useQuery({
     queryKey: ['subscriptionPlans'],
     queryFn: async () => {
       const response = await axiosSecure.get('/business-owner/subscription/plans')
+      return response.data
+    }
+  })
+
+  const { data: subResponse, isLoading: isLoadingSub } = useQuery({
+    queryKey: ['mySubscription'],
+    queryFn: async () => {
+      const response = await axiosSecure.get('/business-owner/subscription/my-subscription')
       return response.data
     }
   })
@@ -89,8 +106,9 @@ const Plan = () => {
   }
 
   const plans = plansResponse?.data || []
+  const currentPlanId = subResponse?.data?.plan?.id
 
-  if (isLoading) {
+  if (isLoadingPlans || isLoadingSub) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="animate-spin text-[#2563EB] w-10 h-10" />
@@ -114,6 +132,7 @@ const Plan = () => {
             plan={plan} 
             onUpgrade={handleUpgrade}
             isPendingUpgrade={checkoutMutation.isPending && checkoutMutation.variables === plan.id}
+            isCurrentPlan={plan.id === currentPlanId}
           />
         ))}
       </div>
