@@ -188,7 +188,7 @@ const Contact = () => {
                   Message
                 </label>
                 <textarea
-                  className="w-full h-full border border-[#1C398E]/50 outline-none p-4 text-white bg-[#0A0F24] placeholder-gray-500 rounded-xl min-h-[120px] focus:border-[#C27AFF] transition-colors text-sm shadow-inner"
+                  className="w-full h-full border border-[#1C398E]/50 outline-none p-4 text-white bg-[#0A0F24] placeholder-gray-500 rounded-xl min-h-[120px] focus:border-[#C27AFF] transition-colors text-sm shadow-inner resize-none"
                   placeholder="Tell us about your restaurant or any questions you have."
                   value={formData.message}
                   onChange={(e) =>
