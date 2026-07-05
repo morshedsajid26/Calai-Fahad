@@ -5,13 +5,17 @@ import Container from "@/components/Container";
 import InputField from "@/components/Inputfield";
 import Dropdown from "@/components/Dropdown";
 import { FiPhone, FiMail, FiMapPin } from "react-icons/fi";
+import emailjs from '@emailjs/browser';
+import toast from 'react-hot-toast';
 
 const Contact = () => {
   const navigate = useNavigate();
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     businessName: "",
+    businessPostcode: "",
     businessType: "",
     phoneNumber: "",
     email: "",
@@ -19,10 +23,35 @@ const Contact = () => {
     message: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Redirect to the success page
-    navigate("/thank-you-contact");
+    setIsSubmitting(true);
+
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          fullName: formData.fullName,
+          businessName: formData.businessName,
+          businessPostcode: formData.businessPostcode,
+          businessType: formData.businessType,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+          dailyOrders: formData.dailyOrders,
+          message: formData.message,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      );
+      
+      // Redirect to the success page
+      navigate("/thank-you-contact");
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      toast.error("Failed to send message. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -65,7 +94,7 @@ const Contact = () => {
                     <FiPhone className="text-lg text-[#00D3F3]" />
                   </div>
                   <span className="text-sm font-medium">
-                    +44 (0) 123 456 7890
+                    +447719436543
                   </span>
                 </div>
                 <div className="flex items-center gap-4 text-gray-200">
@@ -101,13 +130,14 @@ const Contact = () => {
             className="w-full md:w-[60%] p-8 md:p-10 rounded-[1.5rem] bg-transparent relative z-10"
           >
             <form onSubmit={handleSubmit} className="flex flex-col h-full">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-6">
                 <InputField
                   label="Full Name*"
                   type="text"
                   required
                   labelClass="!text-gray-300 !font-medium mb-1 text-sm"
-                  inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner"
+                  inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner "
+                  className={`col-span-2`}
                   placeholder="Enter your full name"
                   value={formData.fullName}
                   onChange={(e) =>
@@ -128,6 +158,7 @@ const Contact = () => {
                   }
                 />
 
+
                 <Dropdown
                   label="Business Type*"
                   placeholder="Select type"
@@ -141,6 +172,18 @@ const Contact = () => {
                     setFormData({ ...formData, businessType: val })
                   }
                 />
+                  <InputField
+                    label="Business Postcode*"
+                    type="text"
+                    required
+                    labelClass="!text-gray-300 !font-medium mb-1 text-sm"
+                    inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner"
+                    placeholder="Enter business postcode"
+                    value={formData.businessPostcode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, businessPostcode: e.target.value })
+                    }
+                  />
 
                 <InputField
                   label="Phone Number*"
@@ -202,9 +245,10 @@ const Contact = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] hover:from-[#001c80] hover:to-[#001870] text-white font-bold py-3 px-8 rounded-full transition-all duration-300 border border-[#0F42FF] shadow-[0_0_15px_rgba(15,66,255,0.3)] hover:shadow-[0_0_20px_rgba(15,66,255,0.6)]"
+                  disabled={isSubmitting}
+                  className={`bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] hover:from-[#001c80] hover:to-[#001870] text-white font-bold py-3 px-8 rounded-full transition-all duration-300 border border-[#0F42FF] shadow-[0_0_15px_rgba(15,66,255,0.3)] hover:shadow-[0_0_20px_rgba(15,66,255,0.6)] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  Book My Free Demo
+                  {isSubmitting ? 'Sending...' : 'Book My Free Demo'}
                 </motion.button>
               </div>
             </form>
