@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Phone, PhoneCall } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
+import Dropdown from "@/components/Dropdown";
 import Vapi from "@vapi-ai/web";
 import toast from "react-hot-toast";
 import { useQuery } from '@tanstack/react-query';
@@ -21,6 +22,7 @@ const TestCallWindow = () => {
 
   const agents = agentsResponse?.data || [];
   const [selectedAgentId, setSelectedAgentId] = useState("");
+  const [selectedAgentName, setSelectedAgentName] = useState("");
 
   const [isCalling, setIsCalling] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -172,30 +174,24 @@ const TestCallWindow = () => {
                 <h3 className="text-white font-bold text-lg md:text-xl">Select Your AI Agent</h3>
               </div>
               
-              <div className="relative">
-                <select 
-                  value={selectedAgentId} 
-                  onChange={(e) => setSelectedAgentId(e.target.value)}
-                  disabled={isCalling || isLoadingAgents}
-                  className="w-full bg-[#0E0E10] text-gray-200 border border-[#262626] hover:border-gray-600 rounded-xl px-5 py-3.5 text-[15px] outline-none focus:border-green-500 transition-all disabled:opacity-50 appearance-none cursor-pointer pr-10 shadow-inner"
-                >
-                  <option value="" disabled>
-                    {isLoadingAgents ? "Loading agents..." : "Choose an AI Assistant..."}
-                  </option>
-                  {agents.map(agent => {
-                    const vapiId = agent.agentId || agent.vapiAgentId || agent.vapi_agent_id || agent.id;
-                    return (
-                      <option key={agent.id} value={vapiId}>
-                        {agent.name || "Unknown Agent"}
-                      </option>
-                    );
-                  })}
-                </select>
-                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m6 9 6 6 6-6"/>
-                  </svg>
-                </div>
+              <div className="relative z-50">
+                <Dropdown
+                  placeholder={isLoadingAgents ? "Loading agents..." : "Select an Agent"}
+                  options={agents.map(a => a.name || "Unknown Agent")}
+                  value={selectedAgentName}
+                  onSelect={(name) => {
+                    const agent = agents.find(a => (a.name || "Unknown Agent") === name);
+                    if (agent) {
+                      const vapiId = agent.agentId || agent.vapiAgentId || agent.vapi_agent_id || agent.id;
+                      setSelectedAgentId(vapiId);
+                      setSelectedAgentName(name);
+                    }
+                  }}
+                  className={`${isCalling || isLoadingAgents ? "opacity-50 pointer-events-none" : ""}`}
+                  inputClass="!w-full !bg-[#0E0E10] !text-white !placeholder-white !border-[#262626] hover:!border-gray-600 focus:!border-green-500 !rounded-xl !px-5 !py-3.5 !text-[15px] !shadow-inner !transition-all"
+                  optionClass="!bg-[#0E0E10] !text-white !border-[#262626]"
+                  icon="!text-gray-500 !right-5"
+                />
               </div>
             </div>
 
