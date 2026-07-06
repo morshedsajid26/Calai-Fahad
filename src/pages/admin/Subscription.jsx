@@ -17,8 +17,16 @@ const PlanCard = ({ plan }) => {
         </div>
         
         <div className="flex items-baseline gap-1.5">
-          <span className="text-white text-[32px] font-bold tracking-tight">${price}</span>
-          <span className="text-gray-500 text-sm font-medium">/month</span>
+          {plan.name?.toLowerCase() === 'enterprise' ? (
+             <span className="text-white text-[24px] font-bold tracking-tight">
+               Custom Price
+             </span>
+          ) : (
+             <>
+                <span className="text-white text-[32px] font-bold tracking-tight">${price}</span>
+                <span className="text-gray-500 text-sm font-medium">/month</span>
+             </>
+          )}
         </div>
         
         <p className="text-gray-400 text-[13px] leading-relaxed min-h-[40px]">
@@ -174,7 +182,7 @@ const Subscription = () => {
           
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {isPlansLoading ? (
             <div className="col-span-full flex justify-center py-10">
               <span className="text-gray-400">Loading plans...</span>

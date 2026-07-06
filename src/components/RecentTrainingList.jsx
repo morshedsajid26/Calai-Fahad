@@ -106,16 +106,18 @@ const RecentTrainingList = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between w-full sm:w-auto sm:space-x-8 pt-2 sm:pt-0 border-t border-white/5 sm:border-0 relative">
-                <div className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 shrink-0 ${agent.status === 'active' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                  <span className="text-white text-sm font-medium capitalize">{agent.status || 'Unknown'}</span>
-                </div>
-                <div className="text-gray-400 text-sm sm:w-24 text-center sm:text-right">
-                  {agent.createdAt ? new Date(agent.createdAt).toLocaleDateString() : 'Recently'}
+              <div className="flex items-center justify-between w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-0">
+                <div className="flex items-center gap-4 sm:gap-8">
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 shrink-0 ${agent.status === 'active' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                    <span className="text-white text-sm font-medium capitalize">{agent.status || 'Unknown'}</span>
+                  </div>
+                  <div className="text-gray-400 text-sm sm:w-24 sm:text-right">
+                    {agent.createdAt ? new Date(agent.createdAt).toLocaleDateString() : 'Recently'}
+                  </div>
                 </div>
                 
-                <div className="relative">
+                <div className="relative ml-2 sm:ml-6">
                   <button 
                     onClick={() => setOpenDropdownId(openDropdownId === agent.id ? null : agent.id)}
                     className="text-gray-400 hover:text-white transition-colors shrink-0 cursor-pointer p-1 rounded-md hover:bg-white/5"
@@ -138,7 +140,6 @@ const RecentTrainingList = () => {
                     </div>
                   )}
                 </div>
-
               </div>
             </div>
           )) : (

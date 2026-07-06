@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
-import { Mail, Lock, Camera, Loader2 } from 'lucide-react'
+import { Mail, Lock, Camera, Loader2, User } from 'lucide-react'
 import InputField from '../../../components/Inputfield'
 import Password from '../../../components/Password'
 import { useQuery, useMutation } from '@tanstack/react-query'
@@ -18,7 +18,7 @@ const ProfileSettings = () => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
-  const [profileImage, setProfileImage] = useState('https://randomuser.me/api/portraits/men/32.jpg')
+  const [profileImage, setProfileImage] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
 
   const [currentPassword, setCurrentPassword] = useState('')
@@ -38,7 +38,7 @@ const ProfileSettings = () => {
 
   // Helper to get full avatar URL
   const getAvatarUrl = (avatarPath) => {
-    if (!avatarPath) return 'https://randomuser.me/api/portraits/men/32.jpg'
+    if (!avatarPath) return null
     if (avatarPath.startsWith('http') || avatarPath.startsWith('blob:')) return avatarPath
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     const baseUrl = apiBaseUrl.replace(/\/api\/?$/, '')
@@ -59,7 +59,7 @@ const ProfileSettings = () => {
   const currentAvatarUrl = profileResponse?.data?.avatar ? getAvatarUrl(profileResponse.data.avatar) : null;
   const { data: avatarBlobUrl } = useQuery({
     queryKey: ['owner-avatar-image', currentAvatarUrl],
-    enabled: !!currentAvatarUrl && !currentAvatarUrl.startsWith('blob:') && !currentAvatarUrl.includes('randomuser.me'),
+    enabled: !!currentAvatarUrl && !currentAvatarUrl.startsWith('blob:'),
     queryFn: async () => {
       const res = await axios.get(currentAvatarUrl, {
         responseType: 'blob',
@@ -192,11 +192,17 @@ const ProfileSettings = () => {
       <div className="bg-[#191919] p-6 rounded-xl border border-white/5 mb-8">
         {/* Profile Image */}
         <div className="relative w-20 h-20 mb-8">
-          <img 
-            src={displayImage} 
-            alt="Profile" 
-            className="w-full h-full rounded-full object-cover border-2 border-white/10"
-          />
+          {displayImage ? (
+            <img 
+              src={displayImage} 
+              alt="Profile" 
+              className="w-full h-full rounded-full object-cover border-2 border-white/10"
+            />
+          ) : (
+            <div className="w-full h-full rounded-full bg-[#1C2242] flex items-center justify-center border-2 border-white/10">
+              <User className="text-gray-400 w-8 h-8" />
+            </div>
+          )}
           {isProfileEditing && (
             <button 
               onClick={handleImageClick}

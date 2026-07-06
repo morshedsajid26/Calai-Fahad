@@ -130,7 +130,7 @@ const UploadPdf = () => {
             type="text" 
             value={agentName}
             onChange={(e) => setAgentName(e.target.value)}
-            placeholder="e.g. Offer offer burger 2"
+            placeholder="e.g. Burger offer"
             className="w-full bg-[#111111] border border-[#272727] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
           />
         </div>

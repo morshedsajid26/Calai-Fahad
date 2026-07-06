@@ -56,7 +56,7 @@ export default function Header({ onMenuClick }) {
     }
   });
 
-  const displayLogo = logoBlobUrl || "/logo.png";
+  const displayLogo = logoBlobUrl || null;
 
   return (
     <header className="bg-[#141416] flex items-center px-4 md:px-6 py-3.5 relative gap-2 sm:gap-4">
@@ -112,11 +112,17 @@ export default function Header({ onMenuClick }) {
               className="relative cursor-pointer"
               onClick={() => setOpenDropdown(!openDropdown)}
             >
-              <Image
-                src={displayLogo}
-                alt="User Avatar"
-                className="w-10 h-10 sm:w-10 sm:h-10 rounded-full object-cover"
-              />
+              {displayLogo ? (
+                <Image
+                  src={displayLogo}
+                  alt="User Avatar"
+                  className="w-10 h-10 sm:w-10 sm:h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 sm:w-10 sm:h-10 rounded-full bg-[#1C2242] flex items-center justify-center border border-gray-600">
+                  <Icon icon="lucide:user" className="text-gray-300 text-xl" />
+                </div>
+              )}
               <span className="absolute bottom-0 right-0 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-[#4ADE80] border-2 border-[#141416] rounded-full"></span>
             </div>
 

@@ -158,7 +158,7 @@ const TestCallWindow = () => {
         <Breadcrumb text={"Check the voice tester"} />
       </div>
 
-      <div className={`flex-1 bg-[#0E0E10] rounded-3xl border border-[#262626] overflow-hidden min-h-[600px] ${isCalling ? 'flex flex-col md:flex-row' : 'relative flex flex-col items-center pt-6 md:pt-10 pb-10'}`}>
+      <div className={`flex-1 bg-[#0E0E10] rounded-3xl border border-[#262626] overflow-y-auto lg:overflow-hidden min-h-[500px] md:min-h-[600px] ${isCalling ? 'flex flex-col lg:flex-row' : 'relative flex flex-col items-center pt-6 md:pt-10 pb-10'}`}>
         
         {!isCalling ? (
           <>
@@ -196,9 +196,9 @@ const TestCallWindow = () => {
             </div>
 
             {/* Voice Orb Area */}
-            <div className="relative my-auto scale-75 md:scale-100 z-10">
+            <div className="relative my-auto z-10 py-6 md:py-0">
               <motion.div
-                className="w-56 h-56 md:w-64 md:h-64 rounded-full flex items-center justify-center relative z-10 overflow-hidden"
+                className="w-48 h-48 md:w-64 md:h-64 rounded-full flex items-center justify-center relative z-10 overflow-hidden"
               >
                 <motion.img
                   src="/moon.png"
@@ -241,7 +241,7 @@ const TestCallWindow = () => {
             {/* --- ACTIVE STATE (Split Screen) --- */}
             
             {/* Left Column: Voice Orb & Controls */}
-            <div className="flex-1 relative flex flex-col items-center justify-between p-6 md:p-8 min-h-[500px]">
+            <div className="flex-1 relative flex flex-col items-center justify-between p-6 md:p-8 min-h-[350px] lg:min-h-[500px] shrink-0">
               
               {/* Timer Pill */}
               <div className="flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full backdrop-blur-md z-20">
@@ -316,7 +316,7 @@ const TestCallWindow = () => {
             </div>
 
             {/* Right Column: Live Transcript */}
-            <div className="w-full md:w-[380px] lg:w-[450px] border-t md:border-t-0 md:border-l border-white/5 flex flex-col bg-[#111114]/30 h-[400px] md:h-auto">
+            <div className="w-full lg:w-[380px] xl:w-[450px] border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col bg-[#111114]/30 min-h-[350px] lg:min-h-0 lg:h-auto shrink-0 flex-1">
               
               {/* Transcript Header */}
               <div className="flex items-center gap-2 px-6 py-5 border-b border-white/5">

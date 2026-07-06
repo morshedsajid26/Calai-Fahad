@@ -11,7 +11,7 @@ const Banner = () => {
   return (
     <section
       id="home"
-      className="relative  bg-linear-to-t from-[#59168B]/40 via-[#02060F] to-[#59168B]/20 overflow-hidden flex items-center  min-h-screen"
+      className="relative bg-linear-to-t from-[#59168B]/40 via-[#02060F] to-[#59168B]/20 overflow-hidden flex items-center  py-24 lg:py-36"
     >
       <Container>
         <div className="grid lg:grid-cols-2 gap-8 items-center">

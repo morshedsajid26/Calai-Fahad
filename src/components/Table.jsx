@@ -57,8 +57,8 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass }) 
   });
 
   return (
-    <div className="space-y-4 w-full">
-      <div className="w-full">
+    <div className="space-y-4 w-full ">
+      <div className="w-full overflow-x-auto ">
         <table className={`w-full border-collapse ${tableClass}`}>
           {/* ==== TABLE HEADER ==== */}  
           <thead>

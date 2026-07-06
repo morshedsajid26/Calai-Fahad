@@ -200,17 +200,19 @@ const Telephony = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center">
-        <Breadcrumb
-          text={`Import and manage Twilio phone numbers linked to businesses and AI Agents.`}
-        />
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex-1">
+          <Breadcrumb
+            text={`Import and manage Twilio phone numbers linked to businesses and AI Agents.`}
+          />
+        </div>
 
-        <div className=" mb-6">
+        <div className="mb-6 shrink-0">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-5 py-3 rounded-full text-lg cursor-pointer"
+            className="flex items-center gap-2 whitespace-nowrap bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-5 py-2 rounded-full text-lg cursor-pointer"
           >
-            <Icon icon="lucide:plus" className="text-lg" />
+            <Icon icon="lucide:plus" className="text-lg shrink-0" />
             Import Number
           </button>
         </div>

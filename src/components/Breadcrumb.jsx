@@ -32,11 +32,11 @@ const Breadcrumb = ({text}) => {
 
   return (
     <div className="mb-6">
-      <h1 className="text-white text-2xl font-medium tracking-tight">
+      <h1 className="text-white text-xl md:text-2xl font-medium tracking-tight">
         {formatTitle(lastPath)}
       </h1>
 
-      <p className="text-[#909090] text-base mt-1 ">{text}</p>
+      <p className="text-[#909090] text-sm md:text-base mt-1 ">{text}</p>
     </div>
   );
 };

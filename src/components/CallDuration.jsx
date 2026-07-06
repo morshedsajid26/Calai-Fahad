@@ -54,7 +54,7 @@ const CallDuration = ({ data: apiData }) => {
   return (
     <div className="w-full bg-[#191919] rounded-2xl px-6 py-10 border border-gray-800/50">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-8">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-medium text-white">Total Call Duration</h2>
           <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ const CallDuration = ({ data: apiData }) => {
       </div>
 
       {/* Chart */}
-      <div className="w-full h-[450px]">
+      <div className="w-full h-[300px] sm:h-[450px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={chartData}
