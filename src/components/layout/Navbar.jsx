@@ -15,6 +15,7 @@ const navitems = [
   { name: "Demo", href: "demo" },
   { name: "Pricing", href: "pricing" },
   { name: "FAQ", href: "faq" },
+  { name: "Contact Us", href: "contact" },
 ];
 
 const Navbar = () => {
@@ -81,7 +82,7 @@ const Navbar = () => {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className=" rounded-2xl shadow-sm md:border md:border-black/5 flex items-center justify-between "
+          className=" rounded-2xl shadow-sm lg:border lg:border-black/5 flex items-center justify-between "
         >
 
             <Link to="/"  onClick={() => scrollToSection("home")}>
@@ -96,7 +97,7 @@ const Navbar = () => {
           </Link>
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-3xl cursor-pointer p-2 rounded-xl hover:bg-slate-100 transition-colors bg-white"
+            className="lg:hidden text-3xl cursor-pointer p-2 rounded-xl hover:bg-slate-100 transition-colors bg-white"
             onClick={() => setOpen(!open)}
           >
             {open ? <FiX /> : <FiMenu />}
@@ -105,7 +106,7 @@ const Navbar = () => {
           
 
           {/* Desktop Menu */}
-          <ul className="hidden md:flex items-center justify-end gap-1 ">
+          <ul className="hidden lg:flex items-center justify-end gap-1 ">
             {navitems.map((item, index) => (
               <motion.li key={index} whileHover={{ y: -2 }}>
                 {item.isRoute ? (
@@ -138,7 +139,7 @@ const Navbar = () => {
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="hidden md:block"
+            className="hidden lg:block"
           >
             {user ? (
               <Link to={dashboardPath}>
@@ -166,7 +167,7 @@ const Navbar = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-[#070B14] mt-4 rounded-2xl shadow-xl overflow-hidden"
+              className="lg:hidden bg-[#070B14] mt-4 rounded-2xl shadow-xl overflow-hidden"
             >
               <ul className="flex flex-col items-start gap-2 p-6">
                 {navitems.map((item, index) => (

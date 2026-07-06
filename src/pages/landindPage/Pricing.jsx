@@ -10,7 +10,7 @@ const PlanCard = ({ plan, index }) => {
   const isPopular = plan.name?.toLowerCase() === "pro" || plan.isPopular;
   const priceValue = plan.priceMonthly;
   const priceDisplay =
-    priceValue !== undefined ? `$${priceValue}` : plan.price || "$0";
+    priceValue !== undefined ? `${priceValue}` : plan.price || "0";
 
   return (
     <motion.div
@@ -39,7 +39,7 @@ const PlanCard = ({ plan, index }) => {
 
         <div className="flex items-baseline gap-1.5">
           <span className="text-white text-[32px] font-bold tracking-tight">
-            {priceDisplay}
+            £{priceDisplay}
           </span>
           <span className="text-gray-500 text-sm font-medium">/month</span>
         </div>
@@ -107,7 +107,7 @@ const Pricing = () => {
           />
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mt-10 justify-center">
           {isLoading ? (
             <div className="col-span-full flex justify-center py-12">
               <Loader2 className="animate-spin text-[#0F42FF] w-8 h-8" />

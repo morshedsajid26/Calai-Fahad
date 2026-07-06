@@ -14,7 +14,7 @@ const Banner = () => {
       className="relative  bg-linear-to-t from-[#59168B]/40 via-[#02060F] to-[#59168B]/20 overflow-hidden flex items-center  min-h-screen"
     >
       <Container>
-        <div className=" grid md:grid-cols-2 gap-5   items-center ">
+        <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -52,7 +52,7 @@ const Banner = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative px-2 md:px-8 py-4 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white border border-[#0F42FF] font-medium font-inter text-base flex items-center gap-2  hover:shadow-[#0E41FE]/70 transition-all"
+                className="group relative px-6 md:px-8 py-4 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white border border-[#0F42FF] font-medium font-inter text-base flex items-center gap-2  hover:shadow-[#0E41FE]/70 transition-all"
               >
                 Start Free Trial
                 <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -63,7 +63,7 @@ const Banner = () => {
                   scale: 1.02,
                   backgroundColor: "rgba(255,255,255,0.05)",
                 }}
-                className="px-2 md:px-8 py-4 border border-white/10 rounded-full text-white font-medium text-base flex items-center gap-3 backdrop-blur-sm transition-all"
+                className="px-6 md:px-8 py-4 border border-white/10 rounded-full text-white font-medium text-base flex items-center gap-3 backdrop-blur-sm transition-all"
               >
                 <div className="w-7 h-7  flex items-center justify-center">
                   <FiPlay className="text-white" />
