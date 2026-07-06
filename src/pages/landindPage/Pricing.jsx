@@ -84,24 +84,22 @@ const PlanCard = ({ plan, index, role, onUpgrade, isPendingUpgrade, isCurrentPla
       </div>
 
       <div className="mt-auto">
-        {role === "BUSINESS_OWNER" && (
-          isCurrentPlan ? (
-            <button 
-              disabled
-              className="w-full py-2.5 rounded-lg border border-[#272727] bg-[#1A1A1A] text-sm text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              Current Plan
-            </button>
-          ) : (
-            <button 
-              onClick={() => onUpgrade(plan)}
-              disabled={isPendingUpgrade}
-              className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isPendingUpgrade && <Loader2 className="w-4 h-4 animate-spin" />}
-              {plan.name?.toLowerCase() === "enterprise" ? "Contact Us" : (plan.buttonText || "Upgrade plan")}
-            </button>
-          )
+        {role === "BUSINESS_OWNER" && isCurrentPlan ? (
+          <button 
+            disabled
+            className="w-full py-2.5 rounded-lg border border-[#272727] bg-[#1A1A1A] text-sm text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            Current Plan
+          </button>
+        ) : (
+          <button 
+            onClick={() => onUpgrade(plan)}
+            disabled={isPendingUpgrade}
+            className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isPendingUpgrade && <Loader2 className="w-4 h-4 animate-spin" />}
+            {plan.name?.toLowerCase() === "enterprise" ? "Contact Us" : (plan.buttonText || "Upgrade plan")}
+          </button>
         )}
       </div>
     </motion.div>
@@ -155,7 +153,10 @@ const Pricing = () => {
   });
 
   const handleUpgrade = (plan) => {
-    if (role !== "BUSINESS_OWNER") return;
+    if (role !== "BUSINESS_OWNER") {
+      toast.error("Please log in as to upgrade");
+      return;
+    }
     
     if (plan.name?.toLowerCase() === "enterprise") {
       setIsContactModalOpen(true);
