@@ -102,7 +102,7 @@ const Contact = () => {
                     <FiMail className="text-lg text-[#00D3F3]" />
                   </div>
                   <span className="text-sm font-medium">
-                    enquiries@calai.info
+                    Enquiries@calai.info
                   </span>
                 </div>
                 

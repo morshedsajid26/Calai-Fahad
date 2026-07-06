@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import EnterpriseContactModal from '../../../components/EnterpriseContactModal'
 
 const PlanCard = ({ plan, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
-  const isPopular = plan.name === "Growth" || plan.name === "Starter"; // Example popular logic
+  const isPopular = plan.name?.toLowerCase() === "starter" || plan.isPopular;
   
   return (
     <div className={`bg-[#0E0E10] border ${isPopular ? 'border-blue-600/30 shadow-[0_0_20px_rgba(37,99,235,0.05)]' : 'border-[#272727]'} p-6 rounded-[28px] flex flex-col gap-6 hover:border-[#333333] transition-all group h-full`}>

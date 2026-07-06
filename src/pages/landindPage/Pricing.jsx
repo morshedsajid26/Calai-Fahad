@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import EnterpriseContactModal from "@/components/EnterpriseContactModal";
 
 const PlanCard = ({ plan, index, role, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
-  const isPopular = plan.name?.toLowerCase() === "pro" || plan.isPopular;
+  const isPopular = plan.name?.toLowerCase() === "starter" || plan.isPopular;
   const priceValue = plan.priceMonthly;
   const priceDisplay =
     priceValue !== undefined ? `${priceValue}` : plan.price || "0";
