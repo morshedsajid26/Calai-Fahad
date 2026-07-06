@@ -3,6 +3,7 @@ import { Sparkles, Check, X, Loader2 } from 'lucide-react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import useAxiosSecure from '../../../hooks/useAxiosSecure'
 import toast from 'react-hot-toast'
+import EnterpriseContactModal from '../../../components/EnterpriseContactModal'
 
 const PlanCard = ({ plan, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
   const isPopular = plan.name === "Growth" || plan.name === "Starter"; // Example popular logic
@@ -56,12 +57,12 @@ const PlanCard = ({ plan, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
           </button>
         ) : (
           <button 
-            onClick={() => onUpgrade(plan.id)}
+            onClick={() => onUpgrade(plan)}
             disabled={isPendingUpgrade}
             className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isPendingUpgrade && <Loader2 className="w-4 h-4 animate-spin" />}
-            Upgrade plan
+            {plan.name?.toLowerCase() === 'enterprise' ? 'Contact Us' : 'Upgrade plan'}
           </button>
         )}
       </div>
@@ -71,6 +72,7 @@ const PlanCard = ({ plan, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
 
 const Plan = () => {
   const axiosSecure = useAxiosSecure()
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
   const { data: plansResponse, isLoading: isLoadingPlans } = useQuery({
     queryKey: ['subscriptionPlans'],
@@ -109,8 +111,12 @@ const Plan = () => {
     }
   })
 
-  const handleUpgrade = (planId) => {
-    checkoutMutation.mutate(planId)
+  const handleUpgrade = (plan) => {
+    if (plan.name?.toLowerCase() === 'enterprise') {
+      setIsContactModalOpen(true)
+      return
+    }
+    checkoutMutation.mutate(plan.id)
   }
 
   const plans = plansResponse?.data || []
@@ -144,6 +150,11 @@ const Plan = () => {
           />
         ))}
       </div>
+
+      <EnterpriseContactModal 
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
     </div>
   )
 }

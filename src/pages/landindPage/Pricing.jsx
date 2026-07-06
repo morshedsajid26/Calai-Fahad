@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Sparkles, Check, X, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Container from "@/components/Container";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import useAxiosPublic from "@/hooks/useAxiosPublic";
+import useAxiosSecure from "@/hooks/useAxiosSecure";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
+import EnterpriseContactModal from "@/components/EnterpriseContactModal";
 
-const PlanCard = ({ plan, index }) => {
+const PlanCard = ({ plan, index, role, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
   const isPopular = plan.name?.toLowerCase() === "pro" || plan.isPopular;
   const priceValue = plan.priceMonthly;
   const priceDisplay =
@@ -80,9 +84,25 @@ const PlanCard = ({ plan, index }) => {
       </div>
 
       <div className="mt-auto">
-        <button className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer">
-          {plan.buttonText || "Upgrade plan"}
-        </button>
+        {role === "BUSINESS_OWNER" && (
+          isCurrentPlan ? (
+            <button 
+              disabled
+              className="w-full py-2.5 rounded-lg border border-[#272727] bg-[#1A1A1A] text-sm text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              Current Plan
+            </button>
+          ) : (
+            <button 
+              onClick={() => onUpgrade(plan)}
+              disabled={isPendingUpgrade}
+              className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isPendingUpgrade && <Loader2 className="w-4 h-4 animate-spin" />}
+              {plan.name?.toLowerCase() === "enterprise" ? "Contact Us" : (plan.buttonText || "Upgrade plan")}
+            </button>
+          )
+        )}
       </div>
     </motion.div>
   );
@@ -90,6 +110,9 @@ const PlanCard = ({ plan, index }) => {
 
 const Pricing = () => {
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
+  const role = Cookies.get("role");
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { data: plansResponse, isLoading } = useQuery({
     queryKey: ["publicPlans"],
     queryFn: async () => {
@@ -98,7 +121,49 @@ const Pricing = () => {
     },
   });
 
+  const { data: subResponse } = useQuery({
+    queryKey: ['mySubscription'],
+    queryFn: async () => {
+      const response = await axiosSecure.get('/business-owner/subscription/my-subscription')
+      return response.data
+    },
+    enabled: role === "BUSINESS_OWNER"
+  });
+
   const plans = plansResponse?.data || [];
+  const currentPlanId = subResponse?.data?.plan?.id;
+
+  const checkoutMutation = useMutation({
+    mutationFn: async (planId) => {
+      const payload = {
+        planId,
+        billingCycle: "monthly"
+      }
+      const response = await axiosSecure.post('/business-owner/payment/create-checkout-session', payload)
+      return response.data
+    },
+    onSuccess: (res) => {
+      if (res?.data?.url) {
+        window.location.href = res.data.url
+      } else {
+        toast.error('Failed to initiate checkout session')
+      }
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || err?.message || 'Payment error occurred')
+    }
+  });
+
+  const handleUpgrade = (plan) => {
+    if (role !== "BUSINESS_OWNER") return;
+    
+    if (plan.name?.toLowerCase() === "enterprise") {
+      setIsContactModalOpen(true);
+      return;
+    }
+    
+    checkoutMutation.mutate(plan.id);
+  };
 
   return (
     <div id="pricing" className="py-15">
@@ -122,7 +187,15 @@ const Pricing = () => {
             </div>
           ) : plans.length > 0 ? (
             plans.map((plan, index) => (
-              <PlanCard key={plan.id || index} plan={plan} index={index} />
+              <PlanCard 
+                key={plan.id || index} 
+                plan={plan} 
+                index={index} 
+                role={role}
+                onUpgrade={handleUpgrade}
+                isPendingUpgrade={checkoutMutation.isPending && checkoutMutation.variables === plan.id}
+                isCurrentPlan={plan.id === currentPlanId}
+              />
             ))
           ) : (
             <div className="col-span-full flex justify-center py-12">
@@ -133,6 +206,11 @@ const Pricing = () => {
           )}
         </div>
       </Container>
+      
+      <EnterpriseContactModal 
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
     </div>
   );
 };
