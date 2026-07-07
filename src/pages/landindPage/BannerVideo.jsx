@@ -128,7 +128,7 @@ const BannerGraphic = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="absolute -bottom-10 right-0 sm:-right-4 md:-right-8 z-30 w-[220px] sm:w-[240px] md:w-[280px]"
+          className="absolute -bottom-10 right-4 sm:-right-4 md:-right-8 z-30 w-[220px] sm:w-[240px] md:w-[280px]"
         >
           <motion.div
             animate={{ y: [0, -12, 0] }}
