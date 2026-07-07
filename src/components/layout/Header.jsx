@@ -40,6 +40,17 @@ export default function Header({ onMenuClick }) {
   const ownerAvatarPath = profileData?.data?.avatar;
   const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, '') || '';
   
+  const { data: businessInfoResponse } = useQuery({
+    queryKey: ['ownerBusinessInfo'],
+    enabled: role === "BUSINESS_OWNER",
+    queryFn: async () => {
+      const response = await axiosSecure.get('/business-owner/settings/business-info');
+      return response.data;
+    }
+  });
+
+  const businessName = businessInfoResponse?.data?.name;
+  
   const currentLogoUrl = role === "SYSTEM_OWNER" 
     ? (logoPath ? `${baseUrl}${logoPath}` : null)
     : (ownerAvatarPath ? `${baseUrl}${ownerAvatarPath}` : null);
@@ -81,7 +92,7 @@ export default function Header({ onMenuClick }) {
         </div> */}
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <h3 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white truncate">
-            Welcome to Calai
+            {role === "BUSINESS_OWNER" ? (businessName || "Welcome") : "Welcome to Calai"}
           </h3>
 
           <Image

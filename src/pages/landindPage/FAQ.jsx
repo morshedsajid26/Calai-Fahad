@@ -13,7 +13,8 @@ const faqs = [
   },
   {
     question: "Will customers know they are speaking to AI?",
-    answer: "Calai is designed to provide natural, friendly conversations so customers can order easily without complicated menus, buttons or waiting on hold.",
+    answer: "Yes. Calai is designed to be transparent while still providing a natural and helpful customer experience. Your AI assistant will introduce itself clearly, for example:",
+    details: "Hi, you're through to [Business Name]. I'm the virtual assistant. Would you like to place an order?",
   },
   {
     question: "Does Calai replace my staff?",
