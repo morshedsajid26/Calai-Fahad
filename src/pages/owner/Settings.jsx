@@ -10,6 +10,7 @@ const Settings = () => {
     { name: "Business Info", path: "/owner/settings/business" },
     { name: "Subscription", path: "/owner/settings/subscription" },
     { name: "Privacy Setting", path: "/owner/settings/privacy" },
+    { name: "Help & Support", path: "/owner/settings/help" },
   ];
 
   const isActivePath = (path) =>

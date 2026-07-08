@@ -119,7 +119,11 @@ const Plan = () => {
     checkoutMutation.mutate(plan.id)
   }
 
-  const plans = plansResponse?.data || []
+  const plans = [...(plansResponse?.data || [])].sort((a, b) => {
+    if (a.name?.toLowerCase() === "enterprise") return 1;
+    if (b.name?.toLowerCase() === "enterprise") return -1;
+    return 0;
+  });
   const currentPlanId = subResponse?.data?.plan?.id
 
   if (isLoadingPlans || isLoadingSub) {

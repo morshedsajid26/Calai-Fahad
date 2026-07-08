@@ -69,6 +69,15 @@ export default function Dashboard() {
   const graphData = dashboardData?.data?.graphData;
   const overallReport = dashboardData?.data?.overallReport;
 
+  const formatTrendText = (text, defaultText) => {
+    if (!text) return defaultText;
+    // Replace any decimal number with 1 decimal place rounded value
+    return text.replace(/([+-]?\d+\.?\d*)/, (match) => {
+      const num = parseFloat(match);
+      return Number.isInteger(num) ? num : num.toFixed(1);
+    });
+  };
+
   const statsData = [
     {
       title: "Total Call Duration",
@@ -76,7 +85,7 @@ export default function Dashboard() {
       icon: "lucide:phone-call",
       iconBg: "bg-[#2563EB]",
       trend: stats?.totalCallDuration?.change || "0%",
-      trendText: stats?.totalCallDuration?.weeklyChange || "+0 this week min"
+      trendText: formatTrendText(stats?.totalCallDuration?.weeklyChange, "+0 this week min")
     },
     {
       title: "Today Total Call",

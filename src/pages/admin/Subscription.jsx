@@ -67,7 +67,11 @@ const Subscription = () => {
     }
   })
 
-  const plans = Array.isArray(plansResponse?.data) ? plansResponse.data : [];
+  const plans = [...(Array.isArray(plansResponse?.data) ? plansResponse.data : [])].sort((a, b) => {
+    if (a.name?.toLowerCase() === "enterprise") return 1;
+    if (b.name?.toLowerCase() === "enterprise") return -1;
+    return 0;
+  });
 
   const { data: billingsResponse, isLoading: isBillingsLoading } = useQuery({
     queryKey: ['billings'],

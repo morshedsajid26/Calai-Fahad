@@ -23,7 +23,7 @@ import ConnectEmail from "../pages/owner/settings/ConnectEmail";
 import BusinessInfo from "../pages/owner/settings/BusinessInfo";
 import OwnerSubscription from "../pages/owner/settings/Subscription";
 import PrivacySetting from "../pages/owner/settings/PrivacySetting";
-
+import HelpSupport from "../pages/owner/settings/HelpSupport";
 
 // auth
 import LogIn from "../pages/auth/LogIn";
@@ -94,8 +94,8 @@ const router = createBrowserRouter([
           { path: "connect", element: <ConnectEmail /> },
           { path: "business", element: <BusinessInfo /> },
           { path: "subscription", element: <OwnerSubscription /> },
-          { path: "privacy", element: <PrivacySetting /> }
-        
+          { path: "privacy", element: <PrivacySetting /> },
+          { path: "help", element: <HelpSupport /> }
         ]
       },
     ],
