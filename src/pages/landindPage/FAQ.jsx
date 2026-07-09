@@ -60,6 +60,12 @@ const faqs = [
     question: "How long does setup take?",
     answer: "Getting started is simple. Provide your restaurant details and menu, and Calai can be prepared for your business without complicated technical setup.",
   },
+  
+  {
+    question: "Do I need to sign a long-term contract?",
+    answer: "No. Calai is designed to be flexible for restaurants and takeaways. There are no long-term contracts—you can use Calai on a monthly basis and cancel with 30 days’ notice",
+    details:"A one-time setup fee applies to cover AI assistant configuration, menu training, call setup, and system preparation. Once your assistant is live, your monthly subscription continues for as long as you choose to use Calai"
+  },
 ];
 
 const FAQ = () => {
@@ -92,6 +98,7 @@ const FAQ = () => {
                 key={index}
                 question={faq.question}
                 answer={faq.answer}
+                details={faq.details}
               />
             ))}
           </motion.div>

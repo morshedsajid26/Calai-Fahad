@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { FiPlus, FiMinus } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FAQdropdown = ({ question, answer, className = "" }) => {
+const FAQdropdown = ({ question, answer, details, className = "" }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -43,6 +43,11 @@ const FAQdropdown = ({ question, answer, className = "" }) => {
                 <p className="text-[#99A1AF] font-inter text-sm md:text-base leading-relaxed">
                   {answer}
                 </p>
+                {details && (
+                  <p className="text-[#99A1AF] font-inter text-sm md:text-base leading-relaxed mt-4">
+                    {details}
+                  </p>
+                )}
               </div>
             </motion.div>
           )}
