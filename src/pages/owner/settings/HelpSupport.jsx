@@ -7,7 +7,7 @@ const HelpSupport = () => {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <Breadcrumb text="Get assistance and contact our support team" />
 
-      <div className="mt-8 bg-[#0E0E10] border border-[#272727] rounded-3xl p-6 sm:p-8 max-w-xl">
+      <div className="mt-8 bg-[#191919] border border-[#272727] rounded-3xl p-6 sm:p-8 max-w-xl">
         <h3 className="text-xl font-bold text-white mb-6">Contact</h3>
         
         <div className="flex flex-col gap-6">

@@ -10,6 +10,8 @@ const BusinessInfo = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
+  const [openingTime, setOpeningTime] = useState('')
+  const [closingTime, setClosingTime] = useState('')
 
   const { data: businessInfoResponse, isLoading, refetch } = useQuery({
     queryKey: ['ownerBusinessInfo'],
@@ -23,8 +25,12 @@ const BusinessInfo = () => {
     if (businessInfoResponse?.data && !isEditing) {
       setName(businessInfoResponse.data.name || '')
       setAddress(businessInfoResponse.data.address || '')
+      setOpeningTime(businessInfoResponse.data.opening_time || '')
+      setClosingTime(businessInfoResponse.data.closing_time || '')
     }
   }, [businessInfoResponse, isEditing])
+
+
 
   const updateMutation = useMutation({
     mutationFn: async (payload) => {
@@ -46,7 +52,12 @@ const BusinessInfo = () => {
   })
 
   const handleSave = () => {
-    updateMutation.mutate({ name, address })
+    updateMutation.mutate({ 
+      name, 
+      address, 
+      opening_time: openingTime, 
+      closing_time: closingTime 
+    })
   }
 
   const handleCancel = () => {
@@ -54,6 +65,8 @@ const BusinessInfo = () => {
     if (businessInfoResponse?.data) {
       setName(businessInfoResponse.data.name || '')
       setAddress(businessInfoResponse.data.address || '')
+      setOpeningTime(businessInfoResponse.data.opening_time || '')
+      setClosingTime(businessInfoResponse.data.closing_time || '')
     }
   }
 
@@ -93,6 +106,27 @@ const BusinessInfo = () => {
             labelClass="!text-sm !font-medium !text-gray-300"
             inputClass={`!bg-[#111111] !border-white/5 !rounded-full !px-5 !py-3.5 !text-sm ${(!isEditing || isPending) ? '!text-gray-500 cursor-default' : '!text-white'} placeholder:!text-gray-600 focus:!outline-none focus:!border-blue-500/50`}
           />
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <InputField 
+                label="Opening Time"
+                type="time"
+                value={openingTime}
+                onChange={(e) => setOpeningTime(e.target.value)}
+                readOnly={!isEditing || isPending}
+                labelClass="!text-sm !font-medium !text-gray-300"
+                inputClass={`!bg-[#111111] !border-white/5 !rounded-full !px-5 !py-3.5 !text-sm ${(!isEditing || isPending) ? '!text-gray-500 cursor-default' : '!text-white'} focus:!outline-none focus:!border-blue-500/50 [color-scheme:dark]`}
+              />
+              <InputField 
+                label="Closing Time"
+                type="time"
+                value={closingTime}
+                onChange={(e) => setClosingTime(e.target.value)}
+                readOnly={!isEditing || isPending}
+                labelClass="!text-sm !font-medium !text-gray-300"
+                inputClass={`!bg-[#111111] !border-white/5 !rounded-full !px-5 !py-3.5 !text-sm ${(!isEditing || isPending) ? '!text-gray-500 cursor-default' : '!text-white'} focus:!outline-none focus:!border-blue-500/50 [color-scheme:dark]`}
+              />
+            </div>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">

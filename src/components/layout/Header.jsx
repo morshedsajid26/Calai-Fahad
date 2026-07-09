@@ -2,7 +2,7 @@ import { FiMenu } from "react-icons/fi";
 import { IoNotifications } from "react-icons/io5";
 import Image from "../Image";
 import { FaAngleDown, FaSearch } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { IoIosNotificationsOutline } from "react-icons/io";
@@ -69,6 +69,35 @@ export default function Header({ onMenuClick }) {
 
   const displayLogo = logoBlobUrl || null;
 
+  const [agentStatus, setAgentStatus] = useState('Offline');
+
+  useEffect(() => {
+    if (role !== "BUSINESS_OWNER") return;
+
+    const checkStatus = () => {
+      const open = businessInfoResponse?.data?.opening_time;
+      const close = businessInfoResponse?.data?.closing_time;
+      
+      if (!open || !close) {
+        setAgentStatus('Offline');
+        return;
+      }
+      
+      const now = new Date();
+      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      
+      if (open < close) {
+        setAgentStatus((currentTime >= open && currentTime <= close) ? 'Online' : 'Offline');
+      } else {
+        setAgentStatus((currentTime >= open || currentTime <= close) ? 'Online' : 'Offline');
+      }
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 60000);
+    return () => clearInterval(interval);
+  }, [businessInfoResponse, role]);
+
   return (
     <header className="bg-[#141416] flex items-center px-4 md:px-6 py-3.5 relative gap-2 sm:gap-4">
       <button
@@ -105,6 +134,16 @@ export default function Header({ onMenuClick }) {
 
 
         <div className="flex items-center ml-auto gap-2 sm:gap-4 shrink-0">
+          {role === "BUSINESS_OWNER" && (
+            <div className="hidden sm:flex items-center gap-2 bg-[#1C2242] px-4 py-2 rounded-full border border-gray-800">
+              <span className="text-sm text-gray-400">Agent:</span>
+              <div className={`flex items-center gap-2 ${agentStatus === 'Online' ? 'text-green-400' : 'text-gray-500'}`}>
+                <div className={`w-2 h-2 rounded-full ${agentStatus === 'Online' ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]' : 'bg-gray-500'}`}></div>
+                <span className="text-sm font-medium">{agentStatus}</span>
+              </div>
+            </div>
+          )}
+
           {/* Notification Button */}
           {/* <button className="flex items-center justify-center w-10 h-10 sm:w-10 sm:h-10 rounded-full bg-[#1C2242] hover:bg-[#252C55] transition-colors shrink-0">
             <IoIosNotificationsOutline className="w-6 h-6 sm:w-6 sm:h-6 text-white" />
