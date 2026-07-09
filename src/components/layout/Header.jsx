@@ -74,9 +74,23 @@ export default function Header({ onMenuClick }) {
   useEffect(() => {
     if (role !== "BUSINESS_OWNER") return;
 
+    const convertTo24Hour = (timeStr) => {
+      if (!timeStr) return null;
+      const parts = timeStr.trim().split(' ');
+      if (parts.length < 2) return timeStr;
+      let [hours, minutes] = parts[0].split(':');
+      const modifier = parts[1].toUpperCase();
+      if (hours === '12') hours = '00';
+      if (modifier === 'PM') hours = String(parseInt(hours, 10) + 12);
+      return `${hours.padStart(2, '0')}:${minutes}`;
+    };
+
     const checkStatus = () => {
-      const open = businessInfoResponse?.data?.opening_time;
-      const close = businessInfoResponse?.data?.closing_time;
+      const rawOpen = businessInfoResponse?.data?.openingTime || businessInfoResponse?.data?.opening_time;
+      const rawClose = businessInfoResponse?.data?.closingTime || businessInfoResponse?.data?.closing_time;
+      
+      const open = convertTo24Hour(rawOpen);
+      const close = convertTo24Hour(rawClose);
       
       if (!open || !close) {
         setAgentStatus('Offline');

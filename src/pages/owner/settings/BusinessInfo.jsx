@@ -21,16 +21,37 @@ const BusinessInfo = () => {
     }
   })
 
+  const convertTo24Hour = (timeStr) => {
+    if (!timeStr) return '';
+    const parts = timeStr.trim().split(' ');
+    if (parts.length < 2) return timeStr;
+    let [hours, minutes] = parts[0].split(':');
+    const modifier = parts[1].toUpperCase();
+    if (hours === '12') hours = '00';
+    if (modifier === 'PM') hours = String(parseInt(hours, 10) + 12);
+    return `${hours.padStart(2, '0')}:${minutes}`;
+  };
+
+  const convertTo12Hour = (timeStr) => {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    const modifier = hours >= 12 ? 'PM' : 'AM';
+    if (hours > 12) hours -= 12;
+    if (hours === 0) hours = 12;
+    return `${String(hours).padStart(2, '0')}:${minutes} ${modifier}`;
+  };
+
   useEffect(() => {
     if (businessInfoResponse?.data && !isEditing) {
       setName(businessInfoResponse.data.name || '')
       setAddress(businessInfoResponse.data.address || '')
-      setOpeningTime(businessInfoResponse.data.opening_time || '')
-      setClosingTime(businessInfoResponse.data.closing_time || '')
+      setOpeningTime(convertTo24Hour(businessInfoResponse.data.openingTime || businessInfoResponse.data.opening_time || ''))
+      setClosingTime(convertTo24Hour(businessInfoResponse.data.closingTime || businessInfoResponse.data.closing_time || ''))
     }
   }, [businessInfoResponse, isEditing])
-
-
 
   const updateMutation = useMutation({
     mutationFn: async (payload) => {
@@ -55,8 +76,10 @@ const BusinessInfo = () => {
     updateMutation.mutate({ 
       name, 
       address, 
-      opening_time: openingTime, 
-      closing_time: closingTime 
+      openingTime: convertTo12Hour(openingTime),
+      closingTime: convertTo12Hour(closingTime),
+      opening_time: convertTo12Hour(openingTime), // Keeping snake_case for backward compatibility
+      closing_time: convertTo12Hour(closingTime)
     })
   }
 
@@ -65,8 +88,8 @@ const BusinessInfo = () => {
     if (businessInfoResponse?.data) {
       setName(businessInfoResponse.data.name || '')
       setAddress(businessInfoResponse.data.address || '')
-      setOpeningTime(businessInfoResponse.data.opening_time || '')
-      setClosingTime(businessInfoResponse.data.closing_time || '')
+      setOpeningTime(convertTo24Hour(businessInfoResponse.data.openingTime || businessInfoResponse.data.opening_time || ''))
+      setClosingTime(convertTo24Hour(businessInfoResponse.data.closingTime || businessInfoResponse.data.closing_time || ''))
     }
   }
 

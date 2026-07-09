@@ -32,6 +32,38 @@ const ViewTenant = () => {
     }
   });
 
+  const { data: agentsResponse, isLoading: isAgentsLoading } = useQuery({
+    queryKey: ['tenantAgents', id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/system-owner/individual-tenant/${id}/agents`);
+      return res.data;
+    }
+  });
+
+  const { data: billingResponse, isLoading: isBillingLoading } = useQuery({
+    queryKey: ['tenantBilling', id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/system-owner/individual-tenant/${id}/billing`);
+      return res.data;
+    }
+  });
+
+  const { data: callsResponse, isLoading: isCallsLoading } = useQuery({
+    queryKey: ['tenantCalls', id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/system-owner/individual-tenant/${id}/calls`);
+      return res.data;
+    }
+  });
+
+  const { data: ordersResponse, isLoading: isOrdersLoading } = useQuery({
+    queryKey: ['tenantOrders', id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/system-owner/individual-tenant/${id}/orders`);
+      return res.data;
+    }
+  });
+
   const tenant = tenantResponse?.data;
   
   if (isLoading) {
@@ -51,13 +83,13 @@ const ViewTenant = () => {
     );
   }
 
-  const billingData = tenant.billing_history || [];
-  const agentsData = tenant.agents || [];
-  const callsData = tenant.calls || tenant.callSummaries || [];
-  const ordersData = tenant.orders || [];
+  const billingData = billingResponse?.data || tenant.billing_history || [];
+  const agentsData = agentsResponse?.data || tenant.agents || [];
+  const callsData = callsResponse?.data || tenant.calls || tenant.callSummaries || [];
+  const ordersData = ordersResponse?.data || tenant.orders || [];
 
-  const usedMinutes = tenant.used_minutes !== undefined ? tenant.used_minutes : 2139;
-  const remainingMinutes = tenant.remaining_minutes !== undefined ? tenant.remaining_minutes : 361;
+  const usedMinutes = tenant.usage?.used !== undefined ? tenant.usage.used : 0;
+  const remainingMinutes = tenant.usage?.remaining !== undefined ? tenant.usage.remaining : 0;
 
   // If total is 0 (even with explicit 0 from API), the pie chart won't render. 
   // We can force it to render an empty state pie if we want, but since we used fallbacks above, it should show.
@@ -72,7 +104,7 @@ const ViewTenant = () => {
       Title: "Date",
       width: "20%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.date}</div>
+      render: (row) => <div className="text-left text-gray-200">{row.date ? new Date(row.date).toLocaleDateString('en-GB') : 'N/A'}</div>
     },
     {
       key: "plan",
@@ -86,7 +118,7 @@ const ViewTenant = () => {
       Title: "Invoice",
       width: "20%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.invoice}</div>
+      render: (row) => <div className="text-left text-gray-200">{row.invoice_no || row.invoice || 'N/A'}</div>
     },
     {
       key: "amount",
@@ -102,7 +134,7 @@ const ViewTenant = () => {
       sortable: true,
       render: (row) => (
         <div className="text-left">
-          <span className="w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] bg-[#4285F4]">
+          <span className="w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] bg-[#4285F4] capitalize">
             {row.status}
           </span>
         </div>
@@ -112,7 +144,7 @@ const ViewTenant = () => {
 
   const agentColumns = [
     { key: "name", Title: "Agent Name", width: "25%", sortable: true, render: (row) => <div className="text-left text-gray-200">{row.name || 'Unknown'}</div> },
-    { key: "vapi_id", Title: "Vapi Assistant ID", width: "35%", sortable: true, render: (row) => <div className="text-left text-gray-400">{row.vapi_assistant_id || row.id || 'N/A'}</div> },
+    { key: "vapi_id", Title: "Vapi Assistant ID", width: "35%", sortable: true, render: (row) => <div className="text-left text-gray-400">{row.vapi_agent_id || row.vapi_assistant_id || row.id || 'N/A'}</div> },
     { key: "status", Title: "Status", width: "20%", sortable: true, render: (row) => (
       <div className="text-left">
         <span className="w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] bg-[#4285F4] capitalize">
@@ -120,21 +152,27 @@ const ViewTenant = () => {
         </span>
       </div>
     )},
-    { key: "created", Title: "Created Date", width: "20%", sortable: true, render: (row) => <div className="text-left text-gray-200">{row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A'}</div> },
+    { key: "created", Title: "Created Date", width: "20%", sortable: true, render: (row) => <div className="text-left text-gray-200">{(row.created_date && row.created_date !== 'N/A') ? new Date(row.created_date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
   ];
 
   const callColumns = [
     { key: 'callerId', Title: 'Caller ID', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.callerId || row.caller_id || 'N/A'}</div> },
     { key: 'duration', Title: 'Call Duration', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.duration || 'N/A'}</div> },
     { key: 'time', Title: 'Time', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.time || 'N/A'}</div> },
-    { key: 'date', Title: 'Date', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.date || 'N/A'}</div> },
+    { key: 'date', Title: 'Date', width: '25%', render: (row) => <div className="text-left text-gray-200">{(row.date && row.date !== 'N/A') ? new Date(row.date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
   ];
 
   const orderColumns = [
     { key: 'orderId', Title: 'Order ID', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.orderId || row.id || 'N/A'}</div> },
-    { key: 'amount', Title: 'Amount', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.amount ? `$${row.amount}` : 'N/A'}</div> },
-    { key: 'status', Title: 'Status', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.status || 'N/A'}</div> },
-    { key: 'date', Title: 'Date', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.date || 'N/A'}</div> },
+    { key: 'amount', Title: 'Amount', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.amount ? `£${row.amount}` : 'N/A'}</div> },
+    { key: 'status', Title: 'Status', width: '25%', render: (row) => (
+      <div className="text-left">
+        <span className="w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] bg-[#4285F4] capitalize">
+          {row.status || 'N/A'}
+        </span>
+      </div>
+    )},
+    { key: 'date', Title: 'Date', width: '25%', render: (row) => <div className="text-left text-gray-200">{(row.date && row.date !== 'N/A') ? new Date(row.date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
   ];
 
   const statusLower = tenant.status?.toLowerCase();
