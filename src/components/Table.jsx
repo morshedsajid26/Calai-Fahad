@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Search } from "lucide-react";
 
-export default function Table({ TableHeads, TableRows, headClass, tableClass }) {
+export default function Table({ TableHeads, TableRows, headClass, tableClass, emptyState }) {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState([]);
@@ -98,18 +98,32 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass }) 
 
           {/* ==== TABLE BODY ==== */}
           <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-800/30 transition-all border-b border-gray-800/50 last:border-0 group">
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="py-5 text-left px-4 text-[15px] font-normal text-white transition-colors"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row) => (
+                <tr key={row.id} className="hover:bg-gray-800/30 transition-all border-b border-gray-800/50 last:border-0 group">
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className="py-5 text-left px-4 text-[15px] font-normal text-white transition-colors"
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length}>
+                  {emptyState ? (
+                    emptyState
+                  ) : (
+                    <div className="py-12 text-center text-gray-400">
+                      No data available
+                    </div>
+                  )}
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

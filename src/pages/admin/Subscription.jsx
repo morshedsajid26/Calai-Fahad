@@ -23,7 +23,7 @@ const PlanCard = ({ plan }) => {
              </span>
           ) : (
              <>
-                <span className="text-white text-[32px] font-bold tracking-tight">${price}</span>
+                <span className="text-white text-[32px] font-bold tracking-tight">£{price}</span>
                 <span className="text-gray-500 text-sm font-medium">/month</span>
              </>
           )}
@@ -87,13 +87,13 @@ const Subscription = () => {
   const stats = [
     {
       title: "Total Revenue",
-      value: `$${apiStats?.total_revenue?.toLocaleString() || 0}`,
+      value: `£${apiStats?.total_revenue?.toLocaleString() || 0}`,
       label: "All time",
       icon: <DollarSign className="w-6 h-6" />,
     },
     {
       title: "This Month",
-      value: `$${apiStats?.monthly_revenue?.toLocaleString() || 0}`,
+      value: `£${apiStats?.monthly_revenue?.toLocaleString() || 0}`,
       label: (
         <div className="flex items-center gap-3">
           <span className="text-gray-500 text-[11px]">revenue this month</span>
@@ -117,7 +117,7 @@ const Subscription = () => {
     { 
       key: 'amount', 
       Title: 'Amount',
-      render: (row) => `$${row.amount}` 
+      render: (row) => `£${row.amount}` 
     },
     { 
       key: 'expiry_date', 
