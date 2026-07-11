@@ -83,11 +83,11 @@ const OrderList = () => {
   }
 
   const columns = [
-    { key: 'callId', Title: 'Caller ID', width: '15%' },
+    { key: 'callId', Title: 'Caller ID', width: '25%' },
     { key: 'customerName', Title: 'Customer Name', width: '20%' },
     { key: 'time', Title: 'Time', width: '15%' },
     { key: 'date', Title: 'Date', width: '15%' },
-    { key: 'orderType', Title: 'Order Type', width: '20%' },
+    { key: 'orderType', Title: 'Order Type', width: '10%' },
     { 
       key: 'action', 
       Title: 'Action', 

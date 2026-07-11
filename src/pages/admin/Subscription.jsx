@@ -138,15 +138,15 @@ const Subscription = () => {
       Title: 'Billing Cycle',
       render: (row) => <span className="capitalize">{row.billing_cycle}</span>
     },
-    { 
-      key: 'action', 
-      Title: 'Action',
-      render: () => (
-        <button className="text-gray-400 hover:text-white transition-colors">
-          <Download className="w-5 h-5" />
-        </button>
-      )
-    }
+    // { 
+    //   key: 'action', 
+    //   Title: 'Action',
+    //   render: () => (
+    //     <button className="text-gray-400 hover:text-white transition-colors">
+    //       <Download className="w-5 h-5" />
+    //     </button>
+    //   )
+    // }
   ]
 
   const tableRows = billingsData.recent_invoices || [];

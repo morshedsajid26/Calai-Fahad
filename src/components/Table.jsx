@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Search } from "lucide-react";
 
-export default function Table({ TableHeads, TableRows, headClass, tableClass, emptyState }) {
+export default function Table({ TableHeads, TableRows, headClass, tableClass, emptyState, wrapperClass = "overflow-x-auto" }) {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState([]);
@@ -58,7 +58,7 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass, em
 
   return (
     <div className="space-y-4 w-full ">
-      <div className="w-full overflow-x-auto ">
+      <div className={`w-full ${wrapperClass}`}>
         <table className={`w-full border-collapse ${tableClass}`}>
           {/* ==== TABLE HEADER ==== */}  
           <thead>

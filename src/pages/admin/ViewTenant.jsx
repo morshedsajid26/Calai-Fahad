@@ -286,7 +286,7 @@ const ViewTenant = () => {
   ];
 
   const orderColumns = [
-    { key: 'callId', Title: 'Caller ID', width: '20%', render: (row) => <div className="text-left text-gray-200">{row.callId || row.number || row.id || 'N/A'}</div> },
+    { key: 'callId', Title: 'Caller ID', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.callId || row.number || row.id || 'N/A'}</div> },
     { key: 'customerName', Title: 'Customer Name', width: '20%', render: (row) => <div className="text-left text-gray-200">{row.customerName || 'N/A'}</div> },
     { key: 'time', Title: 'Time', width: '15%', render: (row) => <div className="text-left text-gray-200">{row.time || 'N/A'}</div> },
     { key: 'date', Title: 'Date', width: '15%', render: (row) => <div className="text-left text-gray-200">{(row.date && row.date !== 'N/A') ? new Date(row.date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
@@ -294,7 +294,7 @@ const ViewTenant = () => {
     { 
       key: 'action', 
       Title: 'Action', 
-      width: '15%',
+      width: '10%',
       sortable: false,
       render: (row) => (
         <div className="flex justify-start">
@@ -478,6 +478,7 @@ const ViewTenant = () => {
               TableRows={callsData} 
               headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
               tableClass="border-none table-fixed min-w-[800px]" 
+              wrapperClass="overflow-visible" 
               emptyState={
                 <div className="text-center py-12 text-gray-500 flex flex-col items-center justify-center gap-3">
                   <Icon icon="lucide:phone" className="text-4xl text-gray-600" />

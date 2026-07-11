@@ -99,6 +99,7 @@ const CallSummary = () => {
             TableRows={calls} 
             headClass=" border-b border-[#1A1A1A] text-gray-200 whitespace-nowrap"
             tableClass="border-none"
+            wrapperClass="overflow-visible"
           />
         ) : (
           <div className="p-8 text-center text-gray-400 text-sm">

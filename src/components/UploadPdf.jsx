@@ -3,6 +3,7 @@ import { CloudUpload, FileText, X, Loader2 } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import useAxiosSecure from '../hooks/useAxiosSecure'
 import toast from 'react-hot-toast'
+import InputField from './Inputfield'
 
 const UploadPdf = () => {
   const [files, setFiles] = useState([])
@@ -125,13 +126,13 @@ const UploadPdf = () => {
         </p>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-300 mb-2">Agent Name</label>
-          <input 
-            type="text" 
+          <InputField
+            label="Agent Name"
+            type="text"
             value={agentName}
             onChange={(e) => setAgentName(e.target.value)}
-            placeholder="e.g. Burger offer"
-            className="w-full bg-[#111111] border border-[#272727] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+            labelClass="!text-sm !font-medium !text-gray-300"
+            inputClass="!w-full !bg-[#111111] !border !border-[#272727] !rounded-xl !px-4 !py-3 !text-white !text-sm focus:!outline-none focus:!border-blue-500 !transition-colors"
           />
         </div>
       </div>
