@@ -87,7 +87,7 @@ const OrderList = () => {
     { key: 'customerName', Title: 'Customer Name', width: '20%' },
     { key: 'time', Title: 'Time', width: '15%' },
     { key: 'date', Title: 'Date', width: '15%' },
-    { key: 'email', Title: 'Email', width: '20%' },
+    { key: 'orderType', Title: 'Order Type', width: '20%' },
     { 
       key: 'action', 
       Title: 'Action', 
@@ -180,7 +180,7 @@ const OrderList = () => {
                                 <span className="inline-block px-4">{product.quantity}</span>
                               </td>
                               <td className="py-5 text-[14px] text-gray-300">{selectedOrder?.time || '-'}</td>
-                              <td className="py-5 text-[14px] text-gray-300 text-right">${product.unit_prize || 0}</td>
+                              <td className="py-5 text-[14px] text-gray-300 text-right">£{product.unit_prize || 0}</td>
                             </tr>
                           ))
                         ) : (
@@ -195,7 +195,7 @@ const OrderList = () => {
                   {/* Footer Actions */}
                   <div className="px-8 py-6 flex justify-between items-center mt-2 border-t border-[#1A1A1A]">
                     <div className="text-[15px] font-medium text-white">
-                      Total: <span className="text-[#2563EB]">${selectedOrder?.totalPrice || 0}</span>
+                      Total: <span className="text-[#2563EB]">£{selectedOrder?.totalPrice || 0}</span>
                     </div>
                     <div className="flex gap-4">
                       <button 

@@ -17,6 +17,7 @@ import AiTraining from "../pages/owner/AiTraining";
 import CallSummary from "../pages/owner/CallSummary";
 import OrderList from "../pages/owner/OrderList";
 import ItemManagement from "../pages/owner/ItemManagement";
+import PrinterManagement from "../pages/owner/PrinterManagement";
 import OwnerSettings from "../pages/owner/Settings";
 import ProfileSettings from "../pages/owner/settings/ProfileSettings";
 import ConnectEmail from "../pages/owner/settings/ConnectEmail";
@@ -84,6 +85,7 @@ const router = createBrowserRouter([
       { path: "/owner/call-summary", element: <CallSummary /> },
       { path: "/owner/order-list", element: <OrderList /> },
       { path: "/owner/item-management", element: <ItemManagement /> },
+      { path: "/owner/printer", element: <PrinterManagement /> },
       { path: "/owner/test-voice", element: <TestCallWindow /> },
       { 
         path: "/owner/settings", 

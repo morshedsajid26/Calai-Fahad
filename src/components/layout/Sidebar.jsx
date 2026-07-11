@@ -27,6 +27,7 @@ export default function Sidebar({ isOpen, onClose }) {
     { name: "Call Summary", path: "/owner/call-summary", icon: "lucide:file-text" },
     { name: "Order list", path: "/owner/order-list", icon: "lucide:list-checks" },
     { name: "Item Management", path: "/owner/item-management", icon: "lucide:monitor-cog" },
+    { name: "Printer Management", path: "/owner/printer", icon: "lucide:printer" },
     { name: "Settings", path: "/owner/settings", icon: "lucide:settings" },
   ];
 

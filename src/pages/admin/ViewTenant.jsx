@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { FileText, X, Bot, User, Download, Loader2, Eye, Printer } from 'lucide-react';
+import { jsPDF } from "jspdf";
+import toast from 'react-hot-toast';
 import Table from '../../components/Table';
 import Dropdown from '../../components/Dropdown';
 import { useQuery } from '@tanstack/react-query';
@@ -12,6 +15,105 @@ const ViewTenant = () => {
   const axiosSecure = useAxiosSecure();
 
   const [activeTab, setActiveTab] = useState('agents');
+  const [modalState, setModalState] = useState({ isOpen: false, type: null, data: null });
+
+  const handleActionSelect = (option, row) => {
+    setModalState({ isOpen: true, type: option, data: row });
+  };
+
+  const handleDownload = () => {
+    if (!modalState.data?.id) return;
+    try {
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text(`Call ${modalState.type}`, 20, 20);
+      doc.setFontSize(12);
+      
+      let y = 30;
+      if (modalState.type === 'Call Summary') {
+        const text = modalState.data.summary || 'No summary available.';
+        const lines = doc.splitTextToSize(text, 170);
+        doc.text(lines, 20, y);
+      } else {
+        const parseTranscript = (str) => {
+          if (!str) return [];
+          return str.split('\n').filter(l => l.trim()).map(line => {
+            if (line.startsWith('User: ')) return { role: 'User', content: line.replace('User: ', '') };
+            if (line.startsWith('AI: ')) return { role: 'AI', content: line.replace('AI: ', '') };
+            return { role: 'AI', content: line };
+          });
+        };
+        const transcriptLines = parseTranscript(modalState.data.transcript);
+        transcriptLines.forEach(msg => {
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+          const lines = doc.splitTextToSize(`${msg.role}: ${msg.content}`, 170);
+          doc.text(lines, 20, y);
+          y += lines.length * 7;
+        });
+      }
+      doc.save(`Call_${modalState.type.replace(/\s+/g, '_')}_${modalState.data.id}.pdf`);
+      toast.success('Download complete');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to download PDF');
+    }
+  };
+
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const orderProducts = selectedOrder?.items || [];
+
+  const handleViewOrder = (row) => {
+    setSelectedOrder(row);
+  };
+
+  const closeOrderModal = () => {
+    setSelectedOrder(null);
+  };
+
+  const handlePrintOrder = async () => {
+    if (!selectedOrder) return;
+    try {
+      const toastId = toast.loading('Preparing print...');
+      const res = await axiosSecure.get(`/system-owner/individual-tenant/download/${selectedOrder.id}`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      toast.dismiss(toastId);
+      const printWindow = window.open(url);
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to prepare print');
+    }
+  };
+
+  const handleDownloadOrder = async () => {
+    if (!selectedOrder) return;
+    try {
+      const toastId = toast.loading('Downloading invoice...');
+      const res = await axiosSecure.get(`/system-owner/individual-tenant/download/${selectedOrder.id}`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Invoice_${selectedOrder.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      toast.success('Download complete', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to download invoice');
+    }
+  };
 
   const [monthOptions] = useState(() => {
     const months = [];
@@ -156,23 +258,55 @@ const ViewTenant = () => {
   ];
 
   const callColumns = [
-    { key: 'callerId', Title: 'Caller ID', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.callerId || row.caller_id || 'N/A'}</div> },
-    { key: 'duration', Title: 'Call Duration', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.duration || 'N/A'}</div> },
-    { key: 'time', Title: 'Time', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.time || 'N/A'}</div> },
-    { key: 'date', Title: 'Date', width: '25%', render: (row) => <div className="text-left text-gray-200">{(row.date && row.date !== 'N/A') ? new Date(row.date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
+    { key: 'callerId', Title: 'Caller ID', width: '20%', render: (row) => <div className="text-left text-gray-200">{row.callerId || row.caller_id || 'N/A'}</div> },
+    { key: 'duration', Title: 'Call Duration', width: '20%', render: (row) => <div className="text-left text-gray-200">{row.duration || 'N/A'}</div> },
+    { key: 'time', Title: 'Time', width: '20%', render: (row) => <div className="text-left text-gray-200">{row.time || 'N/A'}</div> },
+    { key: 'date', Title: 'Date', width: '20%', render: (row) => <div className="text-left text-gray-200">{(row.date && row.date !== 'N/A') ? new Date(row.date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
+    { 
+      key: 'action', 
+      Title: 'Summary', 
+      width: '20%',
+      sortable: false,
+      render: (row) => ( 
+        <div className="relative w-[180px]">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+            <FileText className="w-4 h-4 text-white" />
+          </div>
+          <Dropdown
+            placeholder="Summary"
+            options={["Call Summary", "Call Transcript"]}
+            onSelect={(val) => handleActionSelect(val, row)}
+            inputClass="!bg-[#1A2255] !placeholder-white !border-none !text-white !rounded-[8px] !py-2.5 !pl-11 !pr-10 !font-medium !text-[13px] !shadow-none !cursor-pointer hover:!bg-[#232D70] transition-colors"
+            optionClass="!bg-[#1A2255] !text-white !border border-[#2A3470] !rounded-[8px] !shadow-xl !mt-1.5"
+            icon="!text-white !right-3"
+          />
+        </div>
+      )
+    }
   ];
 
   const orderColumns = [
-    { key: 'orderId', Title: 'Order ID', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.orderId || row.id || 'N/A'}</div> },
-    { key: 'amount', Title: 'Amount', width: '25%', render: (row) => <div className="text-left text-gray-200">{row.amount ? `£${row.amount}` : 'N/A'}</div> },
-    { key: 'status', Title: 'Status', width: '25%', render: (row) => (
-      <div className="text-left">
-        <span className="w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] bg-[#4285F4] capitalize">
-          {row.status || 'N/A'}
-        </span>
-      </div>
-    )},
-    { key: 'date', Title: 'Date', width: '25%', render: (row) => <div className="text-left text-gray-200">{(row.date && row.date !== 'N/A') ? new Date(row.date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
+    { key: 'callId', Title: 'Caller ID', width: '20%', render: (row) => <div className="text-left text-gray-200">{row.callId || row.number || row.id || 'N/A'}</div> },
+    { key: 'customerName', Title: 'Customer Name', width: '20%', render: (row) => <div className="text-left text-gray-200">{row.customerName || 'N/A'}</div> },
+    { key: 'time', Title: 'Time', width: '15%', render: (row) => <div className="text-left text-gray-200">{row.time || 'N/A'}</div> },
+    { key: 'date', Title: 'Date', width: '15%', render: (row) => <div className="text-left text-gray-200">{(row.date && row.date !== 'N/A') ? new Date(row.date).toLocaleDateString('en-GB') : (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : 'N/A')}</div> },
+    { key: 'totalPrice', Title: 'Amount', width: '15%', render: (row) => <div className="text-left text-gray-200">£{row.totalPrice || row.amount || 0}</div> },
+    { 
+      key: 'action', 
+      Title: 'Action', 
+      width: '15%',
+      sortable: false,
+      render: (row) => (
+        <div className="flex justify-start">
+          <button 
+            onClick={() => handleViewOrder(row)}
+            className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
+          >
+            <Eye className="w-5 h-5" />
+          </button>
+        </div>
+      )
+    }
   ];
 
   const statusLower = tenant.status?.toLowerCase();
@@ -294,7 +428,7 @@ const ViewTenant = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-hidden w-full">
+      <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-visible w-full">
         <div className="flex border-b border-gray-800/50">
           <button 
             onClick={() => setActiveTab('agents')}
@@ -384,6 +518,154 @@ const ViewTenant = () => {
           )}
         </div>
       </div>
+
+      {/* Dynamic Modal */}
+      {modalState.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-white">
+           <div className={`bg-[#111111] border border-[#1A1A1A] rounded-[20px] w-full relative shadow-2xl flex flex-col ${modalState.type === 'Call Transcript' ? 'max-w-[550px]' : 'max-w-[600px]'}`}>
+              
+              {/* Header */}
+              <div className="px-8 py-6 border-b border-[#1A1A1A] flex justify-between items-center">
+                <h2 className="text-[17px] font-medium text-gray-200">
+                  {modalState.type}
+                </h2>
+                <button 
+                  onClick={() => setModalState({ isOpen: false, type: null, data: null })}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Call Transcript Content */}
+              {modalState.type === 'Call Transcript' && (
+                <div className="p-8 max-h-[500px] overflow-y-auto space-y-6 custom-scrollbar">
+                  {modalState.data?.transcript?.length > 0 ? (
+                    modalState.data.transcript.split('\n').filter(l => l.trim()).map((line, idx) => {
+                      const isUser = line.startsWith('User: ');
+                      const content = line.replace(/^(User|AI):\s*/, '');
+                      return (
+                        <div key={idx} className={`flex items-start gap-4 ${isUser ? 'flex-row-reverse' : ''}`}>
+                          <div className="w-10 h-10 rounded-full bg-[#1A2255] flex items-center justify-center shrink-0">
+                            {!isUser ? <Bot className="w-5 h-5 text-emerald-400" /> : <User className="w-5 h-5 text-blue-300" />}
+                          </div>
+                          <div className={`bg-[#1A1A1A] text-gray-200 px-5 py-3.5 rounded-2xl text-[15px] max-w-[80%] ${isUser ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}>
+                            {content}
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center text-gray-400">No transcript available.</div>
+                  )}
+                </div>
+              )}
+
+              {/* Call Summary Content */}
+              {modalState.type === 'Call Summary' && (
+                <div className="flex flex-col">
+                  <div className="p-8 max-h-[500px] overflow-y-auto custom-scrollbar">
+                    <p className="text-gray-300 text-[15px] leading-[1.8] whitespace-pre-wrap">
+                      {modalState.data?.summary || 'No summary available.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Footer Actions */}
+              <div className="border-t border-[#1A1A1A] px-8 py-5 flex justify-end mt-auto">
+                <button 
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[14px] font-medium cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
+              </div>
+
+           </div>
+        </div>
+      )}
+
+      {/* View Order Modal */}
+      {/* View Order Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-white">
+           <div className="bg-[#111111] border border-[#1A1A1A] rounded-[20px] w-full max-w-[700px] overflow-hidden relative shadow-2xl">
+              
+              {/* Header */}
+              <div className="px-8 py-6 border-b border-[#1A1A1A] flex justify-between items-center">
+                <h2 className="text-[17px] text-gray-200">
+                  Order Summary <span className="text-gray-400">({selectedOrder.customerName || 'Customer'})</span>
+                </h2>
+                <button 
+                  onClick={closeOrderModal}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <>
+                {/* Table Content */}
+                <div className="px-8 py-2 max-h-[400px] overflow-y-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-[#1A1A1A]">
+                        <th className="py-4 text-[14px] font-semibold text-white">Product name</th>
+                        <th className="py-4 text-[14px] font-semibold text-white text-center">Order Quantity</th>
+                        <th className="py-4 text-[14px] font-semibold text-white">Time</th>
+                        <th className="py-4 text-[14px] font-semibold text-white text-right">Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orderProducts.length > 0 ? (
+                        orderProducts.map((product, idx) => (
+                          <tr key={product.id || idx} className="border-b border-[#1A1A1A]">
+                            <td className="py-5 text-[14px] text-gray-300">{product.product_name || `Item ${idx+1}`}</td>
+                            <td className="py-5 text-[14px] text-gray-300 text-center">
+                              <span className="inline-block px-4">{product.quantity}</span>
+                            </td>
+                            <td className="py-5 text-[14px] text-gray-300">{selectedOrder?.time || '-'}</td>
+                            <td className="py-5 text-[14px] text-gray-300 text-right">£{product.unit_prize || 0}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" className="py-8 text-center text-gray-500 text-sm">No items found for this order.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Footer Actions */}
+                <div className="px-8 py-6 flex justify-between items-center mt-2 border-t border-[#1A1A1A]">
+                  <div className="text-[15px] font-medium text-white">
+                    Total: <span className="text-[#2563EB]">£{selectedOrder?.totalPrice || 0}</span>
+                  </div>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={handlePrintOrder}
+                      className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[13px] font-medium cursor-pointer"
+                    >
+                      <Printer className="w-4 h-4" />
+                      Print
+                    </button>
+                    <button 
+                      onClick={handleDownloadOrder}
+                      className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[13px] font-medium cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download
+                    </button>
+                  </div>
+                </div>
+              </>
+           </div>
+        </div>
+      )}
+
     </div>
   );
 };
