@@ -109,7 +109,12 @@ const Telephony = () => {
   });
 
   const handleAddNumber = () => {
-    addMutation.mutate(newNumber);
+    addMutation.mutate({
+      businessId: newNumber.businessId,
+      twilio_number: newNumber.twilioNumber,
+      manager_number: newNumber.managerNumber,
+      assistant_id: newNumber.vapiAgentId
+    });
   };
 
   const handleEditClick = (number) => {
@@ -122,8 +127,8 @@ const Telephony = () => {
       updateMutation.mutate({
         id: editingNumber.id,
         data: {
-          twilioNumber: editingNumber.twilioNumber,
-          managerNumber: editingNumber.managerNumber
+          twilio_number: editingNumber.twilioNumber,
+          manager_number: editingNumber.managerNumber
         }
       });
     }
