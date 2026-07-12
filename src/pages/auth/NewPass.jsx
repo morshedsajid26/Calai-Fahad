@@ -19,7 +19,10 @@ const NewPass = () => {
 
   const resetMutation = useMutation({
     mutationFn: async (resetData) => {
-      const response = await axiosPublic.post("/auth/reset-password", resetData);
+      const response = await axiosPublic.post(
+        "/auth/reset-password",
+        resetData,
+      );
       return response.data;
     },
     onSuccess: (data) => {
@@ -93,7 +96,11 @@ const NewPass = () => {
         >
           {resetMutation.isPending ? (
             <>
-              <Icon icon="lucide:loader-2" className="animate-spin" width="18" />
+              <Icon
+                icon="lucide:loader-2"
+                className="animate-spin"
+                width="18"
+              />
               Resetting...
             </>
           ) : (

@@ -4,7 +4,6 @@ import UploadPdf from "@/components/UploadPdf";
 import RecentTrainingList from "@/components/RecentTrainingList";
 
 const AiTraining = () => {
-
   return (
     <div>
       <Breadcrumb
@@ -13,7 +12,9 @@ const AiTraining = () => {
 
       <div className="mt-6">
         {/* Content Area */}
-        <div><UploadPdf /></div>
+        <div>
+          <UploadPdf />
+        </div>
 
         {/* Recent Training List */}
         <RecentTrainingList />

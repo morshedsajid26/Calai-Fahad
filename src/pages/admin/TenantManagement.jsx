@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
-import Table from '../../components/Table';
-import { Icon } from '@iconify/react';
-import InputField from '../../components/Inputfield';
-import Dropdown from '../../components/Dropdown';
-import Password from '../../components/Password';
-import { Link } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import useAxiosSecure from '../../hooks/useAxiosSecure';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import Table from "../../components/Table";
+import { Icon } from "@iconify/react";
+import InputField from "../../components/Inputfield";
+import Dropdown from "../../components/Dropdown";
+import Password from "../../components/Password";
+import { Link } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import toast from "react-hot-toast";
 
 const TenantManagement = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
 
-  const { data: tenantsResponse, isLoading, isError, error } = useQuery({
-    queryKey: ['tenants'],
+  const {
+    data: tenantsResponse,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["tenants"],
     queryFn: async () => {
-      const res = await axiosSecure.get('/system-owner/tenants');
+      const res = await axiosSecure.get("/system-owner/tenants");
       return res.data;
-    }
+    },
   });
 
   const tenants = tenantsResponse?.data || [];
@@ -28,7 +33,7 @@ const TenantManagement = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingTenantId, setDeletingTenantId] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  
+
   const [newTenant, setNewTenant] = useState({
     first_name: "",
     last_name: "",
@@ -36,17 +41,17 @@ const TenantManagement = () => {
     password: "",
     business_name: "",
     phone: "",
-    business_type: "restaurent"
+    business_type: "restaurent",
   });
 
   const addMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosSecure.post('/system-owner/tenants', data);
+      const res = await axiosSecure.post("/system-owner/tenants", data);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
-      toast.success('Tenant added successfully');
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      toast.success("Tenant added successfully");
       setIsAddModalOpen(false);
       setNewTenant({
         first_name: "",
@@ -55,12 +60,12 @@ const TenantManagement = () => {
         password: "",
         business_name: "",
         phone: "",
-        business_type: "restaurent"
+        business_type: "restaurent",
       });
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to add tenant');
-    }
+      toast.error(error.response?.data?.message || "Failed to add tenant");
+    },
   });
 
   const updateMutation = useMutation({
@@ -69,13 +74,13 @@ const TenantManagement = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
-      toast.success('Tenant updated successfully');
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      toast.success("Tenant updated successfully");
       setIsEditModalOpen(false);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update tenant');
-    }
+      toast.error(error.response?.data?.message || "Failed to update tenant");
+    },
   });
 
   const deleteMutation = useMutation({
@@ -84,18 +89,23 @@ const TenantManagement = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
-      toast.success('Tenant deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      toast.success("Tenant deleted successfully");
       setIsDeleteModalOpen(false);
       setDeletingTenantId(null);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to delete tenant');
-    }
+      toast.error(error.response?.data?.message || "Failed to delete tenant");
+    },
   });
 
   const handleEditClick = (tenant) => {
-    setEditingTenant({ id: tenant.id, name: tenant.name, plan: tenant.plan, business_type: tenant.business_type || "" });
+    setEditingTenant({
+      id: tenant.id,
+      name: tenant.name,
+      plan: tenant.plan,
+      business_type: tenant.business_type || "",
+    });
     setIsEditModalOpen(true);
   };
 
@@ -106,8 +116,8 @@ const TenantManagement = () => {
         data: {
           name: editingTenant.name,
           plan: editingTenant.plan,
-          business_type: editingTenant.business_type
-        }
+          business_type: editingTenant.business_type,
+        },
       });
     }
   };
@@ -127,7 +137,7 @@ const TenantManagement = () => {
     if (newTenant.first_name && newTenant.email && newTenant.password) {
       addMutation.mutate(newTenant);
     } else {
-      toast.error('Please fill all required fields');
+      toast.error("Please fill all required fields");
     }
   };
 
@@ -135,7 +145,8 @@ const TenantManagement = () => {
     const isExpired = currentStatus?.toLowerCase() === "expired";
     if (isExpired) return;
 
-    const newStatus = currentStatus?.toLowerCase() === "active" ? "suspended" : "active";
+    const newStatus =
+      currentStatus?.toLowerCase() === "active" ? "suspended" : "active";
     updateMutation.mutate({ id, data: { status: newStatus } });
   };
 
@@ -145,14 +156,18 @@ const TenantManagement = () => {
       Title: "Tenant Name",
       width: "25%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.name}</div>
+      render: (row) => (
+        <div className="text-left text-gray-200">{row.name}</div>
+      ),
     },
     {
       key: "plan",
       Title: "Plan",
       width: "20%",
       sortable: true,
-      render: (row) => <div className="text-left text-gray-200">{row.plan}</div>
+      render: (row) => (
+        <div className="text-left text-gray-200">{row.plan}</div>
+      ),
     },
     {
       key: "status",
@@ -168,12 +183,14 @@ const TenantManagement = () => {
 
         return (
           <div className="text-left">
-             <span className={`w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] transition-colors duration-300 ${bgClass} capitalize`}>
-              {row.status || 'Unknown'}
+            <span
+              className={`w-[85px] inline-block text-center px-2 py-1 text-[11px] font-medium text-white rounded-[4px] transition-colors duration-300 ${bgClass} capitalize`}
+            >
+              {row.status || "Unknown"}
             </span>
           </div>
         );
-      }
+      },
     },
     {
       key: "expiry",
@@ -181,9 +198,11 @@ const TenantManagement = () => {
       width: "20%",
       sortable: true,
       render: (row) => {
-        const dateStr = row.expiry_date ? new Date(row.expiry_date).toLocaleDateString('en-GB') : 'N/A';
+        const dateStr = row.expiry_date
+          ? new Date(row.expiry_date).toLocaleDateString("en-GB")
+          : "N/A";
         return <div className="text-left text-gray-200">{dateStr}</div>;
-      }
+      },
     },
     {
       key: "actions",
@@ -198,62 +217,81 @@ const TenantManagement = () => {
         return (
           <div className="flex items-center justify-start gap-8">
             <Link to={`/admin/tenant-management/view/${row.id}`}>
-            <button className="text-gray-400 hover:text-white transition-colors" title="View">
-              <Icon icon="lucide:eye" className="text-lg" />
-            </button>
+              <button
+                className="text-gray-400 hover:text-white transition-colors"
+                title="View"
+              >
+                <Icon icon="lucide:eye" className="text-lg" />
+              </button>
             </Link>
-            <button 
+            <button
               onClick={() => handleEditClick(row)}
-              className="text-gray-400 hover:text-white transition-colors" title="Edit">
+              className="text-gray-400 hover:text-white transition-colors"
+              title="Edit"
+            >
               <Icon icon="lucide:square-pen" className="text-lg" />
             </button>
-            
-            <button 
+
+            <button
               onClick={() => toggleTenantStatus(row.id, row.status)}
               disabled={isExpired || updateMutation.isPending}
               className="w-5 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title={isActive ? "Suspend Tenant" : "Activate Tenant"}
             >
               {isActive ? (
-                <Icon icon="lucide:user-x" className="text-lg text-[#EA4335] hover:text-[#EA4335]" />
+                <Icon
+                  icon="lucide:user-x"
+                  className="text-lg text-[#EA4335] hover:text-[#EA4335]"
+                />
               ) : (
-                <Icon icon="lucide:user-check" className="text-lg text-[#22C55E] hover:text-green-400" />
+                <Icon
+                  icon="lucide:user-check"
+                  className="text-lg text-[#22C55E] hover:text-green-400"
+                />
               )}
             </button>
-            <button 
+            <button
               onClick={() => handleDeleteClick(row.id)}
-              className="text-[#EA4335] hover:text-red-400 transition-colors" title="Delete">
+              className="text-[#EA4335] hover:text-red-400 transition-colors"
+              title="Delete"
+            >
               <Icon icon="lucide:trash-2" className="text-lg" />
             </button>
           </div>
         );
-      }
-    }
+      },
+    },
   ];
 
   return (
     <div>
-        <div className="flex items-center justify-end mb-4">
-            <button 
-              onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-5 py-3 rounded-full text-lg">
-                <Icon icon="lucide:plus" className="text-lg" />
-                Add Tenant
-            </button>
-        </div>
+      <div className="flex items-center justify-end mb-4">
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="flex items-center gap-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-5 py-3 rounded-full text-lg"
+        >
+          <Icon icon="lucide:plus" className="text-lg" />
+          Add Tenant
+        </button>
+      </div>
       <div className="bg-[#191919] rounded-2xl border border-gray-800/50 overflow-hidden w-full relative min-h-[200px]">
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-white">Loading...</div>
+          <div className="flex items-center justify-center py-20 text-white">
+            Loading...
+          </div>
         ) : isError ? (
           <div className="flex items-center justify-center py-20 text-red-500">
-            Error: {error?.response?.data?.message || error?.message || 'Failed to fetch tenants'}
+            Error:{" "}
+            {error?.response?.data?.message ||
+              error?.message ||
+              "Failed to fetch tenants"}
           </div>
         ) : (
-          <Table 
-            TableHeads={columns} 
-            TableRows={tenants} 
-            headClass="[&>div]:justify-start border-none text-left whitespace-nowrap" 
-            tableClass="border-none" 
+          <Table
+            TableHeads={columns}
+            TableRows={tenants}
+            headClass="[&>div]:justify-start border-none text-left whitespace-nowrap"
+            tableClass="border-none"
           />
         )}
       </div>
@@ -262,21 +300,27 @@ const TenantManagement = () => {
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-[#0E0E10] border border-gray-800 rounded-[20px] w-full max-w-[550px] p-8 relative shadow-2xl">
-            <button 
+            <button
               onClick={() => setIsEditModalOpen(false)}
               className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
             >
               <Icon icon="lucide:x" className="text-xl" />
             </button>
 
-            <h2 className="text-white text-xl font-semibold mb-1">Edit Tenant</h2>
-            <p className="text-gray-400 text-[13px] mb-8">Update tenant information.</p>
+            <h2 className="text-white text-xl font-semibold mb-1">
+              Edit Tenant
+            </h2>
+            <p className="text-gray-400 text-[13px] mb-8">
+              Update tenant information.
+            </p>
 
             <div className="space-y-6">
               <InputField
                 label="Company Name"
                 value={editingTenant?.name || ""}
-                onChange={(e) => setEditingTenant({...editingTenant, name: e.target.value})}
+                onChange={(e) =>
+                  setEditingTenant({ ...editingTenant, name: e.target.value })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
@@ -285,10 +329,12 @@ const TenantManagement = () => {
                 label="Business Type"
                 options={[
                   { label: "Restaurant", value: "restaurent" },
-                  { label: "Takeaway", value: "take_way" }
+                  { label: "Takeaway", value: "take_way" },
                 ]}
                 value={editingTenant?.business_type || "restaurent"}
-                onSelect={(val) => setEditingTenant({...editingTenant, business_type: val})}
+                onSelect={(val) =>
+                  setEditingTenant({ ...editingTenant, business_type: val })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
                 optionClass="!bg-white !text-[#111]"
@@ -299,7 +345,9 @@ const TenantManagement = () => {
                 label="Plan"
                 options={["No Plan", "Classic", "Pro"]}
                 value={editingTenant?.plan || "No Plan"}
-                onSelect={(val) => setEditingTenant({...editingTenant, plan: val})}
+                onSelect={(val) =>
+                  setEditingTenant({ ...editingTenant, plan: val })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
                 optionClass="!bg-white !text-[#111]"
@@ -308,18 +356,18 @@ const TenantManagement = () => {
             </div>
 
             <div className="flex items-center justify-center gap-5 mt-10">
-              <button 
+              <button
                 onClick={() => setIsEditModalOpen(false)}
                 className="bg-white text-black font-semibold px-8 py-2.5 rounded-full hover:bg-gray-200 transition-colors text-sm"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleSaveEdit}
                 disabled={updateMutation.isPending}
                 className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm disabled:opacity-50"
               >
-                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                {updateMutation.isPending ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -330,24 +378,27 @@ const TenantManagement = () => {
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-[#0E0E10] border border-gray-800 rounded-[20px] w-full max-w-[500px] p-8 relative shadow-2xl">
-            <h2 className="text-white text-xl font-bold mb-3">Are you absolutely sure?</h2>
+            <h2 className="text-white text-xl font-bold mb-3">
+              Are you absolutely sure?
+            </h2>
             <p className="text-gray-400 text-[14px] leading-relaxed mb-10 pr-4">
-              This action cannot be undone. This will permanently delete the tenant account and remove all associated data from the platform.
+              This action cannot be undone. This will permanently delete the
+              tenant account and remove all associated data from the platform.
             </p>
 
             <div className="flex items-center justify-center gap-5">
-              <button 
+              <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="bg-white text-black font-semibold px-10 py-2.5 rounded-full hover:bg-gray-200 transition-colors text-sm"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleConfirmDelete}
                 disabled={deleteMutation.isPending}
                 className="bg-[#ef4444] text-white px-10 py-2.5 rounded-full font-semibold hover:bg-red-600 transition-colors text-sm disabled:opacity-50"
               >
-                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                {deleteMutation.isPending ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
@@ -358,15 +409,19 @@ const TenantManagement = () => {
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-[#0E0E10] border border-gray-800 rounded-[20px] w-full max-w-[550px] p-8 relative shadow-2xl overflow-y-auto max-h-[90vh] hide-scrollbar">
-            <button 
+            <button
               onClick={() => setIsAddModalOpen(false)}
               className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
             >
               <Icon icon="lucide:x" className="text-xl" />
             </button>
 
-            <h2 className="text-white text-xl font-semibold mb-1">Add Tenant</h2>
-            <p className="text-gray-400 text-[13px] mb-8">Add tenant information.</p>
+            <h2 className="text-white text-xl font-semibold mb-1">
+              Add Tenant
+            </h2>
+            <p className="text-gray-400 text-[13px] mb-8">
+              Add tenant information.
+            </p>
 
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -374,7 +429,9 @@ const TenantManagement = () => {
                   label="First Name"
                   placeholder="John"
                   value={newTenant.first_name}
-                  onChange={(e) => setNewTenant({...newTenant, first_name: e.target.value})}
+                  onChange={(e) =>
+                    setNewTenant({ ...newTenant, first_name: e.target.value })
+                  }
                   labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                   inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
                 />
@@ -382,7 +439,9 @@ const TenantManagement = () => {
                   label="Last Name"
                   placeholder="Doe"
                   value={newTenant.last_name}
-                  onChange={(e) => setNewTenant({...newTenant, last_name: e.target.value})}
+                  onChange={(e) =>
+                    setNewTenant({ ...newTenant, last_name: e.target.value })
+                  }
                   labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                   inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
                 />
@@ -392,7 +451,9 @@ const TenantManagement = () => {
                 label="Business Name"
                 placeholder="Tech Corp"
                 value={newTenant.business_name}
-                onChange={(e) => setNewTenant({...newTenant, business_name: e.target.value})}
+                onChange={(e) =>
+                  setNewTenant({ ...newTenant, business_name: e.target.value })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
@@ -401,7 +462,9 @@ const TenantManagement = () => {
                 label="Email"
                 placeholder="admin@techcorp.com"
                 value={newTenant.email}
-                onChange={(e) => setNewTenant({...newTenant, email: e.target.value})}
+                onChange={(e) =>
+                  setNewTenant({ ...newTenant, email: e.target.value })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
@@ -410,7 +473,9 @@ const TenantManagement = () => {
                 label="Password"
                 placeholder="••••••••"
                 value={newTenant.password}
-                onChange={(e) => setNewTenant({...newTenant, password: e.target.value})}
+                onChange={(e) =>
+                  setNewTenant({ ...newTenant, password: e.target.value })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
@@ -419,7 +484,9 @@ const TenantManagement = () => {
                 label="Phone"
                 placeholder="+1234567890"
                 value={newTenant.phone}
-                onChange={(e) => setNewTenant({...newTenant, phone: e.target.value})}
+                onChange={(e) =>
+                  setNewTenant({ ...newTenant, phone: e.target.value })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
@@ -428,10 +495,12 @@ const TenantManagement = () => {
                 label="Business Type"
                 options={[
                   { label: "Restaurant", value: "restaurent" },
-                  { label: "Takeaway", value: "take_way" }
+                  { label: "Takeaway", value: "take_way" },
                 ]}
                 value={newTenant.business_type || "restaurent"}
-                onSelect={(val) => setNewTenant({...newTenant, business_type: val})}
+                onSelect={(val) =>
+                  setNewTenant({ ...newTenant, business_type: val })
+                }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
                 optionClass="!bg-white !text-[#111]"
@@ -440,18 +509,18 @@ const TenantManagement = () => {
             </div>
 
             <div className="flex items-center justify-center gap-5 mt-10">
-              <button 
+              <button
                 onClick={() => setIsAddModalOpen(false)}
                 className="bg-white text-black font-semibold px-8 py-2.5 rounded-full hover:bg-gray-200 transition-colors text-sm"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleAddTenant}
                 disabled={addMutation.isPending}
                 className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-8 py-2.5 rounded-full font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all text-sm disabled:opacity-50"
               >
-                {addMutation.isPending ? 'Adding...' : 'Add Tenant'}
+                {addMutation.isPending ? "Adding..." : "Add Tenant"}
               </button>
             </div>
           </div>

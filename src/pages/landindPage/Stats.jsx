@@ -8,13 +8,15 @@ const problemsData = [
   {
     icon: <PhoneOff className="w-6 h-6 text-white" />,
     title: "Missed Opportunities",
-    description: "Busy phone lines mean customers may give up and order somewhere else.",
+    description:
+      "Busy phone lines mean customers may give up and order somewhere else.",
     bg: "bg-[#9810FA]", // Purple
   },
   {
     icon: <Users className="w-6 h-6 text-white" />,
     title: "Staff Under Pressure",
-    description: "Your team spends valuable time answering repetitive questions instead of focusing on service.",
+    description:
+      "Your team spends valuable time answering repetitive questions instead of focusing on service.",
     bg: "bg-[#3B82F6]", // Blue
   },
   {
@@ -33,7 +35,9 @@ const ProblemCard = ({ problem, index }) => (
     transition={{ duration: 0.5, delay: index * 0.1 }}
     className="bg-gradient-to-b from-[#B5B9FF]/30 to-[#2B2C49]/50 border border-[#0F42FF]/40 p-6 md:p-8 rounded-[24px] flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300 shadow-lg"
   >
-    <div className={`${problem.bg} w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-md`}>
+    <div
+      className={`${problem.bg} w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-md`}
+    >
       {problem.icon}
     </div>
     <div className="flex flex-col gap-3">
@@ -49,7 +53,10 @@ const ProblemCard = ({ problem, index }) => (
 
 const Stats = () => {
   return (
-    <section id="feature" className="py-20 relative bg-linear-to-b from-[#59168B]/20 via-[#1C398E]/20 to-[#271436]/20">
+    <section
+      id="feature"
+      className="py-20 relative bg-linear-to-b from-[#59168B]/20 via-[#1C398E]/20 to-[#271436]/20"
+    >
       <Container>
         <div className="mb-14">
           <Header

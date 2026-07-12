@@ -18,7 +18,6 @@ const TermsCondition = () => {
           </button>
 
           <div className="text-gray-300">Hello!! Welcome to Calai</div>
-          
         </div>
 
         <div className="flex  sm:flex-row items-center gap-3 sm:gap-6 text-gray-300 w-full md:w-auto justify-end sm:justify-end">

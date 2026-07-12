@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
 import { Trash2, X, Loader2, UploadCloud, FileText } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import Table from "../../components/Table";
 import Breadcrumb from "../../components/Breadcrumb";
 import Dropdown from "../../components/Dropdown";
@@ -11,7 +11,7 @@ const ItemManagement = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const fileInputRef = useRef(null);
-  
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
   const [selectedAgentId, setSelectedAgentId] = useState("");
@@ -20,45 +20,49 @@ const ItemManagement = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const { data: agentsResponse } = useQuery({
-    queryKey: ['agents'],
+    queryKey: ["agents"],
     queryFn: async () => {
-      const res = await axiosSecure.get('/agent');
+      const res = await axiosSecure.get("/agent");
       return res.data;
-    }
+    },
   });
   const agents = agentsResponse?.data || [];
-  const agentNames = agents.map(a => a.name || 'Unnamed Agent');
+  const agentNames = agents.map((a) => a.name || "Unnamed Agent");
 
   const { data: itemsResponse, isLoading } = useQuery({
-    queryKey: ['itemManagement', selectedAgentId],
+    queryKey: ["itemManagement", selectedAgentId],
     queryFn: async () => {
-      const url = selectedAgentId 
+      const url = selectedAgentId
         ? `/business-owner/item-management?vapiAgentId=${selectedAgentId}`
-        : '/business-owner/item-management';
-      const res = await axiosSecure.get(url)
-      return res.data
-    }
-  })
+        : "/business-owner/item-management";
+      const res = await axiosSecure.get(url);
+      return res.data;
+    },
+  });
 
   const items = itemsResponse?.data || [];
 
   const uploadMenuMutation = useMutation({
     mutationFn: async ({ agentId, formData }) => {
-      const res = await axiosSecure.patch(`/business-owner/item-management/update-menu?vapiAgentId=${agentId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axiosSecure.patch(
+        `/business-owner/item-management/update-menu?vapiAgentId=${agentId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
       return res.data;
     },
     onSuccess: () => {
-      toast.success('Menu updated successfully');
+      toast.success("Menu updated successfully");
       setIsUploadModalOpen(false);
       setUploadAgentId("");
       setSelectedFiles([]);
-      queryClient.invalidateQueries({ queryKey: ['itemManagement'] });
+      queryClient.invalidateQueries({ queryKey: ["itemManagement"] });
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || 'Failed to update menu');
-    }
+      toast.error(err.response?.data?.message || "Failed to update menu");
+    },
   });
 
   const handleUploadSubmit = () => {
@@ -72,8 +76,8 @@ const ItemManagement = () => {
     }
 
     const formData = new FormData();
-    selectedFiles.forEach(file => {
-      formData.append('menu_file', file);
+    selectedFiles.forEach((file) => {
+      formData.append("menu_file", file);
     });
 
     uploadMenuMutation.mutate({ agentId: uploadAgentId, formData });
@@ -81,11 +85,13 @@ const ItemManagement = () => {
 
   const handleModalFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles(prev => [...prev, ...files]);
+    setSelectedFiles((prev) => [...prev, ...files]);
   };
 
   const removeFile = (indexToRemove) => {
-    setSelectedFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+    setSelectedFiles((prev) =>
+      prev.filter((_, index) => index !== indexToRemove),
+    );
   };
 
   const handleDeleteClick = (item) => {
@@ -112,7 +118,7 @@ const ItemManagement = () => {
       sortable: false,
       render: (row) => (
         <div className="flex justify-center">
-          <button 
+          <button
             onClick={() => handleDeleteClick(row)}
             className="text-red-500/70 hover:text-red-500 transition-colors p-2 hover:bg-red-500/10 rounded-lg"
           >
@@ -135,20 +141,28 @@ const ItemManagement = () => {
   }
 
   return (
-    <div >
+    <div>
       <Breadcrumb text="You can see your item management" />
-      
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex-1 w-full max-w-xs">
           <Dropdown
             placeholder="Filter by Agent"
-            options={['All Agents', ...agentNames]}
-            value={selectedAgentId === "" ? "All Agents" : agents.find(a => (a.vapiAgentId || a.id) === selectedAgentId)?.name || ""}
+            options={["All Agents", ...agentNames]}
+            value={
+              selectedAgentId === ""
+                ? "All Agents"
+                : agents.find(
+                    (a) => (a.vapiAgentId || a.id) === selectedAgentId,
+                  )?.name || ""
+            }
             onSelect={(val) => {
-              if (val === 'All Agents') {
+              if (val === "All Agents") {
                 setSelectedAgentId("");
               } else {
-                const a = agents.find(ag => (ag.name || 'Unnamed Agent') === val);
+                const a = agents.find(
+                  (ag) => (ag.name || "Unnamed Agent") === val,
+                );
                 if (a) setSelectedAgentId(a.vapiAgentId || a.id);
               }
             }}
@@ -158,7 +172,7 @@ const ItemManagement = () => {
           />
         </div>
         <div className="flex shrink-0">
-          <button 
+          <button
             onClick={() => setIsUploadModalOpen(true)}
             className="flex items-center gap-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white px-6 py-3 rounded-full text-sm font-semibold border border-[#1e3a8a] shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] transition-all cursor-pointer"
           >
@@ -187,7 +201,7 @@ const ItemManagement = () => {
       {isUploadModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-[#0E0E10] border border-gray-800 rounded-[20px] w-full max-w-[600px] p-8 relative shadow-2xl">
-            <button 
+            <button
               onClick={() => {
                 setIsUploadModalOpen(false);
                 setUploadAgentId("");
@@ -198,16 +212,25 @@ const ItemManagement = () => {
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-white text-xl font-bold mb-6">Upload Menu File</h2>
-            
+            <h2 className="text-white text-xl font-bold mb-6">
+              Upload Menu File
+            </h2>
+
             <div className="mb-6">
-              <label className="block text-gray-400 text-sm mb-2">Select Agent</label>
+              <label className="block text-gray-400 text-sm mb-2">
+                Select Agent
+              </label>
               <Dropdown
                 placeholder="Choose an agent"
                 options={agentNames}
-                value={agents.find(a => (a.vapiAgentId || a.id) === uploadAgentId)?.name || ""}
+                value={
+                  agents.find((a) => (a.vapiAgentId || a.id) === uploadAgentId)
+                    ?.name || ""
+                }
                 onSelect={(val) => {
-                  const a = agents.find(ag => (ag.name || 'Unnamed Agent') === val);
+                  const a = agents.find(
+                    (ag) => (ag.name || "Unnamed Agent") === val,
+                  );
                   if (a) setUploadAgentId(a.vapiAgentId || a.id);
                 }}
                 inputClass="!bg-[#111111] !border-[#272727] !text-white !rounded-xl !py-3.5 !px-4 !text-sm w-full placeholder:!text-white !placeholder-white"
@@ -217,24 +240,28 @@ const ItemManagement = () => {
             </div>
 
             <div className="mb-6">
-              <label className="block text-gray-400 text-sm mb-2">Upload Files</label>
-              <div 
-                className="border-2 border-dashed border-gray-700 hover:border-gray-500 rounded-xl p-8 text-center transition-colors relative cursor-pointer group"
-              >
-                <input 
-                  type="file" 
-                  multiple 
-                  onChange={handleModalFileSelect} 
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                  accept=".pdf,.csv,.xlsx" 
+              <label className="block text-gray-400 text-sm mb-2">
+                Upload Files
+              </label>
+              <div className="border-2 border-dashed border-gray-700 hover:border-gray-500 rounded-xl p-8 text-center transition-colors relative cursor-pointer group">
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleModalFileSelect}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  accept=".pdf,.csv,.xlsx"
                 />
                 <div className="flex flex-col items-center justify-center gap-3">
                   <div className="p-3 bg-blue-500/10 rounded-full text-blue-500 group-hover:scale-110 transition-transform">
                     <UploadCloud className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-gray-300 font-medium mb-1">Click to upload or drag and drop</p>
-                    <p className="text-gray-500 text-xs">PDF, CSV, or Excel files</p>
+                    <p className="text-gray-300 font-medium mb-1">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-gray-500 text-xs">
+                      PDF, CSV, or Excel files
+                    </p>
                   </div>
                 </div>
               </div>
@@ -242,12 +269,17 @@ const ItemManagement = () => {
               {selectedFiles.length > 0 && (
                 <div className="mt-4 space-y-2 max-h-[150px] overflow-y-auto pr-1">
                   {selectedFiles.map((file, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-[#111111] border border-gray-800 rounded-lg p-3">
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between bg-[#111111] border border-gray-800 rounded-lg p-3"
+                    >
                       <div className="flex items-center gap-3 overflow-hidden">
                         <FileText className="w-5 h-5 text-gray-400 shrink-0" />
-                        <span className="text-gray-300 text-sm truncate">{file.name}</span>
+                        <span className="text-gray-300 text-sm truncate">
+                          {file.name}
+                        </span>
                       </div>
-                      <button 
+                      <button
                         onClick={() => removeFile(idx)}
                         className="text-gray-500 hover:text-red-500 transition-colors p-1 cursor-pointer"
                       >
@@ -260,7 +292,7 @@ const ItemManagement = () => {
             </div>
 
             <div className="flex justify-end gap-3 mt-8">
-              <button 
+              <button
                 onClick={() => {
                   setIsUploadModalOpen(false);
                   setUploadAgentId("");
@@ -270,12 +302,14 @@ const ItemManagement = () => {
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleUploadSubmit}
                 disabled={uploadMenuMutation.isPending}
                 className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {uploadMenuMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                {uploadMenuMutation.isPending && (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                )}
                 Upload
               </button>
             </div>
@@ -287,26 +321,33 @@ const ItemManagement = () => {
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-[#0E0E10] border border-gray-800 rounded-[20px] w-full max-w-[500px] p-8 relative shadow-2xl">
-            <button 
+            <button
               onClick={() => setIsDeleteModalOpen(false)}
               className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-white text-xl font-bold mb-3 text-center">Are you absolutely sure?</h2>
+            <h2 className="text-white text-xl font-bold mb-3 text-center">
+              Are you absolutely sure?
+            </h2>
             <p className="text-gray-400 text-[14px] leading-relaxed mb-10 text-center px-4">
-              This action cannot be undone. This will permanently delete the item <span className="text-white font-semibold">{deletingItem?.name}</span> and remove it from your inventory.
+              This action cannot be undone. This will permanently delete the
+              item{" "}
+              <span className="text-white font-semibold">
+                {deletingItem?.name}
+              </span>{" "}
+              and remove it from your inventory.
             </p>
 
             <div className="flex items-center justify-center gap-5">
-              <button 
+              <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="bg-white text-black font-semibold px-10 py-2.5 rounded-full hover:bg-gray-200 transition-colors text-sm cursor-pointer"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleConfirmDelete}
                 className="bg-[#ef4444] text-white px-10 py-2.5 rounded-full font-semibold hover:bg-red-600 transition-colors text-sm cursor-pointer"
               >

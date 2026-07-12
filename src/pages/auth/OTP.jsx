@@ -8,30 +8,36 @@ import { Icon } from "@iconify/react";
 const OTP = () => {
   const inputs = useRef([]);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
   const axiosPublic = useAxiosPublic();
-  
+
   const email = location.state?.email || "";
 
   const verifyOtpMutation = useMutation({
     mutationFn: async (otpData) => {
-      const response = await axiosPublic.post('/auth/verify-forgot-password-otp', otpData);
+      const response = await axiosPublic.post(
+        "/auth/verify-forgot-password-otp",
+        otpData,
+      );
       return response.data;
     },
     onSuccess: (data) => {
       if (data?.success) {
-        toast.success(data?.message || 'OTP verified successfully!');
-        navigate('/auth/new/password', { state: { email, otp: otp.join("") } });
+        toast.success(data?.message || "OTP verified successfully!");
+        navigate("/auth/new/password", { state: { email, otp: otp.join("") } });
       } else {
-        toast.error(data?.message || 'Verification failed');
+        toast.error(data?.message || "Verification failed");
       }
     },
     onError: (error) => {
-      const errorMsg = error?.response?.data?.message || error?.message || 'An error occurred during verification';
+      const errorMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "An error occurred during verification";
       toast.error(errorMsg);
-    }
+    },
   });
 
   const handleChange = (event, index) => {
@@ -62,10 +68,10 @@ const OTP = () => {
     event.preventDefault();
     const pastedData = event.clipboardData.getData("text").trim();
     if (!/^\d+$/.test(pastedData)) return; // Allow only numbers
-    
+
     const digits = pastedData.slice(0, 6).split("");
     const newOtp = [...otp];
-    
+
     for (let i = 0; i < 6; i++) {
       if (digits[i] !== undefined) {
         newOtp[i] = digits[i];
@@ -94,10 +100,17 @@ const OTP = () => {
         Enter OTP Code
       </h1>
       <p className="text-gray-400 text-[13px] mb-8 text-center">
-        Your verification code is on its way to <span className="text-[#2563EB] font-medium">{email || 'your email'}</span>! Check your inbox and enter the code below to reset your password.
+        Your verification code is on its way to{" "}
+        <span className="text-[#2563EB] font-medium">
+          {email || "your email"}
+        </span>
+        ! Check your inbox and enter the code below to reset your password.
       </p>
 
-      <form onSubmit={handleConfirm} className="w-full flex flex-col items-center">
+      <form
+        onSubmit={handleConfirm}
+        className="w-full flex flex-col items-center"
+      >
         <div className="flex gap-4 justify-center mb-10">
           {[...Array(6)].map((_, i) => (
             <input
@@ -114,25 +127,32 @@ const OTP = () => {
           ))}
         </div>
 
-        <button 
+        <button
           type="submit"
           disabled={verifyOtpMutation.isPending}
           className="w-full mt-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white text-sm font-medium py-3.5 rounded-full border border-[#1D4ED8] shadow-[0_0_20px_rgba(29,78,216,0.25)] hover:shadow-[0_0_25px_rgba(29,78,216,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {verifyOtpMutation.isPending ? (
             <>
-              <Icon icon="lucide:loader-2" className="animate-spin" width="18" />
+              <Icon
+                icon="lucide:loader-2"
+                className="animate-spin"
+                width="18"
+              />
               Verifying...
             </>
           ) : (
-            'Confirm'
+            "Confirm"
           )}
         </button>
       </form>
-     
+
       <div className="mt-4 text-[12px] text-gray-400">
         You can resend the code in 56 Seconds?{" "}
-        <Link to="/auth/forgot/password" className="text-[#2563EB] hover:text-blue-400">
+        <Link
+          to="/auth/forgot/password"
+          className="text-[#2563EB] hover:text-blue-400"
+        >
           Resend Code
         </Link>
       </div>

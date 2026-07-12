@@ -10,7 +10,14 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import EnterpriseContactModal from "@/components/EnterpriseContactModal";
 
-const PlanCard = ({ plan, index, role, onUpgrade, isPendingUpgrade, isCurrentPlan }) => {
+const PlanCard = ({
+  plan,
+  index,
+  role,
+  onUpgrade,
+  isPendingUpgrade,
+  isCurrentPlan,
+}) => {
   const isPopular = plan.name?.toLowerCase() === "starter" || plan.isPopular;
   const priceValue = plan.priceMonthly;
   const priceDisplay =
@@ -43,9 +50,9 @@ const PlanCard = ({ plan, index, role, onUpgrade, isPendingUpgrade, isCurrentPla
 
         <div className="flex items-baseline gap-1.5">
           {plan.name?.toLowerCase() === "enterprise" ? (
-             <span className="text-white text-[24px] font-bold tracking-tight">
-               Custom Price
-             </span>
+            <span className="text-white text-[24px] font-bold tracking-tight">
+              Custom Price
+            </span>
           ) : (
             <>
               <span className="text-white text-[32px] font-bold tracking-tight">
@@ -85,20 +92,22 @@ const PlanCard = ({ plan, index, role, onUpgrade, isPendingUpgrade, isCurrentPla
 
       <div className="mt-auto">
         {role === "BUSINESS_OWNER" && isCurrentPlan ? (
-          <button 
+          <button
             disabled
             className="w-full py-2.5 rounded-lg border border-[#272727] bg-[#1A1A1A] text-sm text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
           >
             Current Plan
           </button>
         ) : (
-          <button 
+          <button
             onClick={() => onUpgrade(plan)}
             disabled={isPendingUpgrade}
             className="w-full py-2.5 rounded-lg border border-[#0F42FF] bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-sm text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isPendingUpgrade && <Loader2 className="w-4 h-4 animate-spin" />}
-            {plan.name?.toLowerCase() === "enterprise" ? "Contact Us" : (plan.buttonText || "Upgrade plan")}
+            {plan.name?.toLowerCase() === "enterprise"
+              ? "Contact Us"
+              : plan.buttonText || "Upgrade plan"}
           </button>
         )}
       </div>
@@ -120,12 +129,14 @@ const Pricing = () => {
   });
 
   const { data: subResponse } = useQuery({
-    queryKey: ['mySubscription'],
+    queryKey: ["mySubscription"],
     queryFn: async () => {
-      const response = await axiosSecure.get('/business-owner/subscription/my-subscription')
-      return response.data
+      const response = await axiosSecure.get(
+        "/business-owner/subscription/my-subscription",
+      );
+      return response.data;
     },
-    enabled: role === "BUSINESS_OWNER"
+    enabled: role === "BUSINESS_OWNER",
   });
 
   const plans = [...(plansResponse?.data || [])].sort((a, b) => {
@@ -139,21 +150,28 @@ const Pricing = () => {
     mutationFn: async (planId) => {
       const payload = {
         planId,
-        billingCycle: "monthly"
-      }
-      const response = await axiosSecure.post('/business-owner/payment/create-checkout-session', payload)
-      return response.data
+        billingCycle: "monthly",
+      };
+      const response = await axiosSecure.post(
+        "/business-owner/payment/create-checkout-session",
+        payload,
+      );
+      return response.data;
     },
     onSuccess: (res) => {
       if (res?.data?.url) {
-        window.location.href = res.data.url
+        window.location.href = res.data.url;
       } else {
-        toast.error('Failed to initiate checkout session')
+        toast.error("Failed to initiate checkout session");
       }
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || err?.message || 'Payment error occurred')
-    }
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Payment error occurred",
+      );
+    },
   });
 
   const handleUpgrade = (plan) => {
@@ -161,12 +179,12 @@ const Pricing = () => {
       toast.error("Please log in as to upgrade");
       return;
     }
-    
+
     if (plan.name?.toLowerCase() === "enterprise") {
       setIsContactModalOpen(true);
       return;
     }
-    
+
     checkoutMutation.mutate(plan.id);
   };
 
@@ -192,13 +210,16 @@ const Pricing = () => {
             </div>
           ) : plans.length > 0 ? (
             plans.map((plan, index) => (
-              <PlanCard 
-                key={plan.id || index} 
-                plan={plan} 
-                index={index} 
+              <PlanCard
+                key={plan.id || index}
+                plan={plan}
+                index={index}
                 role={role}
                 onUpgrade={handleUpgrade}
-                isPendingUpgrade={checkoutMutation.isPending && checkoutMutation.variables === plan.id}
+                isPendingUpgrade={
+                  checkoutMutation.isPending &&
+                  checkoutMutation.variables === plan.id
+                }
                 isCurrentPlan={plan.id === currentPlanId}
               />
             ))
@@ -211,8 +232,8 @@ const Pricing = () => {
           )}
         </div>
       </Container>
-      
-      <EnterpriseContactModal 
+
+      <EnterpriseContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />

@@ -5,8 +5,8 @@ import Container from "@/components/Container";
 import InputField from "@/components/Inputfield";
 import Dropdown from "@/components/Dropdown";
 import { FiPhone, FiMail, FiMapPin } from "react-icons/fi";
-import emailjs from '@emailjs/browser';
-import toast from 'react-hot-toast';
+import emailjs from "@emailjs/browser";
+import toast from "react-hot-toast";
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -41,9 +41,9 @@ const Contact = () => {
           dailyOrders: formData.dailyOrders,
           message: formData.message,
         },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
       );
-      
+
       // Redirect to the success page
       navigate("/thank-you-contact");
     } catch (error) {
@@ -93,9 +93,7 @@ const Contact = () => {
                   <div className="w-10 h-10 rounded-full bg-[#59168B]/30 flex items-center justify-center shrink-0 border border-[#C27AFF]/30">
                     <FiPhone className="text-lg text-[#00D3F3]" />
                   </div>
-                  <span className="text-sm font-medium">
-                    +447719436543
-                  </span>
+                  <span className="text-sm font-medium">+447719436543</span>
                 </div>
                 <div className="flex items-center gap-4 text-gray-200">
                   <div className="w-10 h-10 rounded-full bg-[#59168B]/30 flex items-center justify-center shrink-0 border border-[#C27AFF]/30">
@@ -105,7 +103,6 @@ const Contact = () => {
                     Enquiries@calai.info
                   </span>
                 </div>
-                
               </div>
             </div>
 
@@ -152,7 +149,6 @@ const Contact = () => {
                   }
                 />
 
-
                 <Dropdown
                   label="Business Type*"
                   placeholder="Select type"
@@ -166,18 +162,21 @@ const Contact = () => {
                     setFormData({ ...formData, businessType: val })
                   }
                 />
-                  <InputField
-                    label="Business Postcode*"
-                    type="text"
-                    required
-                    labelClass="!text-gray-300 !font-medium mb-1 text-sm"
-                    inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner"
-                    placeholder="Enter business postcode"
-                    value={formData.businessPostcode}
-                    onChange={(e) =>
-                      setFormData({ ...formData, businessPostcode: e.target.value })
-                    }
-                  />
+                <InputField
+                  label="Business Postcode*"
+                  type="text"
+                  required
+                  labelClass="!text-gray-300 !font-medium mb-1 text-sm"
+                  inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner"
+                  placeholder="Enter business postcode"
+                  value={formData.businessPostcode}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      businessPostcode: e.target.value,
+                    })
+                  }
+                />
 
                 <InputField
                   label="Phone Number*"
@@ -240,9 +239,9 @@ const Contact = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className={`bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] hover:from-[#001c80] hover:to-[#001870] text-white font-bold py-3 px-8 rounded-full transition-all duration-300 border border-[#0F42FF] shadow-[0_0_15px_rgba(15,66,255,0.3)] hover:shadow-[0_0_20px_rgba(15,66,255,0.6)] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] hover:from-[#001c80] hover:to-[#001870] text-white font-bold py-3 px-8 rounded-full transition-all duration-300 border border-[#0F42FF] shadow-[0_0_15px_rgba(15,66,255,0.3)] hover:shadow-[0_0_20px_rgba(15,66,255,0.6)] ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
-                  {isSubmitting ? 'Sending...' : 'Book My Free Demo'}
+                  {isSubmitting ? "Sending..." : "Book My Free Demo"}
                 </motion.button>
               </div>
             </form>

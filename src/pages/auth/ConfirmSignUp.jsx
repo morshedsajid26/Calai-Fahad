@@ -8,46 +8,52 @@ import { Icon } from "@iconify/react";
 const ConfirmSignUp = () => {
   const inputs = useRef([]);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
   const axiosPublic = useAxiosPublic();
-  
+
   const email = location.state?.email || "";
 
   // Mutation to verify OTP
   const verifyMutation = useMutation({
     mutationFn: async (verifyData) => {
-      const response = await axiosPublic.post('/auth/verify-otp', verifyData);
+      const response = await axiosPublic.post("/auth/verify-otp", verifyData);
       return response.data;
     },
     onSuccess: (data) => {
       if (data?.success) {
-        toast.success(data?.message || 'Account verified successfully!');
-        navigate('/auth/login');
+        toast.success(data?.message || "Account verified successfully!");
+        navigate("/auth/login");
       } else {
-        toast.error(data?.message || 'Verification failed');
+        toast.error(data?.message || "Verification failed");
       }
     },
     onError: (error) => {
-      const errorMsg = error?.response?.data?.message || error?.message || 'Verification failed. Please try again.';
+      const errorMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Verification failed. Please try again.";
       toast.error(errorMsg);
-    }
+    },
   });
 
   // Mutation to resend OTP
   const resendMutation = useMutation({
     mutationFn: async (otpData) => {
-      const response = await axiosPublic.post('/auth/send-otp', otpData);
+      const response = await axiosPublic.post("/auth/send-otp", otpData);
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data?.message || 'Verification code resent successfully!');
+      toast.success(data?.message || "Verification code resent successfully!");
     },
     onError: (error) => {
-      const errorMsg = error?.response?.data?.message || error?.message || 'Failed to resend verification code';
+      const errorMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to resend verification code";
       toast.error(errorMsg);
-    }
+    },
   });
 
   const handleChange = (event, index) => {
@@ -78,10 +84,10 @@ const ConfirmSignUp = () => {
     event.preventDefault();
     const pastedData = event.clipboardData.getData("text").trim();
     if (!/^\d+$/.test(pastedData)) return; // Allow only numeric pastes
-    
+
     const digits = pastedData.slice(0, 6).split("");
     const newOtp = [...otp];
-    
+
     for (let i = 0; i < 6; i++) {
       if (digits[i] !== undefined) {
         newOtp[i] = digits[i];
@@ -119,10 +125,17 @@ const ConfirmSignUp = () => {
         Confirm Your Account
       </h1>
       <p className="text-gray-400 text-[13px] mb-8 text-center">
-        We’ve sent a verification code to <span className="text-[#2563EB] font-medium">{email || 'your email'}</span>. Enter the code below to confirm your account and get started.
+        We’ve sent a verification code to{" "}
+        <span className="text-[#2563EB] font-medium">
+          {email || "your email"}
+        </span>
+        . Enter the code below to confirm your account and get started.
       </p>
 
-      <form onSubmit={handleConfirm} className="w-full flex flex-col items-center">
+      <form
+        onSubmit={handleConfirm}
+        className="w-full flex flex-col items-center"
+      >
         <div className="flex gap-4 justify-center mb-10">
           {[...Array(6)].map((_, i) => (
             <input
@@ -139,30 +152,34 @@ const ConfirmSignUp = () => {
           ))}
         </div>
 
-        <button 
+        <button
           type="submit"
           disabled={verifyMutation.isPending}
           className="w-full mt-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] text-white text-sm font-medium py-3.5 rounded-full border border-[#1D4ED8] shadow-[0_0_20px_rgba(29,78,216,0.25)] hover:shadow-[0_0_25px_rgba(29,78,216,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {verifyMutation.isPending ? (
             <>
-              <Icon icon="lucide:loader-2" className="animate-spin" width="18" />
+              <Icon
+                icon="lucide:loader-2"
+                className="animate-spin"
+                width="18"
+              />
               Confirming...
             </>
           ) : (
-            'Confirm'
+            "Confirm"
           )}
         </button>
       </form>
-      
+
       <div className="mt-4 text-[12px] text-gray-400">
         Did not receive code?{" "}
-        <button 
-          onClick={handleResend} 
+        <button
+          onClick={handleResend}
           disabled={resendMutation.isPending}
           className="text-[#2563EB] hover:text-blue-400 font-medium cursor-pointer bg-transparent border-none outline-none disabled:opacity-50 disabled:cursor-not-allowed ml-1"
         >
-          {resendMutation.isPending ? 'Resending...' : 'Resend Code'}
+          {resendMutation.isPending ? "Resending..." : "Resend Code"}
         </button>
       </div>
     </div>

@@ -8,30 +8,29 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-black text-white font-inter">
       {/* Header */}
-     <header className="border-b border-white/10 px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-             <div className="flex w-full md:w-auto items-center justify-between md:justify-start gap-4">
-               <button
-                 onClick={() => navigate(-1)}
-                 className="w-8 h-8 shrink-0 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
-               >
-                 <ArrowLeft className="w-4 h-4" />
-               </button>
-     
-               <div className="text-gray-300">Hello!! Welcome to Calai</div>
-               
-             </div>
-     
-             <div className="flex  sm:flex-row items-center gap-3 sm:gap-6 text-gray-300 w-full md:w-auto justify-end sm:justify-end">
-               <div className="flex items-center gap-2">
-                 <Mail className="w-4 h-4 shrink-0" />
-                 <span className="text-xs sm:text-sm">Enquiries@calai.info</span>
-               </div>
-               <div className="flex items-center gap-2">
-                 <Phone className="w-4 h-4 shrink-0" />
-                 <span className="text-xs sm:text-sm">+447719436543</span>
-               </div>
-             </div>
-           </header>
+      <header className="border-b border-white/10 px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+        <div className="flex w-full md:w-auto items-center justify-between md:justify-start gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-8 h-8 shrink-0 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+
+          <div className="text-gray-300">Hello!! Welcome to Calai</div>
+        </div>
+
+        <div className="flex  sm:flex-row items-center gap-3 sm:gap-6 text-gray-300 w-full md:w-auto justify-end sm:justify-end">
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 shrink-0" />
+            <span className="text-xs sm:text-sm">Enquiries@calai.info</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Phone className="w-4 h-4 shrink-0" />
+            <span className="text-xs sm:text-sm">+447719436543</span>
+          </div>
+        </div>
+      </header>
 
       {/* Content */}
       <main className=" mx-auto px-6 py-12">

@@ -9,9 +9,9 @@ const CustomerCalls = () => {
       <Container className={`text-center lg:!w-[40%]`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, margin: "-50px" }}
-      transition={{ duration: 0.6 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 0.6 }}
         >
           <h1 className="bg-gradient-to-r from-[#C27AFF] to-[#00D3F3] bg-clip-text text-transparent text-4xl md:text-6xl font-bold">
             Let AI Handle Your Customer Calls

@@ -39,12 +39,16 @@ const Banner = () => {
             {/* Heading */}
             <h1 className="text-3xl md:text-5xl font-bold  leading-[1.1] font-inter text-center md:text-start text-white flex flex-col">
               AI That Answers Calls
-              <span className=" bg-gradient-to-l from-[#9810FA]  to-[#C27AFF] bg-clip-text text-transparent">& Takes Orders Automatically</span>
+              <span className=" bg-gradient-to-l from-[#9810FA]  to-[#C27AFF] bg-clip-text text-transparent">
+                & Takes Orders Automatically
+              </span>
             </h1>
 
             {/* Subheading */}
             <p className="text-lg md:text-xl text-[#99A1AF]  font-inter text-center md:text-start">
-              Better service for your customers, Less pressure on your team, Calai answers calls, takes orders, upsell on items and helps your business save time and money
+              Better service for your customers, Less pressure on your team,
+              Calai answers calls, takes orders, upsell on items and helps your
+              business save time and money
             </p>
 
             {/* Buttons */}

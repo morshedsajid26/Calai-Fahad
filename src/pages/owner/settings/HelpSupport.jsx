@@ -9,7 +9,7 @@ const HelpSupport = () => {
 
       <div className="mt-8 bg-[#191919] border border-[#272727] rounded-3xl p-6 sm:p-8 max-w-xl">
         <h3 className="text-xl font-bold text-white mb-6">Contact</h3>
-        
+
         <div className="flex flex-col gap-6">
           {/* Phone Number */}
           <div className="flex items-start gap-4">
@@ -17,11 +17,15 @@ const HelpSupport = () => {
               <Phone className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-gray-400 text-sm font-medium mb-1">Business Number</p>
-              <p className="text-white text-[15px] font-semibold">+447719436543</p>
+              <p className="text-gray-400 text-sm font-medium mb-1">
+                Business Number
+              </p>
+              <p className="text-white text-[15px] font-semibold">
+                +447719436543
+              </p>
             </div>
           </div>
-          
+
           <div className="w-full h-px bg-white/5" />
 
           {/* Email */}
@@ -30,9 +34,11 @@ const HelpSupport = () => {
               <Mail className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-gray-400 text-sm font-medium mb-1">Business Email</p>
-              <a 
-                href="mailto:hello@calai.info" 
+              <p className="text-gray-400 text-sm font-medium mb-1">
+                Business Email
+              </p>
+              <a
+                href="mailto:hello@calai.info"
                 className="text-white text-[15px] font-semibold hover:text-blue-400 transition-colors"
               >
                 hello@calai.info
