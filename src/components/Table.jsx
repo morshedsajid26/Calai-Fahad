@@ -56,6 +56,35 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass, em
     },
   });
 
+  const getPageNumbers = () => {
+    const totalPages = table.getPageCount();
+    const currentPage = table.getState().pagination.pageIndex;
+    
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i);
+    }
+
+    if (currentPage <= 3) {
+      return [0, 1, 2, 3, 4, "...", totalPages - 3, totalPages - 2, totalPages - 1];
+    }
+
+    if (currentPage >= totalPages - 4) {
+      return [0, 1, 2, "...", totalPages - 5, totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1];
+    }
+
+    return [
+      0, 1, 2,
+      "...",
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      "...",
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+    ];
+  };
+
   return (
     <div className="space-y-4 w-full ">
       <div className={`w-full ${wrapperClass}`}>
@@ -145,19 +174,28 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass, em
             </button>
             
             <div className="flex items-center gap-1.5">
-                {table.getPageOptions().map((pageIdx) => (
-                    <button
-                        key={pageIdx}
-                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg border text-sm font-medium transition-all ${
-                            table.getState().pagination.pageIndex === pageIdx
-                                ? "bg-blue-600/20 text-blue-500 border-blue-500/50"
-                                : "bg-[#151515] text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white"
-                        }`}
-                        onClick={() => table.setPageIndex(pageIdx)}
-                    >
-                        {pageIdx + 1}
-                    </button>
-                ))}
+                {getPageNumbers().map((item, idx) => {
+                    if (item === "...") {
+                        return (
+                            <span key={`ellipsis-${idx}`} className="px-1 text-gray-500">
+                                ...
+                            </span>
+                        );
+                    }
+                    return (
+                        <button
+                            key={item}
+                            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg border text-sm font-medium transition-all ${
+                                table.getState().pagination.pageIndex === item
+                                    ? "bg-blue-600/20 text-blue-500 border-blue-500/50"
+                                    : "bg-[#151515] text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white"
+                            }`}
+                            onClick={() => table.setPageIndex(item)}
+                        >
+                            {item + 1}
+                        </button>
+                    );
+                })}
             </div>
 
             <button
