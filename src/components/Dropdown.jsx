@@ -25,10 +25,22 @@ const Dropdown = ({
   const [show, setShow] = useState(false);
   const dropdownRef = useRef(null);
 
-  const handleSelect = (value) => {
-    setSelected(value);
+  const handleSelect = (item) => {
+    const val = typeof item === "object" && item !== null ? item.value : item;
+    setSelected(val);
     setShow(false);
-    if (onSelect) onSelect(value);
+    if (onSelect) onSelect(val);
+  };
+
+  const getDisplayValue = () => {
+    if (!selected) return "";
+    const option = options.find(
+      (opt) => (typeof opt === "object" && opt !== null ? opt.value : opt) === selected
+    );
+    if (option) {
+      return typeof option === "object" && option !== null ? option.label : option;
+    }
+    return selected;
   };
 
   useEffect(() => {
@@ -60,7 +72,7 @@ const Dropdown = ({
         <div onClick={() => setShow(!show)}>
           <input
             readOnly
-            value={selected || ""}
+            value={getDisplayValue()}
             className={`w-full bg-transparent outline-none text-[#364153] border border-[#D1D5DC] p-4 rounded-lg  placeholder:text-[#0A0A0A]/50    cursor-pointer ${inputClass}`}
             placeholder={placeholder}
           />
@@ -79,15 +91,19 @@ const Dropdown = ({
               : "opacity-0 invisible max-h-0 "
           }`}
         >
-          {options.map((item, index) => (
-            <div
-              key={index}
-              onClick={() => handleSelect(item)}
-              className={`py-2 cursor-pointer hover:bg-[#152483] hover:text-white `}
-            >
-              {item}
-            </div>
-          ))} 
+          {options.map((item, index) => {
+            const isObj = typeof item === "object" && item !== null;
+            const label = isObj ? item.label : item;
+            return (
+              <div
+                key={index}
+                onClick={() => handleSelect(item)}
+                className={`py-2 cursor-pointer hover:bg-[#152483] hover:text-white `}
+              >
+                {label}
+              </div>
+            );
+          })} 
         </div>
       </div>
     </div>

@@ -36,7 +36,7 @@ const TenantManagement = () => {
     password: "",
     business_name: "",
     phone: "",
-    business_type: "Restaurant"
+    business_type: "restaurent"
   });
 
   const addMutation = useMutation({
@@ -55,7 +55,7 @@ const TenantManagement = () => {
         password: "",
         business_name: "",
         phone: "",
-        business_type: "Restaurant"
+        business_type: "restaurent"
       });
     },
     onError: (error) => {
@@ -283,8 +283,11 @@ const TenantManagement = () => {
 
               <Dropdown
                 label="Business Type"
-                options={["Restaurant", "Take_way"]}
-                value={editingTenant?.business_type || "Restaurant"}
+                options={[
+                  { label: "Restaurant", value: "restaurent" },
+                  { label: "Takeaway", value: "take_way" }
+                ]}
+                value={editingTenant?.business_type || "restaurent"}
                 onSelect={(val) => setEditingTenant({...editingTenant, business_type: val})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
@@ -423,8 +426,11 @@ const TenantManagement = () => {
 
               <Dropdown
                 label="Business Type"
-                options={["Restaurant", "Take_way"]}
-                value={newTenant.business_type || "Restaurant"}
+                options={[
+                  { label: "Restaurant", value: "restaurent" },
+                  { label: "Takeaway", value: "take_way" }
+                ]}
+                value={newTenant.business_type || "restaurent"}
                 onSelect={(val) => setNewTenant({...newTenant, business_type: val})}
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
