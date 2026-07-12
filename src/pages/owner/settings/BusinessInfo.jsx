@@ -12,6 +12,7 @@ const BusinessInfo = () => {
   const [address, setAddress] = useState('')
   const [openingTime, setOpeningTime] = useState('')
   const [closingTime, setClosingTime] = useState('')
+  const [offDays, setOffDays] = useState([])
 
   const { data: businessInfoResponse, isLoading, refetch } = useQuery({
     queryKey: ['ownerBusinessInfo'],
@@ -50,6 +51,16 @@ const BusinessInfo = () => {
       setAddress(businessInfoResponse.data.address || '')
       setOpeningTime(convertTo24Hour(businessInfoResponse.data.openingTime || businessInfoResponse.data.opening_time || ''))
       setClosingTime(convertTo24Hour(businessInfoResponse.data.closingTime || businessInfoResponse.data.closing_time || ''))
+      
+      let offDaysData = businessInfoResponse.data.offDays || businessInfoResponse.data.off_days;
+      if (typeof offDaysData === 'string') {
+        try {
+          offDaysData = JSON.parse(offDaysData);
+        } catch(e) {
+          offDaysData = offDaysData.split(',').map(d => d.trim());
+        }
+      }
+      setOffDays(Array.isArray(offDaysData) ? offDaysData : [])
     }
   }, [businessInfoResponse, isEditing])
 
@@ -78,8 +89,10 @@ const BusinessInfo = () => {
       address, 
       openingTime: convertTo12Hour(openingTime),
       closingTime: convertTo12Hour(closingTime),
-      opening_time: convertTo12Hour(openingTime), // Keeping snake_case for backward compatibility
-      closing_time: convertTo12Hour(closingTime)
+      opening_time: convertTo12Hour(openingTime), 
+      closing_time: convertTo12Hour(closingTime),
+      offDays: offDays,
+      off_days: offDays
     })
   }
 
@@ -90,8 +103,25 @@ const BusinessInfo = () => {
       setAddress(businessInfoResponse.data.address || '')
       setOpeningTime(convertTo24Hour(businessInfoResponse.data.openingTime || businessInfoResponse.data.opening_time || ''))
       setClosingTime(convertTo24Hour(businessInfoResponse.data.closingTime || businessInfoResponse.data.closing_time || ''))
+      
+      let offDaysData = businessInfoResponse.data.offDays || businessInfoResponse.data.off_days;
+      if (typeof offDaysData === 'string') {
+        try {
+          offDaysData = JSON.parse(offDaysData);
+        } catch(e) {
+          offDaysData = offDaysData.split(',').map(d => d.trim());
+        }
+      }
+      setOffDays(Array.isArray(offDaysData) ? offDaysData : [])
     }
   }
+
+  const toggleOffDay = (day) => {
+    if (!isEditing) return;
+    setOffDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
 
   if (isLoading) {
     return (
@@ -102,6 +132,7 @@ const BusinessInfo = () => {
   }
 
   const isPending = updateMutation.isPending
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -149,6 +180,28 @@ const BusinessInfo = () => {
                 labelClass="!text-sm !font-medium !text-gray-300"
                 inputClass={`!bg-[#111111] !border-white/5 !rounded-full !px-5 !py-3.5 !text-sm ${(!isEditing || isPending) ? '!text-gray-500 cursor-default' : '!text-white'} focus:!outline-none focus:!border-blue-500/50 [color-scheme:dark]`}
               />
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <label className="text-sm font-medium text-gray-300">Off Days (Select closed days)</label>
+              <div className="flex flex-wrap gap-3">
+                {daysOfWeek.map((day) => (
+                  <button
+                    key={day}
+                    onClick={() => toggleOffDay(day)}
+                    disabled={!isEditing || isPending}
+                    className={`px-4 py-2 rounded-full text-[13px] transition-all font-medium border
+                      ${offDays.includes(day) 
+                        ? 'bg-red-500/10 border-red-500/50 text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' 
+                        : 'bg-[#111] border-white/10 text-gray-400 hover:border-white/20'
+                      }
+                      ${(!isEditing || isPending) ? 'cursor-default opacity-80' : 'cursor-pointer'}
+                    `}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
             </div>
         </div>
 
