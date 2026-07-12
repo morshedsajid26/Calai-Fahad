@@ -427,7 +427,7 @@ const TenantManagement = () => {
               <div className="grid grid-cols-2 gap-4">
                 <InputField
                   label="First Name"
-                  placeholder="John"
+                  placeholder="Enter first name"
                   value={newTenant.first_name}
                   onChange={(e) =>
                     setNewTenant({ ...newTenant, first_name: e.target.value })
@@ -437,7 +437,7 @@ const TenantManagement = () => {
                 />
                 <InputField
                   label="Last Name"
-                  placeholder="Doe"
+                  placeholder="Enter last name"
                   value={newTenant.last_name}
                   onChange={(e) =>
                     setNewTenant({ ...newTenant, last_name: e.target.value })
@@ -449,7 +449,7 @@ const TenantManagement = () => {
 
               <InputField
                 label="Business Name"
-                placeholder="Tech Corp"
+                placeholder="Enter business name"
                 value={newTenant.business_name}
                 onChange={(e) =>
                   setNewTenant({ ...newTenant, business_name: e.target.value })
@@ -460,7 +460,7 @@ const TenantManagement = () => {
 
               <InputField
                 label="Email"
-                placeholder="admin@techcorp.com"
+                placeholder="Enter email"
                 value={newTenant.email}
                 onChange={(e) =>
                   setNewTenant({ ...newTenant, email: e.target.value })
@@ -471,7 +471,7 @@ const TenantManagement = () => {
 
               <Password
                 label="Password"
-                placeholder="••••••••"
+                placeholder="Enter password"
                 value={newTenant.password}
                 onChange={(e) =>
                   setNewTenant({ ...newTenant, password: e.target.value })
@@ -482,7 +482,7 @@ const TenantManagement = () => {
 
               <InputField
                 label="Phone"
-                placeholder="+1234567890"
+                placeholder="Enter phone number"
                 value={newTenant.phone}
                 onChange={(e) =>
                   setNewTenant({ ...newTenant, phone: e.target.value })

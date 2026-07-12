@@ -78,7 +78,7 @@ export default function LogIn() {
         <InputField
           label="Email"
           type="email"
-          placeholder="Enter Email"
+          placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
@@ -89,7 +89,7 @@ export default function LogIn() {
         {/* Password Input */}
         <Password
           label="Password"
-          placeholder="Enter Password"
+          placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"

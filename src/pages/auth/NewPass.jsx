@@ -72,7 +72,7 @@ const NewPass = () => {
       <form onSubmit={handleReset} className="w-full space-y-6">
         <Password
           label="Password"
-          placeholder="New Password"
+          placeholder="Enter new password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
@@ -81,7 +81,7 @@ const NewPass = () => {
         />
         <Password
           label="Confirm Password"
-          placeholder="Confirm New Password"
+          placeholder="Confirm new password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"

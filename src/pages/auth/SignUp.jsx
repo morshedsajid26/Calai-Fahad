@@ -89,7 +89,7 @@ const SignUp = () => {
           <InputField
             label="First Name"
             type="text"
-            placeholder="Enter First Name"
+            placeholder="Enter first name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
@@ -99,7 +99,7 @@ const SignUp = () => {
           <InputField
             label="Last Name"
             type="text"
-            placeholder="Enter Last Name"
+            placeholder="Enter last name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
@@ -110,7 +110,7 @@ const SignUp = () => {
         <InputField
           label="Organization Name"
           type="text"
-          placeholder="Enter Organization Name"
+          placeholder="Enter organization name"
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
@@ -121,7 +121,7 @@ const SignUp = () => {
         <InputField
           label="Email"
           type="email"
-          placeholder="Enter Email"
+          placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
@@ -132,7 +132,7 @@ const SignUp = () => {
         {/* Password Input */}
         <Password
           label="Password"
-          placeholder="Enter Password"
+          placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"
@@ -142,7 +142,7 @@ const SignUp = () => {
 
         <Password
           label="Confirm Password"
-          placeholder="Enter Confirm Password"
+          placeholder="Confirm password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"

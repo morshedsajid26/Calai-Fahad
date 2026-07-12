@@ -128,7 +128,7 @@ const Contact = () => {
                   labelClass="!text-gray-300 !font-medium mb-1 text-sm"
                   inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner "
                   className="sm:col-span-2"
-                  placeholder="Enter your full name"
+                  placeholder="Enter full name"
                   value={formData.fullName}
                   onChange={(e) =>
                     setFormData({ ...formData, fullName: e.target.value })
@@ -142,7 +142,7 @@ const Contact = () => {
                   className=""
                   labelClass="!text-gray-300 !font-medium mb-1 text-sm"
                   inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner"
-                  placeholder="Enter your business name"
+                  placeholder="Enter business name"
                   value={formData.businessName}
                   onChange={(e) =>
                     setFormData({ ...formData, businessName: e.target.value })
@@ -197,7 +197,7 @@ const Contact = () => {
                   required
                   labelClass="!text-gray-300 !font-medium mb-1 text-sm"
                   inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner"
-                  placeholder="Enter your email"
+                  placeholder="Enter email"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -206,7 +206,7 @@ const Contact = () => {
 
                 <Dropdown
                   label="Daily Phone Orders (optional)"
-                  placeholder="Select average"
+                  placeholder="Select call volume"
                   options={["Less than 20", "20–50", "50–100", "100+"]}
                   labelClass="!text-gray-300 !font-medium mb-1 text-sm"
                   inputClass="!bg-[#0A0F24] !text-white !border-[#1C398E]/50 !placeholder-gray-500 focus:!border-[#C27AFF] !py-3 !text-sm transition-colors shadow-inner"
@@ -225,7 +225,7 @@ const Contact = () => {
                 </label>
                 <textarea
                   className="w-full h-full border border-[#1C398E]/50 outline-none p-4 text-white bg-[#0A0F24] placeholder-gray-500 rounded-xl min-h-[120px] focus:border-[#C27AFF] transition-colors text-sm shadow-inner resize-none"
-                  placeholder="Tell us about your restaurant or any questions you have."
+                  placeholder="Tell us about your specific needs or questions..."
                   value={formData.message}
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })

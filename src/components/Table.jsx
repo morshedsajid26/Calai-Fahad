@@ -64,25 +64,23 @@ export default function Table({ TableHeads, TableRows, headClass, tableClass, em
       return Array.from({ length: totalPages }, (_, i) => i);
     }
 
-    if (currentPage <= 3) {
-      return [0, 1, 2, 3, 4, "...", totalPages - 3, totalPages - 2, totalPages - 1];
+    let pages = [0, 1, 2];
+    
+    if (currentPage > 3 && currentPage < totalPages - 4) {
+      pages.push("...");
+      pages.push(currentPage - 1, currentPage, currentPage + 1);
+      pages.push("...");
+    } else if (currentPage === 3) {
+      pages.push(3, 4, "...");
+    } else if (currentPage === totalPages - 4) {
+      pages.push("...", totalPages - 5, totalPages - 4);
+    } else {
+      pages.push("...");
     }
 
-    if (currentPage >= totalPages - 4) {
-      return [0, 1, 2, "...", totalPages - 5, totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1];
-    }
-
-    return [
-      0, 1, 2,
-      "...",
-      currentPage - 1,
-      currentPage,
-      currentPage + 1,
-      "...",
-      totalPages - 3,
-      totalPages - 2,
-      totalPages - 1,
-    ];
+    pages.push(totalPages - 3, totalPages - 2, totalPages - 1);
+    
+    return pages;
   };
 
   return (

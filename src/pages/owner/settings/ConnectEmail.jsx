@@ -91,7 +91,7 @@ const ConnectEmail = () => {
           <InputField
             label="Phone Number"
             type="text"
-            placeholder="e.g. +1 052 569 8962"
+            placeholder="e.g. +1 (555) 000-0000"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             readOnly={!isEditing || isPending}
@@ -101,7 +101,7 @@ const ConnectEmail = () => {
           <InputField
             label="Email Address"
             type="email"
-            placeholder="fhgjdhxc@gmai.com"
+            placeholder="e.g. example@email.com"
             value={email}
             readOnly={true}
             labelClass="!text-sm !font-medium !text-gray-300"

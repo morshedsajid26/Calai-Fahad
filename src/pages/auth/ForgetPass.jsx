@@ -59,7 +59,7 @@ const ForgetPass = () => {
         <InputField
           label="Your Registered Email"
           type="email"
-          placeholder="Enter Email"
+          placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           labelClass="!text-[13px] !text-gray-300 !font-medium !ml-1"

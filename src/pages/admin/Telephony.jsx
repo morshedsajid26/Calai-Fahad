@@ -307,7 +307,7 @@ const Telephony = () => {
               <Dropdown
                 label="Business Name"
                 options={tenantNames}
-                placeholder="Select Business"
+                placeholder="Select business"
                 value={
                   tenants.find((t) => t.id === newNumber.businessId)?.name ||
                   tenants.find((t) => t.id === newNumber.businessId)
@@ -328,7 +328,7 @@ const Telephony = () => {
 
               <InputField
                 label="Twilio Number"
-                placeholder="+12345678"
+                placeholder="+1 (555) 000-0000"
                 value={newNumber.twilioNumber}
                 onChange={(e) =>
                   setNewNumber({ ...newNumber, twilioNumber: e.target.value })
@@ -339,7 +339,7 @@ const Telephony = () => {
 
               <InputField
                 label="Manager Number"
-                placeholder="+123548968"
+                placeholder="+1 (555) 000-0000"
                 value={newNumber.managerNumber}
                 onChange={(e) =>
                   setNewNumber({ ...newNumber, managerNumber: e.target.value })
@@ -351,7 +351,7 @@ const Telephony = () => {
               <Dropdown
                 label="Unconnected Agent"
                 options={agentNames}
-                placeholder="Select Agent"
+                placeholder="Select agent"
                 value={(() => {
                   const a = unconnectedAgents.find(
                     (agent) =>
@@ -422,7 +422,7 @@ const Telephony = () => {
             <div className="space-y-6">
               <InputField
                 label="Twilio Number"
-                placeholder="+12345678"
+                placeholder="+1 (555) 000-0000"
                 value={editingNumber?.twilioNumber || ""}
                 onChange={(e) =>
                   setEditingNumber({
@@ -436,7 +436,7 @@ const Telephony = () => {
 
               <InputField
                 label="Manager Number"
-                placeholder="+123548968"
+                placeholder="+1 (555) 000-0000"
                 value={editingNumber?.managerNumber || ""}
                 onChange={(e) =>
                   setEditingNumber({

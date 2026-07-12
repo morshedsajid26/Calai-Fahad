@@ -250,7 +250,7 @@ const ProfileSettings = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <InputField
             label="First Name"
-            placeholder="First name"
+            placeholder="Enter first name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             readOnly={!isProfileEditing || isProfilePending}
@@ -259,7 +259,7 @@ const ProfileSettings = () => {
           />
           <InputField
             label="Last Name"
-            placeholder="Last name"
+            placeholder="Enter last name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             readOnly={!isProfileEditing || isProfilePending}
@@ -272,7 +272,7 @@ const ProfileSettings = () => {
           <InputField
             label="Email"
             type="email"
-            placeholder="Enter Email"
+            placeholder="Enter email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             readOnly={true}
@@ -324,7 +324,7 @@ const ProfileSettings = () => {
         <div className="mb-6">
           <Password
             label="Current Password"
-            placeholder="Enter Password"
+            placeholder="Enter current password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             readOnly={!isPasswordEditing || isPasswordPending}
@@ -338,7 +338,7 @@ const ProfileSettings = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
           <Password
             label="New Password"
-            placeholder="Enter Password"
+            placeholder="Enter new password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             readOnly={!isPasswordEditing || isPasswordPending}
@@ -349,7 +349,7 @@ const ProfileSettings = () => {
           />
           <Password
             label="Confirm New Password"
-            placeholder="Enter Password"
+            placeholder="Confirm new password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             readOnly={!isPasswordEditing || isPasswordPending}

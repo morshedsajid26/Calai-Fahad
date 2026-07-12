@@ -190,7 +190,7 @@ const BusinessInfo = () => {
         <div className="flex flex-col gap-6 mb-8">
           <InputField
             label="Business Name"
-            placeholder="Al Support"
+            placeholder="e.g. AI Support"
             value={name}
             onChange={(e) => setName(e.target.value)}
             readOnly={!isEditing || isPending}
@@ -200,7 +200,7 @@ const BusinessInfo = () => {
           <InputField
             label="Business Address"
             type="text"
-            placeholder="Unknow"
+            placeholder="Enter business address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             readOnly={!isEditing || isPending}

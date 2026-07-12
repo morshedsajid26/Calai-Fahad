@@ -270,7 +270,7 @@ const PrinterManagement = () => {
               <InputField
                 label="Device Name"
                 type="text"
-                placeholder="Printer Name"
+                placeholder="Enter printer name"
                 value={deviceName}
                 onChange={(e) => setDeviceName(e.target.value)}
                 labelClass="!text-sm !font-medium !text-gray-300"
