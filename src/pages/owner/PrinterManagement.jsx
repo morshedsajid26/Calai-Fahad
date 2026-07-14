@@ -104,18 +104,19 @@ const PrinterManagement = () => {
   const handleEditClick = (printer) => {
     setSelectedPrinter(printer);
     setDeviceName(printer.deviceName || printer.device_name || "");
+    setSerialNumber(printer.serialNumber || printer.serial_number || "");
     setIsEditModalOpen(true);
   };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    if (!deviceName) {
-      toast.error("Device name is required");
+    if (!deviceName || !serialNumber) {
+      toast.error("Please fill in all fields");
       return;
     }
     editPrinterMutation.mutate({
       id: selectedPrinter.id,
-      data: { device_name: deviceName },
+      data: { device_name: deviceName, serial_number: serialNumber },
     });
   };
 
@@ -143,7 +144,7 @@ const PrinterManagement = () => {
     },
     {
       key: "serialNumber",
-      Title: "Serial Number",
+      Title: "MAC Address",
       width: "25%",
       render: (row) => (
         <div className="text-left text-gray-400 font-mono text-sm">
@@ -277,7 +278,7 @@ const PrinterManagement = () => {
                 inputClass="!w-full !bg-[#1A1A1A] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-white !placeholder-gray-500 focus:!outline-none focus:!border-[#2563EB] !transition-colors !text-sm"
               />
               <InputField
-                label="Serial Number"
+                label="MAC Address"
                 type="text"
                 placeholder="e.g. 00:11:62:AA:BB:CC"
                 value={serialNumber}
@@ -337,16 +338,12 @@ const PrinterManagement = () => {
                 inputClass="!w-full !bg-[#1A1A1A] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-white !placeholder-gray-500 focus:!outline-none focus:!border-[#2563EB] !transition-colors !text-sm"
               />
               <InputField
-                label="Serial Number (Cannot be changed)"
+                label="MAC Address"
                 type="text"
-                value={
-                  selectedPrinter?.serialNumber ||
-                  selectedPrinter?.serial_number ||
-                  ""
-                }
-                disabled
-                labelClass="!text-sm !font-medium !text-gray-500"
-                inputClass="!w-full !bg-[#151515] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-gray-500 focus:!outline-none !transition-colors !text-sm !font-mono cursor-not-allowed !opacity-70"
+                value={serialNumber}
+                onChange={(e) => setSerialNumber(e.target.value)}
+                labelClass="!text-sm !font-medium !text-gray-300"
+                inputClass="!w-full !bg-[#1A1A1A] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-white !placeholder-gray-500 focus:!outline-none focus:!border-[#2563EB] !transition-colors !text-sm !font-mono"
               />
               <div className="pt-4 flex justify-end gap-3">
                 <button
