@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react'
 import { CloudUpload, FileText, X, Loader2 } from 'lucide-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import useAxiosSecure from '../hooks/useAxiosSecure'
 import toast from 'react-hot-toast'
 import InputField from './Inputfield'
+import Dropdown from './Dropdown'
 
 const FileUploadBox = ({ label, file, setFile, isRequired }) => {
   const fileInputRef = useRef(null)
@@ -115,15 +116,25 @@ const FileUploadBox = ({ label, file, setFile, isRequired }) => {
 
 const UploadPdf = () => {
   const [agentName, setAgentName] = useState('')
+  const [selectedTenant, setSelectedTenant] = useState('')
   const [rulesFile, setRulesFile] = useState(null)
   const [menuFile, setMenuFile] = useState(null)
   
   const axiosSecure = useAxiosSecure()
   const queryClient = useQueryClient()
 
+  const { data: tenantsResponse } = useQuery({
+    queryKey: ['tenants'],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/system-owner/tenants')
+      return res.data
+    }
+  })
+  const tenants = tenantsResponse?.data || []
+
   const createAgentMutation = useMutation({
     mutationFn: async (formData) => {
-      const response = await axiosSecure.post('/agent/create', formData, {
+      const response = await axiosSecure.post('/system-owner/agent/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -143,6 +154,10 @@ const UploadPdf = () => {
   })
 
   const handleApply = () => {
+    if (!selectedTenant) {
+      toast.error('Please select a tenant')
+      return
+    }
     if (!agentName.trim()) {
       toast.error('Please enter an agent name')
       return
@@ -153,6 +168,7 @@ const UploadPdf = () => {
     }
 
     const formData = new FormData()
+    formData.append('businessId', selectedTenant)
     formData.append('agent_name', agentName)
     formData.append('rules_file', rulesFile)
     formData.append('menu_file', menuFile)
@@ -160,7 +176,7 @@ const UploadPdf = () => {
     createAgentMutation.mutate(formData)
   }
 
-  const isFormValid = agentName.trim() && rulesFile && menuFile
+  const isFormValid = agentName.trim() && rulesFile && menuFile && selectedTenant
 
   return (
     <div className="bg-[#191919] p-6 rounded-xl border border-white/5 relative">
@@ -170,7 +186,22 @@ const UploadPdf = () => {
           Upload documents (PDF or Excel) with text that will be used to train your AI text model. <br/>
         </p>
 
-        <div className="mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="flex flex-col gap-1.5 z-50">
+            <Dropdown
+              label="Select Tenant"
+              placeholder="-- Select Tenant --"
+              options={tenants.map(tenant => ({ label: tenant.email ? `${tenant.name} (${tenant.email})` : tenant.name, value: tenant.id }))}
+              value={selectedTenant}
+              onSelect={(val) => setSelectedTenant(val)}
+              labelClass="!text-sm !font-medium !text-gray-300"
+              inputClass="!w-full !bg-[#111111] !border !border-[#272727] !rounded-xl !px-4 !py-3 !text-white !text-sm focus:!outline-none focus:!border-blue-500 !transition-colors placeholder:text-gray-300"
+              optionClass="!bg-[#191919] !border-[#272727] !text-gray-300"
+              icon="!text-gray-400"
+              isSearchable={true}
+            />
+          </div>
+
           <InputField
             label="Agent Name"
             type="text"

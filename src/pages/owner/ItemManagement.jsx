@@ -22,12 +22,20 @@ const ItemManagement = () => {
   const { data: agentsResponse } = useQuery({
     queryKey: ["agents"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/agent");
+      const res = await axiosSecure.get("/business-owner/agent");
       return res.data;
     },
   });
   const agents = agentsResponse?.data || [];
-  const agentNames = agents.map((a) => a.name || "Unnamed Agent");
+
+  React.useEffect(() => {
+    if (agents.length > 0) {
+      const agent = agents[0];
+      const vapiId = agent.agentId || agent.vapiAgentId || agent.vapi_agent_id || agent.id;
+      if (!selectedAgentId) setSelectedAgentId(vapiId);
+      if (!uploadAgentId) setUploadAgentId(vapiId);
+    }
+  }, [agents, selectedAgentId, uploadAgentId]);
 
   const { data: itemsResponse, isLoading } = useQuery({
     queryKey: ["itemManagement", selectedAgentId],
@@ -144,33 +152,7 @@ const ItemManagement = () => {
     <div>
       <Breadcrumb text="You can see your item management" />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div className="flex-1 w-full max-w-xs">
-          <Dropdown
-            placeholder="Filter by Agent"
-            options={["All Agents", ...agentNames]}
-            value={
-              selectedAgentId === ""
-                ? "All Agents"
-                : agents.find(
-                    (a) => (a.vapiAgentId || a.id) === selectedAgentId,
-                  )?.name || ""
-            }
-            onSelect={(val) => {
-              if (val === "All Agents") {
-                setSelectedAgentId("");
-              } else {
-                const a = agents.find(
-                  (ag) => (ag.name || "Unnamed Agent") === val,
-                );
-                if (a) setSelectedAgentId(a.vapiAgentId || a.id);
-              }
-            }}
-            inputClass="!bg-[#111111] !border-[#272727] !text-white !rounded-xl !py-3.5 !px-4 !text-sm placeholder:!text-white !placeholder-white"
-            optionClass="!bg-[#111111] !text-white !border-[#272727]"
-            icon="!text-gray-400"
-          />
-        </div>
+      <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center gap-4 mb-6">
         <div className="flex shrink-0">
           <button
             onClick={() => setIsUploadModalOpen(true)}
@@ -215,29 +197,6 @@ const ItemManagement = () => {
             <h2 className="text-white text-xl font-bold mb-6">
               Upload Menu File
             </h2>
-
-            <div className="mb-6">
-              <label className="block text-gray-400 text-sm mb-2">
-                Select Agent
-              </label>
-              <Dropdown
-                placeholder="Choose an agent"
-                options={agentNames}
-                value={
-                  agents.find((a) => (a.vapiAgentId || a.id) === uploadAgentId)
-                    ?.name || ""
-                }
-                onSelect={(val) => {
-                  const a = agents.find(
-                    (ag) => (ag.name || "Unnamed Agent") === val,
-                  );
-                  if (a) setUploadAgentId(a.vapiAgentId || a.id);
-                }}
-                inputClass="!bg-[#111111] !border-[#272727] !text-white !rounded-xl !py-3.5 !px-4 !text-sm w-full placeholder:!text-white !placeholder-white"
-                optionClass="!bg-[#111111] !text-white !border-[#272727]"
-                icon="!text-gray-400"
-              />
-            </div>
 
             <div className="mb-6">
               <label className="block text-gray-400 text-sm mb-2">

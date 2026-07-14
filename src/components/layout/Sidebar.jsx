@@ -22,7 +22,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const ownerNavLinks = [
     { name: "Dashboard", path: "/owner/dashboard", icon: "lucide:layout-dashboard" },
-    { name: "AI Training", path: "/owner/ai-training", icon: "lucide:bot" },
+    { name: "Agents", path: "/owner/agents", icon: "lucide:bot" },
     { name: "Test Call Window", path: "/owner/test-voice", icon: "lucide:phone-call" },
     { name: "Call Summary", path: "/owner/call-summary", icon: "lucide:file-text" },
     { name: "Order list", path: "/owner/order-list", icon: "lucide:list-checks" },
@@ -33,6 +33,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const adminNavLinks = [
     { name: "Dashboard", path: "/admin/dashboard", icon: "lucide:layout-grid" },
+    { name: "AI Training", path: "/admin/ai-training", icon: "lucide:bot" },
     { name: "Tenant Management", path: "/admin/tenant-management", icon: "lucide:users" },
     { name: "Telephony", path: "/admin/telephony-integration", icon: "lucide:phone" },
     { name: "Subscriptions & Billing", path: "/admin/subscriptions-billing", icon: "lucide:credit-card" },

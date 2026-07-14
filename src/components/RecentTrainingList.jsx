@@ -26,14 +26,14 @@ const RecentTrainingList = () => {
   const { data: agentsResponse, isLoading } = useQuery({
     queryKey: ['recentAgents'],
     queryFn: async () => {
-      const res = await axiosSecure.get('/agent')
+      const res = await axiosSecure.get('/system-owner/agent')
       return res.data
     }
   })
 
   const deleteAgentMutation = useMutation({
     mutationFn: async (agentId) => {
-      const res = await axiosSecure.delete(`/agent/${agentId}`)
+      const res = await axiosSecure.delete(`/system-owner/agent/${agentId}`)
       return res.data
     },
     onSuccess: () => {

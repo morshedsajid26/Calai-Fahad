@@ -18,7 +18,7 @@ const TestCallWindow = () => {
   const { data: agentsResponse, isLoading: isLoadingAgents } = useQuery({
     queryKey: ["agents"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/agent");
+      const res = await axiosSecure.get("/business-owner/agent");
       return res.data;
     },
   });
@@ -26,6 +26,15 @@ const TestCallWindow = () => {
   const agents = agentsResponse?.data || [];
   const [selectedAgentId, setSelectedAgentId] = useState("");
   const [selectedAgentName, setSelectedAgentName] = useState("");
+
+  useEffect(() => {
+    if (agents.length > 0 && !selectedAgentId) {
+      const agent = agents[0];
+      const vapiId = agent.agentId || agent.vapiAgentId || agent.vapi_agent_id || agent.id;
+      setSelectedAgentId(vapiId);
+      setSelectedAgentName(agent.name || "Unnamed Agent");
+    }
+  }, [agents, selectedAgentId]);
 
   const [isCalling, setIsCalling] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -172,9 +181,9 @@ const TestCallWindow = () => {
         {!isCalling ? (
           <>
             {/* --- IDLE STATE (Before Call) --- */}
-            {/* Agent Selector Card */}
-            <div className="w-[90%] max-w-md bg-[#111114]/90 backdrop-blur-xl border border-[#262626] rounded-2xl p-5 md:p-6 z-40 shadow-2xl flex-shrink-0">
-              <div className="flex items-center justify-center gap-3 mb-5">
+            {/* Agent Info Card */}
+            <div className="w-[90%] max-w-md bg-[#111114]/90 backdrop-blur-xl border border-[#262626] rounded-2xl p-5 md:p-6 z-40 shadow-2xl flex-shrink-0 text-center">
+              <div className="flex items-center justify-center gap-3 mb-2">
                 <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-400">
                   <svg
                     width="18"
@@ -190,36 +199,12 @@ const TestCallWindow = () => {
                   </svg>
                 </div>
                 <h3 className="text-white font-bold text-lg md:text-xl">
-                  Select Your AI Agent
+                  Test Your AI Agent
                 </h3>
               </div>
-
-              <div className="relative z-50">
-                <Dropdown
-                  placeholder={
-                    isLoadingAgents ? "Loading agents..." : "Select an Agent"
-                  }
-                  options={agents.map((a) => a.name || "Unknown Agent")}
-                  value={selectedAgentName}
-                  onSelect={(name) => {
-                    const agent = agents.find(
-                      (a) => (a.name || "Unknown Agent") === name,
-                    );
-                    if (agent) {
-                      const vapiId =
-                        agent.agentId ||
-                        agent.vapiAgentId ||
-                        agent.vapi_agent_id ||
-                        agent.id;
-                      setSelectedAgentId(vapiId);
-                      setSelectedAgentName(name);
-                    }
-                  }}
-                  className={`${isCalling || isLoadingAgents ? "opacity-50 pointer-events-none" : ""}`}
-                  inputClass="!w-full !bg-[#0E0E10] !text-white !placeholder-white !border-[#262626] hover:!border-gray-600 focus:!border-green-500 !rounded-xl !px-5 !py-3.5 !text-[15px] !shadow-inner !transition-all"
-                  optionClass="!bg-[#0E0E10] !text-white !border-[#262626]"
-                  icon="!text-gray-500 !right-5"
-                />
+              
+              <div className="text-gray-400 text-sm mt-3">
+                {isLoadingAgents ? "Loading agent..." : selectedAgentName ? `Agent: ${selectedAgentName}` : "No agent found"}
               </div>
             </div>
 

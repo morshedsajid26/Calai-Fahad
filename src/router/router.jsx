@@ -13,7 +13,8 @@ import ViewTenant from "../pages/admin/ViewTenant";
 
 // owner
 import OwnerDashboard from "../pages/owner/Dashboard";
-import AiTraining from "../pages/owner/AiTraining";
+import AiTraining from "../pages/admin/AiTraining";
+import AgentList from "../pages/owner/AgentList";
 import CallSummary from "../pages/owner/CallSummary";
 import OrderList from "../pages/owner/OrderList";
 import ItemManagement from "../pages/owner/ItemManagement";
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
     element: <DashboardLayout />,
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> },
+      { path: "/admin/ai-training", element: <AiTraining /> },
       { path: "/admin/tenant-management", element: <TenantManagement /> },
       { path: "/admin/tenant-management/view/:id", element: <ViewTenant /> },
       { path: "/admin/subscriptions-billing", element: <Subscription /> },
@@ -81,7 +83,7 @@ const router = createBrowserRouter([
     children: [
        // owner
       { path: "/owner/dashboard", element: <OwnerDashboard /> },
-      { path: "/owner/ai-training", element: <AiTraining /> },
+      { path: "/owner/agents", element: <AgentList /> },
       { path: "/owner/call-summary", element: <CallSummary /> },
       { path: "/owner/order-list", element: <OrderList /> },
       { path: "/owner/item-management", element: <ItemManagement /> },
