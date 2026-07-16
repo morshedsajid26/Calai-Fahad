@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
 import Header from "../components/layout/Header";
+import LiveOrderPopup from "../components/LiveOrderPopup";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,6 +23,9 @@ export default function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+      
+      {/* Global Live Order Listener */}
+      <LiveOrderPopup />
     </div>
   );
 }
