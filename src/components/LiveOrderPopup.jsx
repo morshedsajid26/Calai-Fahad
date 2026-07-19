@@ -1,12 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Cookies from "js-cookie";
 import { X, BellRing, MapPin, Phone, User, ShoppingBag } from "lucide-react";
 import useAuth from "../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const LiveOrderPopup = () => {
   const [incomingOrder, setIncomingOrder] = useState(null);
   const { user } = useAuth();
+  const audioRef = useRef(null);
+
+  // Play a notification sound for 6 seconds when an order arrives
+  useEffect(() => {
+    let timer;
+    if (incomingOrder) {
+      try {
+        const audio = new Audio('/notification.wav');
+        audio.loop = true; // Loop the sound
+        audioRef.current = audio;
+        audio.play().catch(e => console.log("Audio play blocked by browser", e));
+        
+        // Stop after 6 seconds
+        timer = setTimeout(() => {
+          audio.pause();
+          audio.currentTime = 0;
+        }, 6000);
+      } catch (e) {
+        toast.error("Audio error:", e);
+      }
+    }
+
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
+  }, [incomingOrder]);
 
   useEffect(() => {
     // Determine socket URL from API URL
@@ -58,12 +90,6 @@ const LiveOrderPopup = () => {
     const handleNewOrder = (order) => {
       console.log("Live order received:", order);
       setIncomingOrder(order);
-      
-      // Play a notification sound
-      try {
-        const audio = new Audio('/notification.mp3'); // Optional sound
-        audio.play().catch(e => console.log("Audio play blocked by browser", e));
-      } catch(e) {}
     };
 
     socket.on('order:confirmed', handleNewOrder);
@@ -90,7 +116,7 @@ const LiveOrderPopup = () => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">New Order Received!</h2>
-              <p className="text-blue-100 text-sm">Order #{incomingOrder.id || 'N/A'}</p>
+              {/* <p className="text-blue-100 text-sm">Order #{incomingOrder.id || 'N/A'}</p> */}
             </div>
           </div>
         </div>
