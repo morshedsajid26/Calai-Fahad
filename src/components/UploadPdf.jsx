@@ -119,6 +119,7 @@ const UploadPdf = () => {
   const [selectedTenant, setSelectedTenant] = useState('')
   const [rulesFile, setRulesFile] = useState(null)
   const [menuFile, setMenuFile] = useState(null)
+  const [specialOffersFile, setSpecialOffersFile] = useState(null)
   
   const axiosSecure = useAxiosSecure()
   const queryClient = useQueryClient()
@@ -145,6 +146,7 @@ const UploadPdf = () => {
       toast.success('Agent created and provisioned successfully')
       setRulesFile(null)
       setMenuFile(null)
+      setSpecialOffersFile(null)
       setAgentName('')
       queryClient.invalidateQueries(['recentAgents'])
     },
@@ -172,6 +174,9 @@ const UploadPdf = () => {
     formData.append('agent_name', agentName)
     formData.append('rules_file', rulesFile)
     formData.append('menu_file', menuFile)
+    if (specialOffersFile) {
+      formData.append('special_offers_file', specialOffersFile)
+    }
 
     createAgentMutation.mutate(formData)
   }
@@ -213,9 +218,10 @@ const UploadPdf = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
         <FileUploadBox label="Rules" file={rulesFile} setFile={setRulesFile} isRequired={true} />
         <FileUploadBox label="Menu" file={menuFile} setFile={setMenuFile} isRequired={true} />
+        <FileUploadBox label="Special Offers" file={specialOffersFile} setFile={setSpecialOffersFile} isRequired={false} />
       </div>
 
       <div className="absolute bottom-6 right-6">
