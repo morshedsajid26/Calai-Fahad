@@ -54,7 +54,7 @@ const Banner = () => {
 
             {/* Buttons */}
             <div className="flex  items-center gap-4 pt-4">
-              <Link to="/onboarding">
+              <a href="#contact">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -63,7 +63,7 @@ const Banner = () => {
                   Start Free Trial
                   <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </motion.button>
-              </Link>
+              </a>
 
               <motion.button
                 whileHover={{
