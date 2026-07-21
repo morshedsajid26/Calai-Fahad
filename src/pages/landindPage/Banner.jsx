@@ -6,6 +6,7 @@ import { FiPlay, FiArrowRight } from "react-icons/fi";
 import { RiSparklingFill } from "react-icons/ri";
 import Container from "@/components/Container";
 import BannerVideo from "./BannerVideo";
+import { Link } from "react-router-dom";
 
 const Banner = () => {
   return (
@@ -53,14 +54,16 @@ const Banner = () => {
 
             {/* Buttons */}
             <div className="flex  items-center gap-4 pt-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="group relative px-2.5 md:px-8 py-4 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white border border-[#0F42FF] font-medium font-inter text-base flex items-center gap-2  hover:shadow-[#0E41FE]/70 transition-all"
-              >
-                Start Free Trial
-                <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
-              </motion.button>
+              <Link to="/onboarding">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group relative px-2.5 md:px-8 py-4 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white border border-[#0F42FF] font-medium font-inter text-base flex items-center gap-2  hover:shadow-[#0E41FE]/70 transition-all"
+                >
+                  Start Free Trial
+                  <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+              </Link>
 
               <motion.button
                 whileHover={{

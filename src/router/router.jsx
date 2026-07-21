@@ -43,6 +43,7 @@ import Telephony from "@/pages/admin/Telephony";
 import TermsCondition from "@/pages/landindPage/TermsCondition";
 import PrivacyPolicy from "@/pages/landindPage/PrivacyPolicy";
 import ThankYouContact from "@/pages/landindPage/ThankYouContact";
+import OnboardingWizard from "@/pages/onboarding/OnboardingWizard";
 
 const router = createBrowserRouter([
   //  AUTH ROUTES
@@ -122,6 +123,10 @@ const router = createBrowserRouter([
   {
     path: "/thank-you-contact",
     element: <ThankYouContact />,
+  },
+  {
+    path: "/onboarding",
+    element: <OnboardingWizard />,
   },
 ]);
 
