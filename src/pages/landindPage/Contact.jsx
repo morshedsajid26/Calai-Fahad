@@ -241,7 +241,7 @@ const Contact = () => {
                   disabled={isSubmitting}
                   className={`bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] hover:from-[#001c80] hover:to-[#001870] text-white font-bold py-3 px-8 rounded-full transition-all duration-300 border border-[#0F42FF] shadow-[0_0_15px_rgba(15,66,255,0.3)] hover:shadow-[0_0_20px_rgba(15,66,255,0.6)] ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
-                  {isSubmitting ? "Sending..." : "Book My Free Demo"}
+                  {isSubmitting ? "Submiting..." : "Submit"}
                 </motion.button>
               </div>
             </form>

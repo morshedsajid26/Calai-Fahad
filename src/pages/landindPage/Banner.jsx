@@ -47,7 +47,7 @@ const Banner = () => {
 
             {/* Subheading */}
             <p className="text-lg md:text-xl text-[#99A1AF]  font-inter text-center md:text-start">
-              Better service for your customers, Less pressure on your team,
+              Better service for your customers, less pressure on your team,
               Calai answers calls, takes orders, upsell on items and helps your
               business save time and money
             </p>

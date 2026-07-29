@@ -19,7 +19,7 @@ const LandingPageLayout = () => {
       <Banner />
       <Stats />
       <HowItWorks />
-      <Demo />
+      {/* <Demo /> */}
       <Features />
       <Pricing />
       <FAQ />

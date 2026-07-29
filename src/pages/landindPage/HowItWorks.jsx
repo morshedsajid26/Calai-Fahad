@@ -41,7 +41,23 @@ const HowItWorks = () => {
       className="py-20 relative bg-gradient-to-b from-transparent via-[#1C398E]/5 to-[#59168B]/10"
     >
       <Container>
-        <div className="mb-16 text-center max-w-4xl mx-auto flex flex-col items-center">
+        <div className="mb-16 text-center max-w-6xl mx-auto flex flex-col items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false }}
+            className="w-full mb-16 rounded-3xl overflow-hidden"
+          >
+            <video
+              src="/CALAI.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
+              className="w-full h-auto object-cover"
+            />
+          </motion.div>
           <Header
             titleText="Meet Calai — Your AI Restaurant Assistant"
             subtitleText="Calai gives your business an intelligent phone assistant that works alongside your team, creating a faster experience for customers while saving you time."

@@ -90,7 +90,7 @@ const PlanCard = ({
         })}
       </div>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-3">
         {role === "BUSINESS_OWNER" && isCurrentPlan ? (
           <button
             disabled
@@ -108,6 +108,22 @@ const PlanCard = ({
             {plan.name?.toLowerCase() === "enterprise"
               ? "Contact Us"
               : plan.buttonText || "Upgrade plan"}
+          </button>
+        )}
+        
+        {plan.name?.toLowerCase() !== "enterprise" && (
+          <button
+            onClick={() => {
+              const contactSection = document.getElementById('contact');
+              if (contactSection) {
+                contactSection.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                window.location.href = '/#contact';
+              }
+            }}
+            className="w-full py-2.5 rounded-lg border border-[#272727] bg-transparent text-sm text-gray-400 hover:text-white hover:bg-[#1A1A1A] transition-all cursor-pointer flex items-center justify-center"
+          >
+            Contact Us
           </button>
         )}
       </div>
