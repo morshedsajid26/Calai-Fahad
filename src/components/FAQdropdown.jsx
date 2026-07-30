@@ -1,11 +1,9 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
 import { FiPlus, FiMinus } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FAQdropdown = ({ question, answer, details, className = "" }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const FAQdropdown = ({ question, answer, details, isOpen, onClick, className = "" }) => {
   return (
     <motion.div 
       variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} 
@@ -17,7 +15,7 @@ const FAQdropdown = ({ question, answer, details, className = "" }) => {
         } ${className}`}
       >
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={onClick}
           className="w-full px-6 py-6 flex items-center justify-between gap-4 text-left cursor-pointer outline-none"
         >
           <h4 className="text-white text-base md:text-lg font-inter font-semibold">
@@ -40,13 +38,13 @@ const FAQdropdown = ({ question, answer, details, className = "" }) => {
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <div className="px-6 pb-6 pt-0">
-                <p className="text-[#99A1AF] font-inter text-sm md:text-base leading-relaxed">
+                <div className="text-[#99A1AF] font-inter text-sm md:text-base leading-relaxed">
                   {answer}
-                </p>
+                </div>
                 {details && (
-                  <p className="text-[#99A1AF] font-inter text-sm md:text-base leading-relaxed mt-4">
+                  <div className="text-[#99A1AF] font-inter text-sm md:text-base leading-relaxed mt-4">
                     {details}
-                  </p>
+                  </div>
                 )}
               </div>
             </motion.div>

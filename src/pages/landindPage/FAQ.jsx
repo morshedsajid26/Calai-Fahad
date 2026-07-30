@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 import { motion } from "framer-motion";
 import Container from "@/components/Container";
@@ -71,20 +71,97 @@ const faqs = [
   },
   {
     question: "How long does setup take?",
-    answer:
-      "Getting started is simple. Provide your restaurant details and menu, and Calai can be prepared for your business without complicated technical setup.",
+    answer: (
+      <div className="flex flex-col gap-4">
+        <p>
+          You can start your free trial and test your AI agent instantly using your Calai dashboard.
+        </p>
+        <p>
+          To connect Calai to your existing business phone number, setup typically takes 3–7 working days, depending on your phone provider.
+        </p>
+        <div>
+          <p className="mb-2">During this time we'll:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Configure your AI assistant</li>
+            <li>Upload your menu and business information</li>
+            <li>Test your AI agent</li>
+            <li>Configure your call routing</li>
+            <li>Liaise with your phone provider where required</li>
+            <li>Ensure everything is working before your business goes live</li>
+          </ul>
+        </div>
+        <p>
+          We'll keep you updated throughout the setup process and let you know as soon as your business is ready to start taking live customer calls.
+        </p>
+      </div>
+    ),
   },
-
   {
     question: "Do I need to sign a long-term contract?",
     answer:
-      "No. Calai is designed to be flexible for restaurants and takeaways. There are no long-term contracts—you can use Calai on a monthly basis and cancel with 30 days’ notice",
+      "No. Calai is designed to be flexible for restaurants and takeaways. There are no long-term contracts—you can use Calai on a monthly basis and cancel with 30 days’ notice.",
     details:
-      "A one-time setup fee applies to cover AI assistant configuration, menu training, call setup, and system preparation. Once your assistant is live, your monthly subscription continues for as long as you choose to use Calai",
+      "A one-time setup fee applies to cover AI assistant configuration, menu training, call setup, and system preparation. Once your assistant is live, your monthly subscription continues for as long as you choose to use Calai.",
+  },
+  {
+    question: "What are AI minutes?",
+    answer:
+      "AI minutes are the time Calai spends speaking with your customers, answering questions, taking orders and assisting callers.",
+  },
+  {
+    question: "What are forwarded minutes?",
+    answer:
+      "Forwarded minutes are used whenever Calai transfers a caller to your restaurant, for example if a customer requests to speak with a member of staff or the AI is unable to complete their request.",
+  },
+  {
+    question: "What happens if I exceed my monthly allowance?",
+    answer:
+      "If you exceed your included AI or forwarded minutes, additional usage will be charged at the standard overage rate. We'll notify you when you're approaching your monthly allowance.",
+  },
+  {
+    question: "Do unused minutes roll over?",
+    answer:
+      "No. Your included AI and forwarded minutes reset at the beginning of each monthly billing cycle.",
+  },
+  {
+    question: "Why do I need a Calai SIM handset?",
+    answer:
+      "If your business only has one business phone number, we'll provide a dedicated Calai SIM handset for a one-time £50 charge. This allows us to connect your existing business number to Calai while keeping your current number for customers.",
+    details:
+      "If your business already has two business phone numbers, no additional SIM handset is required.",
+  },
+  {
+    question: "Is there a setup fee?",
+    answer:
+      "Starter and Growth plans include a one-time £79 onboarding fee, which covers AI configuration, menu setup, testing and deployment.",
+    details: "The Pro plan includes onboarding at no additional cost.",
+  },
+  {
+    question: "Can I upgrade or downgrade my plan?",
+    answer:
+      "Yes. You can change your plan at any time. Any changes will take effect from your next billing cycle.",
+  },
+  {
+    question: "Can Calai answer multiple calls at the same time?",
+    answer:
+      "Yes. Unlike a traditional phone line, Calai can answer multiple customer calls simultaneously, helping you avoid missed orders during busy periods.",
+  },
+  {
+    question: "Can Calai take card payments over the phone?",
+    answer:
+      "No. For your security and your customers' privacy, Calai does not process or store card payment details.",
+    details:
+      "If a customer wishes to pay by card over the phone, Calai will automatically transfer the call to your restaurant so a member of your team can securely take the payment. Cash and card payments made in person at collection or delivery remain unchanged.",
   },
 ];
 
 const FAQ = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const handleToggle = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <section id="faq" className="py-10 bg-black">
       <Container>
@@ -115,6 +192,8 @@ const FAQ = () => {
                 question={faq.question}
                 answer={faq.answer}
                 details={faq.details}
+                isOpen={openIndex === index}
+                onClick={() => handleToggle(index)}
               />
             ))}
           </motion.div>
