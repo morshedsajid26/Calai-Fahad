@@ -156,7 +156,7 @@ export default function Header({ onMenuClick }) {
         </div> */}
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <h3 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white truncate">
-            {role === "BUSINESS_OWNER" ? (businessName || "Welcome") : "Welcome to Calai"}
+            {role === "BUSINESS_OWNER" ? (businessName) : "Welcome to Calai"}
           </h3>
 
           <Image
