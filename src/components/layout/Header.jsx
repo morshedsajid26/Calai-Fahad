@@ -89,6 +89,12 @@ export default function Header({ onMenuClick }) {
       const rawOpen = businessInfoResponse?.data?.openingTime || businessInfoResponse?.data?.opening_time;
       const rawClose = businessInfoResponse?.data?.closingTime || businessInfoResponse?.data?.closing_time;
       
+      const now = new Date();
+      const londonTimeStr = now.toLocaleString('en-US', { timeZone: 'Europe/London' });
+      const londonDate = new Date(londonTimeStr);
+      const currentTimeStr = `${londonDate.getHours().toString().padStart(2, '0')}:${londonDate.getMinutes().toString().padStart(2, '0')}`;
+      const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      
       const open = convertTo24Hour(rawOpen);
       const close = convertTo24Hour(rawClose);
       
@@ -97,8 +103,23 @@ export default function Header({ onMenuClick }) {
         return;
       }
       
-      const now = new Date();
-      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      let offDaysData = businessInfoResponse?.data?.offDays || businessInfoResponse?.data?.off_days;
+      if (typeof offDaysData === "string") {
+        try {
+          offDaysData = JSON.parse(offDaysData);
+        } catch (e) {
+          offDaysData = offDaysData.split(",").map((d) => d.trim());
+        }
+      }
+      const offDaysArray = Array.isArray(offDaysData) ? offDaysData : [];
+      const currentDay = days[londonDate.getDay()];
+      
+      if (offDaysArray.includes(currentDay)) {
+        setAgentStatus('Offline');
+        return;
+      }
+      
+      const currentTime = currentTimeStr;
       
       if (open < close) {
         setAgentStatus((currentTime >= open && currentTime <= close) ? 'Online' : 'Offline');
