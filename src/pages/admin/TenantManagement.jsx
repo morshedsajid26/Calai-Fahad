@@ -103,8 +103,7 @@ const TenantManagement = () => {
     setEditingTenant({
       id: tenant.id,
       name: tenant.name,
-      plan: tenant.plan,
-      business_type: tenant.business_type || "",
+      status: tenant.status?.toLowerCase() || "active",
     });
     setIsEditModalOpen(true);
   };
@@ -115,8 +114,7 @@ const TenantManagement = () => {
         id: editingTenant.id,
         data: {
           name: editingTenant.name,
-          plan: editingTenant.plan,
-          business_type: editingTenant.business_type,
+          status: editingTenant.status,
         },
       });
     }
@@ -141,14 +139,7 @@ const TenantManagement = () => {
     }
   };
 
-  const toggleTenantStatus = (id, currentStatus) => {
-    const isExpired = currentStatus?.toLowerCase() === "expired";
-    if (isExpired) return;
 
-    const newStatus =
-      currentStatus?.toLowerCase() === "active" ? "suspended" : "active";
-    updateMutation.mutate({ id, data: { status: newStatus } });
-  };
 
   const columns = [
     {
@@ -210,10 +201,6 @@ const TenantManagement = () => {
       width: "20%",
       sortable: false,
       render: (row) => {
-        const statusLower = row.status?.toLowerCase();
-        const isActive = statusLower === "active";
-        const isExpired = statusLower === "expired";
-
         return (
           <div className="flex items-center justify-start gap-8">
             <Link to={`/admin/tenant-management/view/${row.id}`}>
@@ -230,25 +217,6 @@ const TenantManagement = () => {
               title="Edit"
             >
               <Icon icon="lucide:square-pen" className="text-lg" />
-            </button>
-
-            <button
-              onClick={() => toggleTenantStatus(row.id, row.status)}
-              disabled={isExpired || updateMutation.isPending}
-              className="w-5 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title={isActive ? "Suspend Tenant" : "Activate Tenant"}
-            >
-              {isActive ? (
-                <Icon
-                  icon="lucide:user-x"
-                  className="text-lg text-[#EA4335] hover:text-[#EA4335]"
-                />
-              ) : (
-                <Icon
-                  icon="lucide:user-check"
-                  className="text-lg text-[#22C55E] hover:text-green-400"
-                />
-              )}
             </button>
             <button
               onClick={() => handleDeleteClick(row.id)}
@@ -316,7 +284,7 @@ const TenantManagement = () => {
 
             <div className="space-y-6">
               <InputField
-                label="Company Name"
+                label="Tenant Name"
                 value={editingTenant?.name || ""}
                 onChange={(e) =>
                   setEditingTenant({ ...editingTenant, name: e.target.value })
@@ -326,31 +294,15 @@ const TenantManagement = () => {
               />
 
               <Dropdown
-                label="Business Type"
-                options={[
-                  { label: "Restaurant", value: "restaurent" },
-                  { label: "Takeaway", value: "take_way" },
-                ]}
-                value={editingTenant?.business_type || "restaurent"}
+                label="Status"
+                options={["active", "suspended", "trial", "expired"]}
+                value={editingTenant?.status || "active"}
                 onSelect={(val) =>
-                  setEditingTenant({ ...editingTenant, business_type: val })
+                  setEditingTenant({ ...editingTenant, status: val })
                 }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
-                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
-              />
-
-              <Dropdown
-                label="Plan"
-                options={["No Plan", "Classic", "Pro"]}
-                value={editingTenant?.plan || "No Plan"}
-                onSelect={(val) =>
-                  setEditingTenant({ ...editingTenant, plan: val })
-                }
-                labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
-                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
+                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm capitalize"
+                optionClass="!bg-white !text-[#111] capitalize"
                 icon="!text-gray-500"
               />
             </div>
@@ -458,23 +410,28 @@ const TenantManagement = () => {
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
+              <Dropdown
+                label="Business Type"
+                options={[
+                  { label: "Restaurant", value: "restaurent" },
+                  { label: "Takeaway", value: "take_way" },
+                ]}
+                value={newTenant.business_type || "restaurent"}
+                onSelect={(val) =>
+                  setNewTenant({ ...newTenant, business_type: val })
+                }
+                labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
+                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
+                optionClass="!bg-white !text-[#111]"
+                icon="!text-gray-500"
+              />
+
               <InputField
                 label="Email"
                 placeholder="Enter email"
                 value={newTenant.email}
                 onChange={(e) =>
                   setNewTenant({ ...newTenant, email: e.target.value })
-                }
-                labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
-                inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-              />
-
-              <Password
-                label="Password"
-                placeholder="Enter password"
-                value={newTenant.password}
-                onChange={(e) =>
-                  setNewTenant({ ...newTenant, password: e.target.value })
                 }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
@@ -491,20 +448,15 @@ const TenantManagement = () => {
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
               />
 
-              <Dropdown
-                label="Business Type"
-                options={[
-                  { label: "Restaurant", value: "restaurent" },
-                  { label: "Takeaway", value: "take_way" },
-                ]}
-                value={newTenant.business_type || "restaurent"}
-                onSelect={(val) =>
-                  setNewTenant({ ...newTenant, business_type: val })
+              <Password
+                label="Password"
+                placeholder="Enter password"
+                value={newTenant.password}
+                onChange={(e) =>
+                  setNewTenant({ ...newTenant, password: e.target.value })
                 }
                 labelClass="!text-gray-200 !text-[13px] !mb-1 !font-medium"
                 inputClass="!bg-[#F5F5F5] !border-none !text-[#111] !rounded-xl !py-3.5 !px-4 !font-medium !text-sm"
-                optionClass="!bg-white !text-[#111]"
-                icon="!text-gray-500"
               />
             </div>
 

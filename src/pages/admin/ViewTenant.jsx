@@ -10,24 +10,41 @@ import {
   Loader2,
   Eye,
   Printer,
+  Trash2,
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import toast from "react-hot-toast";
 import Table from "../../components/Table";
 import Dropdown from "../../components/Dropdown";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const ViewTenant = () => {
   const { id } = useParams();
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState("agents");
   const [modalState, setModalState] = useState({
     isOpen: false,
     type: null,
     data: null,
+  });
+
+  const deleteAgentMutation = useMutation({
+    mutationFn: async (agentId) => {
+      const res = await axiosSecure.delete(`/system-owner/individual-tenant/${id}/agents/${agentId}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["tenantAgents", id]);
+      toast.success("Agent deleted successfully");
+      setModalState({ isOpen: false, type: null, data: null });
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to delete agent");
+    },
   });
 
   const handleActionSelect = (option, row) => {
@@ -342,7 +359,7 @@ const ViewTenant = () => {
     {
       key: "created",
       Title: "Created Date",
-      width: "20%",
+      width: "15%",
       sortable: true,
       render: (row) => (
         <div className="text-left text-gray-200">
@@ -351,6 +368,23 @@ const ViewTenant = () => {
             : row.created_at
               ? new Date(row.created_at).toLocaleDateString("en-GB")
               : "N/A"}
+        </div>
+      ),
+    },
+    {
+      key: "action",
+      Title: "Action",
+      width: "10%",
+      sortable: false,
+      render: (row) => (
+        <div className="flex justify-start">
+          <button
+            onClick={() => handleActionSelect("Delete Agent", row)}
+            className="text-red-500/70 hover:text-red-500 transition-colors p-2 hover:bg-red-500/10 rounded-lg"
+            title="Delete Agent"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       ),
     },
@@ -789,16 +823,44 @@ const ViewTenant = () => {
               </div>
             )}
 
+            {/* Delete Agent Content */}
+            {modalState.type === "Delete Agent" && (
+              <div className="flex flex-col p-8">
+                <p className="text-gray-300 text-[15px] leading-[1.8] whitespace-pre-wrap text-center mb-6">
+                  Are you sure you want to delete the agent <span className="font-bold text-white">{modalState.data?.name}</span>?
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => setModalState({ isOpen: false, type: null, data: null })}
+                    className="px-6 py-2.5 rounded-[10px] text-[14px] font-medium border border-gray-700 text-gray-300 hover:bg-gray-800 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      deleteAgentMutation.mutate(modalState.data.id || modalState.data.vapi_agent_id || modalState.data.vapi_assistant_id);
+                    }}
+                    disabled={deleteAgentMutation.isPending}
+                    className="flex items-center justify-center bg-red-500 hover:bg-red-600 transition-colors text-white px-6 py-2.5 rounded-[10px] text-[14px] font-medium min-w-[100px] cursor-pointer"
+                  >
+                    {deleteAgentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Footer Actions */}
-            <div className="border-t border-[#1A1A1A] px-8 py-5 flex justify-end mt-auto">
-              <button
-                onClick={handleDownload}
-                className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[14px] font-medium cursor-pointer"
-              >
-                <Download className="w-4 h-4" />
-                Download
-              </button>
-            </div>
+            {modalState.type !== "Delete Agent" && (
+              <div className="border-t border-[#1A1A1A] px-8 py-5 flex justify-end mt-auto">
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 bg-[#1A2255] hover:bg-[#232D70] transition-colors text-white px-6 py-2.5 rounded-[10px] text-[14px] font-medium cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
