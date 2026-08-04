@@ -157,11 +157,15 @@ const PrinterManagement = () => {
       link.href = url;
       
       const contentDisposition = res.headers["content-disposition"];
-      let filename = "printer-bridge";
+      let filename = "printer-bridge.zip";
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
         if (filenameMatch && filenameMatch.length === 2) {
-          filename = filenameMatch[1];
+          let extractedFilename = filenameMatch[1];
+          if (!extractedFilename.endsWith('.zip')) {
+            extractedFilename += '.zip';
+          }
+          filename = extractedFilename;
         }
       }
       
