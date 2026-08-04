@@ -2,7 +2,7 @@ import { FiMenu } from "react-icons/fi";
 import { IoNotifications } from "react-icons/io5";
 import Image from "../Image";
 import { FaAngleDown, FaSearch } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { IoIosNotificationsOutline } from "react-icons/io";
@@ -14,6 +14,20 @@ import axios from 'axios';
 
 export default function Header({ onMenuClick }) {
   const [openDropdown, setOpenDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const { logOutUser } = useAuth();
   const role = Cookies.get("role") || "BUSINESS_OWNER";
   const axiosSecure = useAxiosSecure();
@@ -192,7 +206,7 @@ export default function Header({ onMenuClick }) {
           </button> */}
 
           {/* Profile Section */}
-          <div className="relative ml-1 sm:ml-2 shrink-0">
+          <div className="relative ml-1 sm:ml-2 shrink-0" ref={dropdownRef}>
             <div
               className="relative cursor-pointer"
               onClick={() => setOpenDropdown(!openDropdown)}
