@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Trash2, Edit2, X, Loader2, Plus, Printer } from "lucide-react";
+import { Trash2, Edit2, X, Loader2, Plus, Printer, Download } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Table from "../../components/Table";
@@ -20,6 +20,7 @@ const PrinterManagement = () => {
   // Form states
   const [deviceName, setDeviceName] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
+  const [ipAddress, setIpAddress] = useState("");
 
   const { data: printersResponse, isLoading } = useQuery({
     queryKey: ["printers"],
@@ -87,17 +88,19 @@ const PrinterManagement = () => {
     setSelectedPrinter(null);
     setDeviceName("");
     setSerialNumber("");
+    setIpAddress("");
   };
 
   const handleAddSubmit = (e) => {
     e.preventDefault();
-    if (!deviceName || !serialNumber) {
+    if (!deviceName || !serialNumber || !ipAddress) {
       toast.error("Please fill in all fields");
       return;
     }
     addPrinterMutation.mutate({
       device_name: deviceName,
       serial_number: serialNumber,
+      ip_address: ipAddress,
     });
   };
 
@@ -105,18 +108,19 @@ const PrinterManagement = () => {
     setSelectedPrinter(printer);
     setDeviceName(printer.deviceName || printer.device_name || "");
     setSerialNumber(printer.serialNumber || printer.serial_number || "");
+    setIpAddress(printer.ipAddress || printer.ip_address || "");
     setIsEditModalOpen(true);
   };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    if (!deviceName || !serialNumber) {
+    if (!deviceName || !serialNumber || !ipAddress) {
       toast.error("Please fill in all fields");
       return;
     }
     editPrinterMutation.mutate({
       id: selectedPrinter.id,
-      data: { device_name: deviceName, serial_number: serialNumber },
+      data: { device_name: deviceName, serial_number: serialNumber, ip_address: ipAddress },
     });
   };
 
@@ -131,11 +135,52 @@ const PrinterManagement = () => {
     }
   };
 
+  const handleDownloadBridge = async (printer) => {
+    const mac = printer.serialNumber || printer.serial_number;
+    const ip = printer.ipAddress || printer.ip_address;
+
+    if (!mac || !ip) {
+      toast.error("Printer must have a MAC address and IP address to download the bridge.");
+      return;
+    }
+
+    const toastId = toast.loading("Downloading bridge...");
+
+    try {
+      const res = await axiosSecure.get(
+        `/business-owner/printer/download-bridge?mac=${mac}&ip=${ip}`,
+        { responseType: "blob" }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      
+      const contentDisposition = res.headers["content-disposition"];
+      let filename = "printer-bridge";
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch && filenameMatch.length === 2) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Download complete", { id: toastId });
+    } catch (err) {
+      console.error("Download error:", err);
+      toast.error("Failed to download bridge", { id: toastId });
+    }
+  };
+
   const columns = [
     {
       key: "deviceName",
       Title: "Device Name",
-      width: "25%",
+      width: "20%",
       render: (row) => (
         <div className="text-left text-gray-200 font-medium">
           {row.deviceName || row.device_name || "N/A"}
@@ -145,7 +190,7 @@ const PrinterManagement = () => {
     {
       key: "serialNumber",
       Title: "MAC Address",
-      width: "25%",
+      width: "20%",
       render: (row) => (
         <div className="text-left text-gray-400 font-mono text-sm">
           {row.serialNumber || row.serial_number || "N/A"}
@@ -153,9 +198,19 @@ const PrinterManagement = () => {
       ),
     },
     {
+      key: "ipAddress",
+      Title: "IP Address",
+      width: "15%",
+      render: (row) => (
+        <div className="text-left text-gray-400 font-mono text-sm">
+          {row.ipAddress || row.ip_address || "N/A"}
+        </div>
+      ),
+    },
+    {
       key: "status",
       Title: "Status",
-      width: "15%",
+      width: "10%",
       render: (row) => (
         <div className="text-left">
           <span
@@ -169,7 +224,7 @@ const PrinterManagement = () => {
     {
       key: "lastSeen",
       Title: "Last Seen",
-      width: "20%",
+      width: "15%",
       render: (row) => (
         <div className="text-left text-gray-400 text-sm">
           {row.lastSeen
@@ -181,21 +236,40 @@ const PrinterManagement = () => {
     {
       key: "action",
       Title: "Action",
-      width: "15%",
+      width: "10%",
       sortable: false,
       render: (row) => (
         <div className="flex justify-start gap-2">
           <button
             onClick={() => handleEditClick(row)}
             className="text-blue-400 hover:text-blue-300 transition-colors p-2 hover:bg-blue-500/10 rounded-lg"
+            title="Edit Printer"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleDeleteClick(row)}
             className="text-red-500/70 hover:text-red-500 transition-colors p-2 hover:bg-red-500/10 rounded-lg"
+            title="Delete Printer"
           >
             <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
+    {
+      key: "download",
+      Title: "",
+      width: "10%",
+      sortable: false,
+      render: (row) => (
+        <div className="flex justify-center">
+          <button
+            onClick={() => handleDownloadBridge(row)}
+            className="flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors px-3 py-2 hover:bg-green-500/10 rounded-lg text-sm font-medium"
+            title="Download Bridge"
+          >
+            <Download className="w-4 h-4" />
           </button>
         </div>
       ),
@@ -286,6 +360,15 @@ const PrinterManagement = () => {
                 labelClass="!text-sm !font-medium !text-gray-300"
                 inputClass="!w-full !bg-[#1A1A1A] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-white !placeholder-gray-500 focus:!outline-none focus:!border-[#2563EB] !transition-colors !text-sm !font-mono"
               />
+              <InputField
+                label="IP Address"
+                type="text"
+                placeholder="e.g. 192.168.1.100"
+                value={ipAddress}
+                onChange={(e) => setIpAddress(e.target.value)}
+                labelClass="!text-sm !font-medium !text-gray-300"
+                inputClass="!w-full !bg-[#1A1A1A] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-white !placeholder-gray-500 focus:!outline-none focus:!border-[#2563EB] !transition-colors !text-sm !font-mono"
+              />
               <div className="pt-4 flex justify-end gap-3">
                 <button
                   type="button"
@@ -342,6 +425,15 @@ const PrinterManagement = () => {
                 type="text"
                 value={serialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
+                labelClass="!text-sm !font-medium !text-gray-300"
+                inputClass="!w-full !bg-[#1A1A1A] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-white !placeholder-gray-500 focus:!outline-none focus:!border-[#2563EB] !transition-colors !text-sm !font-mono"
+              />
+              <InputField
+                label="IP Address"
+                type="text"
+                placeholder="e.g. 192.168.1.100"
+                value={ipAddress}
+                onChange={(e) => setIpAddress(e.target.value)}
                 labelClass="!text-sm !font-medium !text-gray-300"
                 inputClass="!w-full !bg-[#1A1A1A] !border !border-gray-800 !rounded-xl !px-4 !py-3 !text-white !placeholder-gray-500 focus:!outline-none focus:!border-[#2563EB] !transition-colors !text-sm !font-mono"
               />
