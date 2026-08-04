@@ -10,29 +10,20 @@ const LiveOrderPopup = () => {
   const { user } = useAuth();
   const audioRef = useRef(null);
 
-  // Play a notification sound for 6 seconds when an order arrives
+  // Play a notification sound continuously until acknowledged
   useEffect(() => {
-    let timer;
     if (incomingOrder) {
       try {
         const audio = new Audio('/notification.wav');
         audio.loop = true; // Loop the sound
         audioRef.current = audio;
         audio.play().catch(e => console.log("Audio play blocked by browser", e));
-        
-        // Stop after 6 seconds
-        timer = setTimeout(() => {
-          audio.pause();
-          audio.currentTime = 0;
-        }, 6000);
       } catch (e) {
         toast.error("Audio error:", e);
       }
     }
-
     
     return () => {
-      if (timer) clearTimeout(timer);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
