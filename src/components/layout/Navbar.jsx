@@ -7,12 +7,10 @@ import Image from "../Image";
 import logo from "/logo.png";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../../hooks/useAuth";
-import Cookies from "js-cookie";
 
 const navitems = [
   { name: "Home", href: "home" },
   { name: "How it works", href: "how-it-works" },
-  { name: "Demo", href: "demo" },
   { name: "Pricing", href: "pricing" },
   { name: "FAQ", href: "faq" },
   { name: "Contact Us", href: "contact" },

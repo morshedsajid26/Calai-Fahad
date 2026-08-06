@@ -23,11 +23,11 @@ const CustomerCalls = () => {
           </p>
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Link to="/onboarding">
+           
               <button className="bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-base px-10 py-3  border border-[#0F42FF] ">
                 Start Free Trial
               </button>
-            </Link>
+         
           </motion.div>
         </motion.div>
       </Container>
