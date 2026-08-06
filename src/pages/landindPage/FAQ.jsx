@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiChevronDown } from "react-icons/fi";
 import Container from "@/components/Container";
 import FAQdropdown from "@/components/FAQdropdown";
 import Header from "@/components/Header";
@@ -157,9 +158,14 @@ const faqs = [
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(12);
 
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 11);
   };
 
   return (
@@ -171,32 +177,73 @@ const FAQ = () => {
             subtitleText="Everything you need to know about Calai"
           />
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, margin: "-50px" }}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.15,
-                },
-              },
-            }}
-            className="mt-8 w-full flex flex-col gap-2"
-          >
-            {faqs.map((faq, index) => (
-              <FAQdropdown
-                key={index}
-                question={faq.question}
-                answer={faq.answer}
-                details={faq.details}
-                isOpen={openIndex === index}
-                onClick={() => handleToggle(index)}
-              />
-            ))}
-          </motion.div>
+          <div className="mt-8 w-full flex flex-col gap-2">
+            {Array.from({ length: visibleCount <= 12 ? 1 : Math.ceil((visibleCount - 12) / 11) + 1 }).map((_, chunkIndex) => {
+              const startIndex = chunkIndex === 0 ? 0 : 12 + (chunkIndex - 1) * 11;
+              const endIndex = chunkIndex === 0 ? 12 : 12 + chunkIndex * 11;
+              
+              return (
+                <motion.div
+                  key={chunkIndex}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-50px" }}
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: { staggerChildren: 0.15 },
+                    },
+                  }}
+                  className="w-full flex flex-col gap-2"
+                >
+                  {faqs.slice(startIndex, Math.min(endIndex, visibleCount)).map((faq, i) => {
+                    const actualIndex = startIndex + i;
+                    return (
+                      <FAQdropdown
+                        key={actualIndex}
+                        question={faq.question}
+                        answer={faq.answer}
+                        details={faq.details}
+                        isOpen={openIndex === actualIndex}
+                        onClick={() => handleToggle(actualIndex)}
+                      />
+                    );
+                  })}
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {visibleCount < faqs.length ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 flex justify-center"
+            >
+              <button
+                onClick={handleLoadMore}
+                className="flex items-center gap-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-sm md:text-base px-8 py-3 border border-[#0F42FF] hover:scale-105 transition-transform"
+              >
+                Load More Questions ({faqs.length - visibleCount} More)
+                <FiChevronDown className="w-5 h-5" />
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 flex justify-center"
+            >
+              <button
+                onClick={() => setVisibleCount(12)}
+                className="flex items-center gap-2 bg-linear-to-t from-[#00135B] via-[#02060F] to-[#00104E] rounded-full text-white font-bold text-sm md:text-base px-8 py-3 border border-[#0F42FF] hover:scale-105 transition-transform"
+              >
+                Show Less
+                <FiChevronDown className="w-5 h-5 rotate-180" />
+              </button>
+            </motion.div>
+          )}
         </div>
       </Container>
     </section>
