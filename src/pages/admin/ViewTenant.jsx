@@ -160,18 +160,7 @@ const ViewTenant = () => {
     }
   };
 
-  const [monthOptions] = useState(() => {
-    const months = [];
-    for (let i = 0; i < 12; i++) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
-      months.push(
-        d.toLocaleString("default", { month: "short", year: "numeric" }),
-      );
-    }
-    return months;
-  });
-  const [selectedMonth, setSelectedMonth] = useState(monthOptions[0]);
+
 
   const {
     data: tenantResponse,
@@ -594,16 +583,6 @@ const ViewTenant = () => {
                 Track monthly minute usage
               </p>
             </div>
-            <div className="w-[140px]">
-              <Dropdown
-                options={monthOptions}
-                value={selectedMonth}
-                onSelect={(val) => setSelectedMonth(val)}
-                inputClass="!bg-[#111111] !border !border-gray-800 !text-gray-300 !rounded-lg !py-2 !px-3 !font-medium !text-sm !cursor-pointer hover:!border-gray-700 transition-colors"
-                optionClass="!bg-[#111111] !text-gray-300 !border !border-gray-800 !rounded-lg !shadow-xl !mt-1"
-                icon="!text-gray-400 !right-2"
-              />
-            </div>
           </div>
 
           <div className="flex-1 bg-[#111111] rounded-xl border border-gray-800/50 mt-4 relative flex items-center justify-center py-10 min-h-[280px]">
@@ -827,23 +806,37 @@ const ViewTenant = () => {
             {modalState.type === "Delete Agent" && (
               <div className="flex flex-col p-8">
                 <p className="text-gray-300 text-[15px] leading-[1.8] whitespace-pre-wrap text-center mb-6">
-                  Are you sure you want to delete the agent <span className="font-bold text-white">{modalState.data?.name}</span>?
+                  Are you sure you want to delete the agent{" "}
+                  <span className="font-bold text-white">
+                    {modalState.data?.name}
+                  </span>
+                  ?
                 </p>
                 <div className="flex justify-center gap-4">
                   <button
-                    onClick={() => setModalState({ isOpen: false, type: null, data: null })}
+                    onClick={() =>
+                      setModalState({ isOpen: false, type: null, data: null })
+                    }
                     className="px-6 py-2.5 rounded-[10px] text-[14px] font-medium border border-gray-700 text-gray-300 hover:bg-gray-800 transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => {
-                      deleteAgentMutation.mutate(modalState.data.id || modalState.data.vapi_agent_id || modalState.data.vapi_assistant_id);
+                      deleteAgentMutation.mutate(
+                        modalState.data.id ||
+                          modalState.data.vapi_agent_id ||
+                          modalState.data.vapi_assistant_id,
+                      );
                     }}
                     disabled={deleteAgentMutation.isPending}
                     className="flex items-center justify-center bg-red-500 hover:bg-red-600 transition-colors text-white px-6 py-2.5 rounded-[10px] text-[14px] font-medium min-w-[100px] cursor-pointer"
                   >
-                    {deleteAgentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
+                    {deleteAgentMutation.isPending ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Delete"
+                    )}
                   </button>
                 </div>
               </div>
