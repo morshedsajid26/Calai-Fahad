@@ -34,7 +34,7 @@ const ViewTenant = () => {
 
   const deleteAgentMutation = useMutation({
     mutationFn: async (agentId) => {
-      const res = await axiosSecure.delete(`/system-owner/individual-tenant/${id}/agents/${agentId}`);
+      const res = await axiosSecure.delete(`/system-owner/agent/${agentId}`);
       return res.data;
     },
     onSuccess: () => {
