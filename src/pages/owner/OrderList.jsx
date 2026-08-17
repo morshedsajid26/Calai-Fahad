@@ -47,7 +47,7 @@ const OrderList = () => {
     try {
       const toastId = toast.loading("Downloading receipt...");
       const res = await axiosSecure.get(
-        `/business-owner/order/download/${selectedOrder.id}`,
+        `/business-owner/order/download-receipt/${selectedOrder.id}`,
         {
           responseType: "text",
         },
@@ -62,7 +62,7 @@ const OrderList = () => {
       toast.success("Download complete", { id: toastId });
     } catch (err) {
       console.error(err);
-      toast.error("Failed to download receipt");
+      toast.error("Failed to download receipt. Please connect your printer.");
     }
   };
 
@@ -105,7 +105,7 @@ const OrderList = () => {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to prepare print");
+      toast.error("Failed to prepare print. Please connect your printer.");
     }
   };
 
